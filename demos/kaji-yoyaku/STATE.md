@@ -1,27 +1,26 @@
 # STATE（上書き式・5KB以内）
 
-引き継ぎはこの1枚（dev-flow の handoff.md は作らず、ここで兼ねる）。計画は `PLAN.md`、決定は `docs/decisions.md`、中核 JS の仕様は `docs/spec-core.md`、デザインの控えは `notes/design-notes.md`。
+引き継ぎはこの1枚。計画は `PLAN.md`（承認済みの全文は `~/.claude/plans/iridescent-mapping-platypus.md`）、決定は `docs/decisions.md`、仕様は `docs/spec-site.md`。
 
-## 済み（commit 済み、最新 f015951）
-- 写真（assets/。風景5枚＋スタッフ3枚、Pexels。一覧 notes/photos.md）
-- CSS 基盤（css/tokens.css・base.css・styleguide.html、部品一覧 notes/css.md）。黄土色は残す
-- 中核 JS と単体テスト164件（全合格、再レビューの指摘まで対応済み）
-- 予約フロー4手順（booking.html・js/ui.js・js/booking.js・css/pages.css）。担当と日時は写真つきで1画面
+## 済み（最新 commit は下の commit を参照）
+- 立て直しの前の状態を 78b0858 に記録（自作の予約・管理画面、共通 CSS の直し：最小文字16px・上部の1行・誤りの赤枠）
+- 予約システムの調査 notes/booking-systems.md（第一候補 Square 予約プラス）
+- 新しい仕様 docs/spec-site.md、PLAN.md の書き直し
 
 ## 今動いている物
-- トップ（index.html・js/top.js・css/top.css）
-- 管理画面（admin.html・js/admin.js・css/admin.css）
+- Square 予約の確認と設定手順書（notes/square-check.md・square-setup.md）
 
 ## 停止点
-- 次：両方の画面を目で確認 → commit → 予約画面の小さな直し（「どなたでも」の円の中の文字「指名なし」と下の名前が重複）→ 批評ループ2回（390・1440、他サイトとの見分け）→ README → 検証（PLAN の検証方法）
-- 戻し方：基準 commit `366199c`（作業前）
-- 控え：`notes/`
+- 次：e2e の試験を先に（tests/e2e/site.spec.mjs）→ 実装 a（入口：ui.js・pages.css・index・top・staff）→ b（ほか5ページ）と c（自作エンジンの削除）を並列 → 批評ループ → レビュー2本 → README → 送る文面
+- 利用者の操作待ち：Square のアカウント作成と店の登録（手順書ができ次第）
+- 戻し方：作業前 `366199c`、立て直し前 `78b0858`
 
 ## 触らない物
 - ポートフォリオ本体：ルートの `index.html`・`src/`・`vite.config.ts`・ルートの `package.json`・`tsconfig*`
 
 ## 書込みの所有
-- index.html・top.js・top.css＝トップ担当、admin.html・admin.js・admin.css＝管理画面担当。ほかのファイルは親（変更は次の子に割り当て）
+- notes/square-*.md＝Square の確認担当。ほかは親（子に割り当てる時に書く）
 
 ## 判断待ち
-- push（承認が別に要る）。Cloudflare Pages・Stripe は利用者の操作
+- 決済のテストができない時の見せ方（Square の確認の結果しだい）
+- push・Cloudflare Pages の公開・クライアントへの送信（それぞれ承認が要る）
