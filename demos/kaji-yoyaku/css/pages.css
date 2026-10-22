@@ -1,28 +1,28 @@
 /*
- * pages.css — ページ固有のレイアウト（tokens.css・base.css の後に読む）
- * 節ごとに区切る。トップ・管理画面の節は後から足す。
+ * pages.css — 全ページ共通の組み（tokens.css・base.css の後に読む）
+ * ui.js の mountChrome が組むヘッダー・メニュー・フッター、デモ帯、予約ボタンの注記。
  */
 
 /* ==========================================================
- * 共通（ui.js が作る部品の、ページをまたぐ調整）
+ * ヘッダー：上部の1行（店名と文字サイズ切替）＋メニュー
  * ========================================================== */
+.chrome { position: relative; z-index: 20; background: var(--paper); border-bottom: 1px solid var(--line); }
 
-/* デモ注記帯は「大きく」でも 390px で1行に収める（帯は本文ではないので 16px で止める） */
-.demo-band { font-size: min(var(--fs-small), 1rem); letter-spacing: 0; }
-
-/* ページ上部の1行：店名と文字サイズ切替（固定ヘッダーの外） */
-.topline { border-bottom: 1px solid var(--line); background: var(--paper); }
+.topline { background: var(--paper); }
 .topline__inner {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-2) var(--space-4);
-  max-width: var(--flow-max);
+  max-width: var(--page-max);
   margin-inline: auto;
   padding: var(--space-2) var(--gutter);
 }
 .topline__shop {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;                 /* 押せる高さ 44px */
   font-family: var(--font-heading);
   font-weight: var(--weight-heading);
   font-size: var(--fs-small);
@@ -30,294 +30,143 @@
   color: var(--sugi);
   text-decoration: none;
 }
-.topline__shop { display: inline-flex; align-items: center; min-height: 2.75rem; }  /* 押せる高さ 44px */
 .topline__shop:hover { text-decoration: underline; text-underline-offset: 0.3em; }
-/* 420px 未満：店名と切替を1段に。「文字の大きさ」の字は見た目から消し、読み上げには残す（radiogroup の名前） */
+
+/* 文字サイズ切替：押している方を杉緑で塗る（aria-pressed） */
+.scale-switch__option[aria-pressed="true"] { background: var(--sugi); color: var(--paper); }
+
+/* メニューを開くボタン（スマホだけ）。線3本は CSS で描く */
+.gnav__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 2.75rem;
+  color: var(--sugi);
+  font-size: var(--fs-small);
+  font-weight: 700;
+}
+.gnav__icon, .gnav__icon::before, .gnav__icon::after {
+  display: block;
+  width: 1.25rem;
+  height: 2px;
+  border-radius: 1px;
+  background: currentColor;
+  transition: transform var(--dur-quick) var(--ease-out), opacity var(--dur-quick) var(--ease-out);
+}
+.gnav__icon { position: relative; }
+.gnav__icon::before, .gnav__icon::after { content: ""; position: absolute; left: 0; }
+.gnav__icon::before { top: -6px; }
+.gnav__icon::after { top: 6px; }
+.gnav__toggle[aria-expanded="true"] .gnav__icon { background: transparent; }
+.gnav__toggle[aria-expanded="true"] .gnav__icon::before { transform: translateY(6px) rotate(45deg); }
+.gnav__toggle[aria-expanded="true"] .gnav__icon::after { transform: translateY(-6px) rotate(-45deg); }
+
+.gnav__inner { max-width: var(--page-max); margin-inline: auto; padding-inline: var(--gutter); }
+.gnav__list a {
+  display: flex;
+  align-items: center;
+  min-height: 3rem;
+  color: var(--ink);
+  font-size: var(--fs-ui);
+  font-weight: var(--weight-medium);
+  text-decoration: none;
+}
+.gnav__list a:hover { color: var(--sugi); text-decoration: underline; text-underline-offset: 0.3em; }
+.gnav__list [aria-current="page"] { color: var(--sugi); font-weight: 700; }
+
+/* スマホ：店名と切替の1行の下に「メニュー」。開くと縦の一覧が下に出る */
+@media (max-width: 959px) {
+  .topline__inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: "shop scale" "menu menu";
+    gap: 0 var(--space-2);
+    padding-block: var(--space-1) 0;
+  }
+  .topline__shop { grid-area: shop; }
+  .topline__scale { grid-area: scale; }
+  .gnav__toggle {
+    grid-area: menu;
+    justify-content: space-between;
+    flex-direction: row-reverse;
+    margin-inline: calc(var(--gutter) * -1);
+    padding-inline: var(--gutter);
+    border-top: 1px solid var(--line);
+  }
+  .chrome:has(.gnav__toggle[aria-expanded="false"]) .gnav { display: none; }
+  .gnav { border-top: 1px solid var(--line); background: var(--mist); }
+  .gnav__list { padding-block: var(--space-2) var(--space-4); }
+  .gnav__list li + li { border-top: 1px solid var(--line); }
+  .gnav__list a { min-height: 3.25rem; }
+  .gnav__list [aria-current="page"]::before { content: ""; width: 4px; align-self: stretch; margin-block: var(--space-3); margin-inline-end: var(--space-3); border-radius: 2px; background: var(--ochre); }
+}
+/* 420px 未満：店名と切替を1段に。「文字の大きさ」の字は見た目から消し、読み上げには残す（group の名前） */
 @media (max-width: 419px) {
-  .topline__inner { flex-wrap: nowrap; gap: var(--space-2); padding-block: var(--space-1); }
-  .topline__shop { flex: 1 1 auto; min-width: 0; font-size: min(var(--fs-small), 1rem); letter-spacing: 0; line-height: 1.3; word-break: auto-phrase; }
-  .topline .scale-switch { flex: 0 0 auto; }
+  .topline__shop { min-width: 0; font-size: min(var(--fs-small), 1rem); letter-spacing: 0; line-height: 1.3; word-break: auto-phrase; }
   .topline .scale-switch > span:first-child {
     position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap;
   }
   .topline .scale-switch__option { min-width: 0; min-height: 2.75rem; padding-inline: var(--space-3); }
 }
+/* PC：上部の1行の下に、メニューを横1列 */
+@media (min-width: 960px) {
+  .gnav__toggle { display: none; }
+  .gnav { border-top: 1px solid var(--line); }
+  .gnav__list { display: flex; flex-wrap: wrap; column-gap: var(--space-6); }
+  .gnav__list a { min-height: 3.25rem; font-size: var(--fs-small); border-block: 3px solid transparent; }
+  .gnav__list [aria-current="page"] { border-bottom-color: var(--ochre); }
+}
 
 /* ==========================================================
- * 予約フロー（booking.html）
+ * ページの先頭（h1 の段）。トップ以外のページで使う
  * ========================================================== */
+.page-head { padding-block: var(--space-6) var(--space-5); }
+.page-head h1 { font-size: clamp(1.75rem, 1.2rem + 2vw, 2.5rem); }
+html[data-font-scale="large"] .page-head h1 { font-size: clamp(2rem, 1.4rem + 2vw, 2.75rem); }
+.page-head__lead { margin-block-start: var(--space-3); word-break: auto-phrase; }
+.page-head .note { margin-block-start: var(--space-2); }
+@media (min-width: 960px) { .page-head { padding-block: var(--space-7) var(--space-6); } }
 
-.booking { padding-block: var(--space-4) var(--space-7); }
-.booking > [data-step] { min-width: 0; }
-.booking__title { margin-block: var(--space-5) var(--space-3); }
-.carry + .booking__title { margin-block-start: var(--space-3); }
-[data-step="2"] .booking__title { margin-block-start: var(--space-2); }
-.booking__lead { margin-block-end: var(--space-5); }
-.booking__aside { margin-block-start: var(--space-4); }
-.booking__actions { display: grid; gap: var(--space-3); justify-items: center; margin-block-start: var(--space-6); }
-.booking__actions--pair { margin-block-start: var(--space-5); }
-.booking__error { margin-block-start: var(--space-4); }
+/* ==========================================================
+ * 予約ボタンの注記・未確認の印
+ * ========================================================== */
+.booking-note { font-size: var(--fs-small); line-height: 1.6; color: var(--mute); word-break: auto-phrase; }
 
-/* 手順3の小見出し（日にち・開始時刻）。操作の見出しなのでゴシック */
-.booking__sub {
-  margin-block: var(--space-5) var(--space-2);
-  font-family: var(--font-heading);
-  font-size: var(--fs-ui);
-  font-weight: var(--weight-heading);
-  color: var(--ink);
-  letter-spacing: 0;
-}
-/* 日にちの見出しの行：右に「前の日へ」「次の日へ」（PC のマウスでも先の日へ動ける） */
-.booking__subrow { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); margin-block: var(--space-2) 0; }
-.booking__subrow .booking__sub { margin: 0; }
-.daynav { display: flex; gap: var(--space-2); }
-.daynav__btn {
-  min-height: 2.75rem;                 /* 44px */
-  padding-inline: var(--space-3);
-  border: var(--border) solid var(--line-strong);
+/* 未確認の事実は断定しない：黄土の枠で「本制作時に確認」と分かるように */
+.tbd {
+  display: inline-block;
+  margin-inline-start: var(--space-2);
+  padding: 0 var(--space-2);
+  border: 1px solid var(--ochre);
   border-radius: var(--radius-control);
   background: var(--paper);
-  color: var(--sugi);
+  color: var(--ochre-text);
   font-size: var(--fs-small);
   font-weight: 700;
-  white-space: nowrap;
-}
-.daynav__btn:hover { border-color: var(--sugi); }
-.daynav__btn[aria-disabled="true"] { color: var(--mute); border-color: var(--line); cursor: default; }
-.booking__dayinfo {
-  margin-block-end: var(--space-3);
-  padding: var(--space-3) var(--space-4);
-  background: var(--mist);
-  border-radius: var(--radius-control);
-  font-size: var(--fs-ui);
-  line-height: var(--lh-ui);
-}
-
-/* ---- 手順1 利用時間 ---- */
-.choice--hours { flex-wrap: nowrap; padding-block: var(--space-4); }
-.choice--hours .choice__body { flex: 1 1 auto; }
-.choice--hours .choice__desc { word-break: auto-phrase; }
-.choice--hours[aria-checked="true"] { padding-block: calc(var(--space-4) - 1px); }
-.choice--hours .choice__title .figure { font-size: 1.5rem; color: var(--ink); }
-[data-step="1"] .dock { margin-block-start: var(--space-4); }
-
-/* ---- 手順2 担当と日時（1画面） ---- */
-.booking__title--tight { margin-block-end: var(--space-2); }
-
-/* 担当：横1列のタイル4つ。390px で横スクロールなし。選択中は黄土の線 */
-.staffpick {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: var(--space-2);
-  margin-block: var(--space-1);
-}
-.staffpick__tile {
-  display: grid;
-  justify-items: center;
-  align-content: start;
-  gap: var(--space-1);
-  min-width: 0;
-  min-height: var(--tap);
-  padding: var(--space-2) 0 var(--space-1);
-  border: var(--border) solid transparent;
-  border-radius: var(--radius-control);
-  transition: border-color var(--dur-quick) var(--ease-out), background-color var(--dur-quick) var(--ease-out);
-}
-.staffpick__tile:hover { background: var(--mist); }
-.staffpick__tile[aria-checked="true"] {
-  border: var(--border-strong) solid var(--ochre);
-  padding: calc(var(--space-2) - 1px) 0 calc(var(--space-1) - 1px);
-  background: var(--paper);
-}
-.staffpick__photo {
-  position: relative;
-  display: grid;
-  place-items: center;
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  overflow: hidden;
-  background: var(--sugi);
-  color: var(--paper);
-  font-family: var(--font-heading);
-  font-weight: var(--weight-heading);
-  font-size: 1.625rem;
-  line-height: 1;
-}
-.staffpick__photo--any svg { width: 40px; height: 28px; margin-block-start: 6px; }
-.staffpick__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.staffpick__name {
-  max-width: 100%;
-  font-size: min(var(--fs-small), 1rem);
-  font-weight: 700;
-  line-height: 1.3;
-  letter-spacing: 0;
-  white-space: nowrap;
-}
-.staffpick__tile[aria-checked="true"] .staffpick__name { color: var(--ochre-text); }
-
-/* 選んだ担当の紹介：タイルの直下に1つだけ。行の形（上下の罫のみ、箱・影なし） */
-.staffintro {
-  padding-block: var(--space-1);
-  border-block: 1px solid var(--line);
-  font-size: var(--fs-small);
   line-height: 1.7;
-}
-.staffintro p { max-width: none; }
-.staffintro__name {
-  margin-inline-end: var(--space-3);
-  font-family: var(--font-heading);
-  font-weight: var(--weight-heading);
-  font-size: var(--fs-ui);
-  letter-spacing: 0;
-  color: var(--sugi);
-}
-.staffintro__photonote { font-family: var(--font-ui); font-weight: 400; font-size: var(--fs-small); letter-spacing: 0; color: var(--mute); }
-.staffintro__meta { color: var(--ink); word-break: auto-phrase; }
-.staffintro__text { word-break: auto-phrase; }
-.staffintro__last { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0 var(--space-3); }
-
-/* 担当を替えた時、日付と時刻の ○× が短く切り替わる */
-.schedule.is-swapping :is(.datestrip, .slots, .booking__dayinfo) { animation: swap-in 200ms var(--ease-out); }
-@keyframes swap-in { from { opacity: 0.3; transform: translateY(6px); } }
-
-
-/* 下部の固定の主ボタン（デモ帯のすぐ上）。時刻を選ぶまで aria-disabled */
-.dock {
-  position: sticky;
-  bottom: var(--band-h);
-  z-index: 10;
-  display: grid;
-  gap: var(--space-2);
-  margin: var(--space-5) calc(var(--gutter) * -1) 0;
-  padding: var(--space-2) var(--gutter) var(--space-3);
-  background: var(--paper);
-  border-top: 1px solid var(--line);
-}
-.dock__picked { font-size: var(--fs-small); font-weight: 700; color: var(--ink); text-align: center; word-break: auto-phrase; }
-.dock:has(> .dock__hint:not([hidden])) { padding-block: var(--space-2); }  /* 案内だけの間は低く */
-.dock__hint { padding-block: 0; font-size: var(--fs-ui); font-weight: 700; color: var(--sugi); text-align: center; word-break: auto-phrase; }
-/* 手順2の日にちの札：「10/23」の下に曜日と ○× を横に並べ、高さを詰める */
-[data-step="2"] .day { grid-template-columns: auto auto; align-items: center; column-gap: var(--space-2); row-gap: 2px; padding-block: var(--space-1) var(--space-2); }
-[data-step="2"] .day[aria-checked="true"] { padding-block: calc(var(--space-1) - 1px) calc(var(--space-2) - 1px); }
-[data-step="2"] .day__num { grid-column: 1 / -1; }
-[data-step="2"] .day .mark { --mark: 1.75rem; margin: 0; }
-[data-step="2"] .datestrip { padding-block: var(--space-1) var(--space-2); }
-[data-step="2"] #h-2-slot { margin-block: var(--space-2); }
-.slots .slot { scroll-margin-block: 8rem 10rem; }  /* 矢印キーで移った行が、上下の固定欄に隠れないように */
-
-/* ---- 手順2 ○×：選んだ時刻の行に終わりの時刻を出す ---- */
-.slot[aria-checked="true"]:hover { border-color: var(--ochre); }   /* 押した後のホバーで黄土の線が消えないように */
-.slot__until { display: none; font-size: var(--fs-small); color: var(--ochre-text); font-weight: 700; white-space: nowrap; }
-.slot[aria-checked="true"] .slot__until { display: inline; margin-inline-start: auto; }
-.slot[aria-checked="true"] .slot__staff + .slot__until { margin-inline-start: var(--space-3); }
-
-/* ---- 手順3 お客様情報 ---- */
-.booking__form { margin-block-start: var(--space-4); }
-.booking__form .switch > span:first-child { word-break: auto-phrase; }
-.booking__switchend { display: inline-flex; align-items: center; gap: var(--space-3); }
-.booking__proxynote { margin-block-start: var(--space-3); }
-.booking__group { margin-block-start: var(--space-6); }
-.booking__legend {
-  display: block;
-  width: 100%;
-  margin-block-end: var(--space-4);
-  padding-block-end: var(--space-2);
-  border-bottom: 1px solid var(--line);
-  font-family: var(--font-heading);
-  font-weight: var(--weight-heading);
-  font-size: var(--fs-lead);
-  color: var(--sugi);
-  letter-spacing: 0;
-}
-.booking__group + .field { margin-block-start: var(--space-2); }
-.booking__sample { margin-block-start: var(--space-2); font-size: var(--fs-small); }
-
-/* ---- 手順4 確認：文章で読み上げる形 ---- */
-.readout {
-  margin-block: var(--space-5);
-  padding-inline-start: var(--space-4);
-  border-inline-start: var(--border-strong) solid var(--sugi);
-  font-size: var(--fs-lead);
-  line-height: 1.85;
-  word-break: auto-phrase;
-}
-.readout > p + p { margin-block-start: var(--space-3); }
-.readout b { color: var(--sugi); }
-.readout .note { font-size: var(--fs-small); }
-.readout__tax { display: block; font-size: var(--fs-small); line-height: 1.7; color: var(--mute); }
-.readout__price .figure { font-size: var(--fs-figure); }
-.booking__edit { display: flex; flex-wrap: wrap; column-gap: var(--space-5); }
-.booking__paynote {
-  margin-block-start: var(--space-4);
-  padding: var(--space-4);
-  background: var(--mist);
-  border-radius: var(--radius-control);
-  font-size: var(--fs-ui);
-  line-height: 1.8;
-}
-.booking__paynote > * + * { margin-block-start: var(--space-3); }
-/* お金と期限の注意は本文と同じ大きさ・色（読み落とすと困る） */
-.booking__deadline { font-size: var(--fs-body); color: var(--ink); font-weight: 700; }
-.booking__policy .link { margin-inline-start: var(--space-2); }
-
-/* ---- 予約の要約（完了・中断の画面） ---- */
-.summary { margin-block: var(--space-4); border-top: var(--border) solid var(--ink); }
-.summary > div {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  column-gap: var(--space-4);
-  padding-block: var(--space-3);
-  border-bottom: 1px solid var(--line);
-}
-.summary dt { flex: 0 0 5em; font-size: var(--fs-small); color: var(--mute); }
-.summary dd { flex: 1 1 12em; word-break: auto-phrase; font-size: var(--fs-ui); line-height: var(--lh-ui); }
-.summary__id { font-weight: 700; font-size: 1.25em; letter-spacing: 0.08em; font-variant-numeric: tabular-nums; }
-
-/* ---- テスト決済（Stripe 未接続の時の代わりの画面） ---- */
-.testpay__lead { margin-block-end: var(--space-5); }
-.testpay__card {
-  margin-block-end: var(--space-4);
-  padding: var(--space-5);
-  border: var(--border) dashed var(--line-strong);
-  border-radius: var(--radius-surface);
-}
-.testpay__amount { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: var(--space-2); padding-block-end: var(--space-3); border-bottom: 1px solid var(--line); }
-.testpay__amount .figure { font-size: 2.25rem; }
-.testpay__row { display: grid; padding-block: var(--space-3) 0; line-height: var(--lh-ui); }
-.testpay__label { font-size: var(--fs-small); color: var(--mute); }
-.testpay__demo { margin-block-start: var(--space-5); }
-
-/* ---- 完了 ---- */
-.done__title { margin-block: var(--space-6) var(--space-4); }
-.done__id { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-2) var(--space-3); font-size: var(--fs-ui); }
-.done__paid { padding: 0 var(--space-2); border: 1px solid var(--sugi); border-radius: var(--radius-control); color: var(--sugi); font-size: var(--fs-small); font-weight: 700; }
-.readout--done { margin-block: var(--space-4) var(--space-6); }
-.done__sub {
-  margin-block: var(--space-6) var(--space-3);
-  padding-block-end: var(--space-2);
-  border-bottom: 1px solid var(--line);
-  font-size: var(--fs-lead);
-  font-weight: var(--weight-heading);
-  color: var(--sugi);
-  letter-spacing: 0;
-}
-#done > p + p { margin-block-start: var(--space-2); }
-.done__steps { display: grid; gap: var(--space-3); padding-inline-start: 1.6em; }
-.done__steps li { padding-inline-start: var(--space-1); }
-.done__steps li::marker { font-weight: 700; color: var(--sugi); }
-.done__democheck { margin-block-start: var(--space-7); padding-block-start: var(--space-3); border-top: 1px dashed var(--line-strong); font-size: var(--fs-small); color: var(--mute); }
-.done__democheck .link { font-size: var(--fs-small); font-weight: 400; margin-inline: var(--space-1); }
-
-/* 印刷：完了の画面の要約だけを紙に残す（操作の部品・デモ帯は出さない） */
-@media print {
-  body { background: #fff; }
-  .topline, .flowbar, .demo-band, .booking-foot, .done__actions, .done__democheck, #done .link--action { display: none !important; }
-  .booking { padding: 0; }
-  .readout { border-inline-start-color: #000; }
+  white-space: nowrap;
 }
 
-/* ---- ページ下（このデモについて） ---- */
-.booking-foot { padding-block: var(--space-4) var(--space-5); border-top: 1px solid var(--line); }
-.booking-foot .link { font-size: var(--fs-small); font-weight: 400; }
+/* ==========================================================
+ * フッター（濃緑）
+ * ========================================================== */
+.foot { padding-block: var(--space-7); }
+.foot__inner { display: grid; gap: var(--space-5); }
+.foot__shop { font-family: var(--font-heading); font-weight: var(--weight-heading); font-size: var(--fs-lead); letter-spacing: 0; }
+.foot__area { font-size: var(--fs-small); color: var(--mist); }
+.foot__navlist { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--space-5); }
+.foot__navlist a { display: flex; align-items: center; min-height: 3rem; color: var(--paper); font-size: var(--fs-small); text-decoration: none; }
+.foot__navlist a:hover { text-decoration: underline; text-underline-offset: 0.3em; }
+.foot__links { display: flex; flex-wrap: wrap; column-gap: var(--space-5); padding-block-start: var(--space-3); border-top: 1px solid rgb(255 255 255 / 0.25); }
+.foot .link--action { font-size: var(--fs-small); color: var(--paper); text-align: start; }
+@media (min-width: 960px) {
+  .foot__inner { grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); column-gap: var(--space-8); align-items: start; }
+  .foot__navlist { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .foot__links { grid-column: 1 / -1; }
+}
+
+/* ==========================================================
+ * デモ注記帯（ui.js の mountDemoBand）
+ * ========================================================== */
+/* 「大きく」でも 390px で1行に収める（帯は本文ではないので 16px で止める） */
+.demo-band { font-size: min(var(--fs-small), 1rem); letter-spacing: 0; }

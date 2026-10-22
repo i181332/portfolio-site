@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>高尾の家事手伝い みどり（デモ）</title>
-<meta name="description" content="八王子・高尾のご自宅へ伺う家事代行。掃除機がけと台所の片づけを2時間から。空き状況を見てそのまま予約できます（ご提案用のデモ）。">
+<title>トップ｜高尾の家事手伝い みどり（デモ）</title>
+<meta name="description" content="八王子市の高尾周辺のご自宅へ伺う家事代行。掃除機がけと台所の片づけを2時間から。担当を選んで、空き状況からそのまま予約できます。">
 <script>
   /* 「大きく」を選んだ方に、標準→大きくの瞬きを見せないため、モジュールより先に読む */
   try {
@@ -25,169 +25,183 @@
 </head>
 <body class="page-top">
 
-<div class="topline">
-  <div class="topline__inner">
-    <a class="topline__shop" href="index.html" data-shop-name>高尾の家事手伝い みどり</a>
-    <div id="font-scale"></div>
-  </div>
-</div>
+<header data-chrome></header>
 
 <main>
-  <!-- 1. 最初の画面：見出しと、今日から3日分の空き -->
+  <!-- 1. 最初の画面：見出し、予約ボタン、写真 -->
   <section class="hero container" aria-labelledby="h-top">
-    <div class="hero__main">
+    <div class="hero__text">
       <h1 class="title-display hero__title" id="h-top"><span><span>掃除機がけと</span><span>台所の片づけ。</span></span><span><span>2時間から</span><span>お伺いします。</span></span></h1>
-      <p class="lead hero__lead"><span>八王子・高尾のご自宅へ。</span><span>1時間<span data-rate>3,500</span>円。</span></p>
-      <p class="hero__family"><a class="link" href="#h-family">ご家族が代わりに予約でき、報告も届きます</a></p>
-
-      <div class="mini" aria-labelledby="mini-title">
-        <h2 class="mini__title" id="mini-title">今日から3日間の空き</h2>
-        <div class="mini__table" id="mini"></div>
-        <p class="mini__note">2時間のご利用で始められる時刻の数です。</p>
-      </div>
-
-      <div class="hero__actions">
-        <a class="btn btn--primary btn--block" href="booking.html">空き状況を見て予約する</a>
-        <button type="button" class="link link--action hero__tel" id="tel">お電話で予約する（デモのため番号は非掲載）</button>
-      </div>
+      <p class="lead hero__lead"><span>八王子、高尾のご自宅へ。</span><span>1時間<span data-rate>3,500</span>円。</span></p>
+      <p class="hero__family"><a class="link" href="flow.html#family">ご家族が代わりに予約でき、報告も届きます</a></p>
     </div>
-    <div class="hero__photo" aria-hidden="true"></div>
+    <div class="hero__photo" role="img" aria-label="畳の部屋に差し込む朝の光"></div>
+    <div class="hero__actions">
+      <a class="btn btn--primary btn--block hero__btn" data-book="any">空き状況を見て予約する</a>
+      <span data-booking-note-slot></span>
+      <a class="link link--action hero__pay" href="payment.html">カード払いを試す（テスト）</a>
+    </div>
   </section>
 
-  <!-- 2. できること -->
-  <section class="band band--mist sect" aria-labelledby="h-can">
-    <div class="container sect__grid">
-      <h2 class="sect__title" id="h-can">できること</h2>
-      <div class="sect__body">
-        <ul class="tasks" role="list">
-          <li class="tasks__row">
-            <img class="tasks__img" src="assets/cloth-hand.webp" alt="" width="1200" height="801" loading="lazy">
-            <div>
-              <h3 class="tasks__name">掃除機がけ</h3>
-              <p>畳、フローリング、じゅうたん。家具のすき間や部屋の隅まで掛け、気になる所は拭き掃除もします。</p>
-            </div>
-          </li>
-          <li class="tasks__row">
-            <img class="tasks__img" src="assets/kitchen-wood.webp" alt="" width="1400" height="928" loading="lazy">
-            <div>
-              <h3 class="tasks__name">台所と水まわり</h3>
-              <p>流し、コンロのまわり、洗面台。洗い物と、使い終えた器の片づけもお受けします。</p>
-            </div>
-          </li>
-          <li class="tasks__row">
-            <img class="tasks__img" src="assets/kettle-window.webp" alt="" width="1100" height="1650" loading="lazy">
-            <div>
-              <h3 class="tasks__name">お部屋の片づけ</h3>
-              <p>出したままの物を元の場所へ戻し、よく使う物を手の届く所にまとめます。捨てる物は、必ずお尋ねしてから決めます。</p>
-            </div>
-          </li>
-        </ul>
-        <p class="note">エアコンの分解洗浄や高い所の作業など、お受けできない作業は本制作時にお店と決めて記載します。</p>
+  <!-- 2. 担当の顔：一番目立つ所。顔を見て、この人で予約する -->
+  <section class="band band--mist faces-band" aria-labelledby="h-faces">
+    <div class="container">
+      <div class="faces__head">
+        <h2 class="sect__title faces__title" id="h-faces">お伺いするのは、この3人です</h2>
+        <p class="faces__lead">顔を見て、担当を選んで予約できます。2回目からも同じ担当を選べます。</p>
+      </div>
+      <ul class="faces" role="list" id="faces"></ul>
+      <div class="faces__foot">
+        <p class="note">写真は素材です（本番はご本人）。</p>
+        <a class="link link--action" href="staff.html">スタッフ紹介を見る</a>
       </div>
     </div>
   </section>
 
-  <!-- 3. 料金 -->
-  <section class="sect container sect__grid" aria-labelledby="h-price">
-    <h2 class="sect__title" id="h-price">料金</h2>
+  <!-- 3. できること -->
+  <section class="sect container sect__grid" aria-labelledby="h-can">
+    <h2 class="sect__title" id="h-can">できること</h2>
     <div class="sect__body">
-      <table class="table table--price price">
-        <caption>1時間<span data-rate>3,500</span>円。お支払いは予約の時にカードで。<span class="price__tax">税込か税別か、交通費・用具代の扱い<span class="tbd">本制作時に確認</span></span></caption>
-        <thead class="visually-hidden"><tr><th scope="col">利用時間</th><th scope="col">料金</th></tr></thead>
-        <tbody id="price-rows"></tbody>
-      </table>
+      <ul class="tasks" role="list">
+        <li class="tasks__row">
+          <img class="tasks__img" src="assets/cloth-hand.webp" alt="" width="1200" height="801" loading="lazy">
+          <div>
+            <h3 class="tasks__name">掃除機がけ</h3>
+            <p>畳、フローリング、じゅうたん。家具のすき間や部屋の隅まで掛けます。</p>
+          </div>
+        </li>
+        <li class="tasks__row">
+          <img class="tasks__img" src="assets/kitchen-wood.webp" alt="" width="1400" height="928" loading="lazy">
+          <div>
+            <h3 class="tasks__name">台所と水まわり</h3>
+            <p>流し、コンロのまわり、洗面台。洗い物と器の片づけもお受けします。</p>
+          </div>
+        </li>
+        <li class="tasks__row">
+          <img class="tasks__img" src="assets/kettle-window.webp" alt="" width="1100" height="1650" loading="lazy">
+          <div>
+            <h3 class="tasks__name">お部屋の片づけ</h3>
+            <p>出したままの物を元の場所へ。捨てる物は、必ずお尋ねしてから決めます。</p>
+          </div>
+        </li>
+      </ul>
+      <a class="link link--action sect__more" href="service.html">できることとお受けできない作業を見る</a>
     </div>
   </section>
 
-  <!-- 4. ご利用の流れ（番号はここだけ） -->
-  <section class="band band--mist sect" aria-labelledby="h-steps">
+  <!-- 4. 料金 -->
+  <section class="band band--mist sect" aria-labelledby="h-price">
     <div class="container sect__grid">
-      <h2 class="sect__title" id="h-steps">ご利用の流れ</h2>
-      <ol class="steps sect__body" role="list">
+      <h2 class="sect__title" id="h-price">料金</h2>
+      <div class="sect__body">
+        <table class="table table--price price">
+          <caption>1時間<span data-rate>3,500</span>円。お支払いは予約の時にカードで。<span class="price__tax">税込か税別か、交通費と用具代の扱い<span class="tbd">本制作時に確認</span></span></caption>
+          <thead class="visually-hidden"><tr><th scope="col">利用時間</th><th scope="col">料金</th></tr></thead>
+          <tbody id="price-rows"></tbody>
+        </table>
+        <a class="link link--action sect__more" href="service.html">サービスと料金を見る</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. ご利用の流れ（番号はここだけ） -->
+  <section class="sect container sect__grid" aria-labelledby="h-steps">
+    <h2 class="sect__title" id="h-steps">ご利用の流れ</h2>
+    <div class="sect__body">
+      <ol class="steps" role="list">
         <li class="steps__row">
           <span class="steps__num" aria-hidden="true">1</span>
           <div>
             <h3 class="steps__name">空き状況を見て予約する</h3>
-            <p>利用時間、担当、日にちと時刻を選び、カードでお支払いいただくと予約が決まります。ご家族の方が代わりに予約することもできます。</p>
+            <p>担当と日時を選び、カードでお支払いいただくと予約が決まります。</p>
           </div>
         </li>
         <li class="steps__row">
           <span class="steps__num" aria-hidden="true">2</span>
           <div>
             <h3 class="steps__name">当日、担当がお伺いする</h3>
-            <p>お伺いの前に、お電話することがあります。どこから始めるかを、玄関で一緒に決めてから作業します。</p>
+            <p>どこから始めるかを、玄関で一緒に決めてから作業します。</p>
           </div>
         </li>
         <li class="steps__row">
           <span class="steps__num" aria-hidden="true">3</span>
           <div>
             <h3 class="steps__name">作業の後にご報告する</h3>
-            <p>終えた場所と、気づいたことをお伝えします。離れて暮らすご家族の方にも、同じ内容をお届けできます。</p>
+            <p>終えた場所と、気づいたことをお伝えします。</p>
           </div>
         </li>
       </ol>
+      <a class="link link--action sect__more" href="flow.html">ご利用の流れを見る</a>
     </div>
-  </section>
-
-  <!-- 5. 担当スタッフ -->
-  <section class="sect container sect__grid" aria-labelledby="h-staff">
-    <div class="sect__head">
-      <h2 class="sect__title" id="h-staff">担当スタッフ</h2>
-      <p class="note">写真は素材です（本番はご本人）。</p>
-    </div>
-    <ul class="people sect__body" role="list" id="people"></ul>
   </section>
 
   <!-- 6. ご家族の方に -->
   <section class="band band--mist sect" aria-labelledby="h-family">
     <div class="container sect__grid">
-      <h2 class="sect__title" id="h-family">ご家族の方に知っていただきたいこと</h2>
-      <dl class="family sect__body">
-        <div class="family__row">
-          <dt>代わりに予約できます</dt>
-          <dd>予約の画面で「ご家族の方が代わりに予約」を選ぶと、お伺いする先の方と、連絡を受ける方を分けて入力できます。当日の連絡と作業後の報告は、ご家族の方に届きます。</dd>
-        </div>
-        <div class="family__row">
-          <dt>同じ担当が続けて伺います</dt>
-          <dd>2回目からも、前回と同じ担当を選んで予約できます。家の中のことを、毎回はじめから説明しなくて済みます。</dd>
-        </div>
-        <div class="family__row">
-          <dt>作業の後にご報告します</dt>
-          <dd>終えた場所と、気づいたことをお伝えします。報告の方法は、電話かメッセージのどちらかから選べるようにする予定です。</dd>
-        </div>
-        <div class="family__row">
-          <dt>取り消しの決まり</dt>
-          <dd>取り消しの期限と料金を、ここに掲載します。<span class="tbd">掲載予定（本制作時に確認）</span></dd>
-        </div>
-        <div class="family__row">
-          <dt>身分証と保険</dt>
-          <dd>スタッフが持参する身分証と、加入している保険の内容を、ここに掲載します。<span class="tbd">掲載予定（本制作時に確認）</span></dd>
-        </div>
-      </dl>
+      <h2 class="sect__title" id="h-family">離れて暮らすご家族の方へ</h2>
+      <div class="sect__body">
+        <dl class="family">
+          <div class="family__row">
+            <dt>代わりに予約できます</dt>
+            <dd>お伺い先と、連絡を受ける方を分けて予約できます。</dd>
+          </div>
+          <div class="family__row">
+            <dt>作業の後に報告が届きます</dt>
+            <dd>終えた場所と気づいたことを、ご家族の方にもお伝えします。</dd>
+          </div>
+          <div class="family__row">
+            <dt>同じ担当が続けて伺います</dt>
+            <dd>家の中のことを、毎回はじめから説明しなくて済みます。</dd>
+          </div>
+        </dl>
+        <a class="link link--action sect__more" href="flow.html#family">ご家族が代わりに予約する時</a>
+      </div>
     </div>
   </section>
 
-  <section class="closing container" aria-label="ご予約">
-    <p class="lead">空いている日と時刻は、予約の画面で2週間先まで見られます。</p>
-    <a class="btn btn--primary closing__btn" href="booking.html">空き状況を見て予約する</a>
+  <!-- 7. よくある質問（抜粋） -->
+  <section class="sect container sect__grid" aria-labelledby="h-faq">
+    <h2 class="sect__title" id="h-faq">よくある質問</h2>
+    <div class="sect__body">
+      <div class="qa">
+        <details class="qa__item">
+          <summary>作業の間、家にいる必要はありますか</summary>
+          <p>はじめてのご利用の日は、ご在宅をお願いしています。2回目からの扱いは、本制作時にお店と決めて掲載します。</p>
+        </details>
+        <details class="qa__item">
+          <summary>毎回同じ担当にお願いできますか</summary>
+          <p>できます。予約の画面で、前回と同じ担当を選んでください。</p>
+        </details>
+        <details class="qa__item">
+          <summary>支払いの方法は何がありますか</summary>
+          <p>予約の時に、クレジットカードでお支払いいただきます。当日に現金のやり取りはありません。</p>
+        </details>
+      </div>
+      <a class="link link--action sect__more" href="faq.html">よくある質問をすべて見る</a>
+    </div>
+  </section>
+
+  <!-- 8. 対応エリア -->
+  <section class="band band--mist sect" aria-labelledby="h-area">
+    <div class="container sect__grid">
+      <h2 class="sect__title" id="h-area">対応エリア</h2>
+      <div class="sect__body">
+        <p class="area__lead">八王子市の高尾駅、狭間駅、めじろ台駅のまわりを中心にお伺いします。エリアの外も、ご相談ください。</p>
+        <a class="link link--action sect__more" href="area.html">対応エリアを見る</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9. 締め：予約とお問い合わせ -->
+  <section class="closing container" aria-labelledby="h-closing">
+    <h2 class="sect__title closing__title" id="h-closing">空いている日を見てみませんか</h2>
+    <a class="btn btn--primary closing__btn" data-book="any">空き状況を見て予約する</a>
+    <span data-booking-note-slot></span>
+    <p class="closing__contact">予約の前に聞いておきたいことは、<a class="link" href="contact.html">お問い合わせ</a>からどうぞ。</p>
   </section>
 </main>
 
-<!-- 7. 濃緑のフッター -->
-<footer class="band band--sugi foot">
-  <div class="container foot__inner">
-    <div>
-      <p class="foot__shop" data-shop-name>高尾の家事手伝い みどり</p>
-      <p class="foot__area">対応エリア　八王子市（高尾とその周辺）</p>
-    </div>
-    <ul class="foot__links" role="list">
-      <li><button type="button" class="link link--action" data-legal="law">特定商取引法に基づく表記</button></li>
-      <li><button type="button" class="link link--action" data-legal="privacy">プライバシーポリシー</button></li>
-      <li><a class="link link--action" href="admin.html">管理画面（デモ）</a></li>
-      <li id="about-demo"></li>
-    </ul>
-  </div>
-</footer>
+<footer data-chrome></footer>
 
 </body>
 </html>

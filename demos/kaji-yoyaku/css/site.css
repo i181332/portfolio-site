@@ -1,0 +1,80 @@
+/*
+ * site.css — トップ以外のページ（service・flow・staff・area・faq・contact・payment）の組み。pages.css の後に読む。
+ * ページの先頭（.page-head）は pages.css。ここにはページごとの節を足す。
+ */
+
+/* ---------- 締めの帯（ページ末の予約の案内） ---------- */
+.page-closing { padding-block: var(--space-7); padding-inline: 0; }
+.page-closing__inner { display: grid; justify-items: start; gap: var(--space-3); }
+.page-closing__title { font-size: clamp(calc(var(--fs-body) * 1.2222), 1rem + 1.5vw, var(--fs-step)); }
+.page-closing__btn { padding-inline: var(--space-7); }
+@media (max-width: 639px) { .page-closing__btn { width: 100%; } }
+
+/* ==========================================================
+ * スタッフ紹介（staff.html）：大きめの写真と、名前・ひとこと・得意なこと・曜日と時間
+ * ========================================================== */
+.members { padding-block-end: var(--space-7); }
+.member {
+  display: grid;
+  gap: var(--space-4);
+  max-width: none;
+  padding-block: var(--space-6);
+  border-top: 1px solid var(--line);
+}
+.member:first-child { border-top: 0; padding-block-start: var(--space-2); }
+.member__photo {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  object-position: center 30%;
+  border-radius: var(--radius-surface);
+  background: var(--mist);
+}
+.member__body { display: grid; gap: var(--space-3); min-width: 0; }
+.member__name { font-size: var(--fs-name); line-height: 1.25; letter-spacing: 0.04em; }
+.member__intro { font-size: var(--fs-lead); line-height: 1.75; word-break: auto-phrase; }
+.member__facts { border-top: 1px solid var(--line); }
+.member__facts > div { display: grid; grid-template-columns: minmax(0, 1fr); padding-block: var(--space-3); border-bottom: 1px solid var(--line); }
+.member__facts dt { font-size: var(--fs-small); font-weight: 700; color: var(--mute); line-height: 1.6; }
+.member__facts dd { font-size: var(--fs-ui); line-height: 1.6; word-break: auto-phrase; }
+.member__btn { width: 100%; margin-block-start: var(--space-2); }
+
+@media (min-width: 760px) {
+  .member { grid-template-columns: minmax(14rem, 22rem) minmax(0, 1fr); column-gap: var(--space-7); align-items: start; padding-block: var(--space-7); }
+  .member__photo { aspect-ratio: 1; }
+  .member__facts > div { grid-template-columns: 9em minmax(0, 1fr); column-gap: var(--space-4); align-items: baseline; }
+  .member__btn { width: auto; justify-self: start; padding-inline: var(--space-7); }
+}
+
+/* ==========================================================
+ * カード払いのお試し（payment.html）
+ * ========================================================== */
+.pay > * { max-width: 46rem; }   /* 左端はヘッダーと揃え、行の長さだけ絞る */
+.pay__done {
+  margin-block-end: var(--space-5);
+  padding: var(--space-4) var(--space-5);
+  border: var(--border) solid var(--wakaba);
+  border-radius: var(--radius-control);
+  background: var(--mist);
+  color: var(--wakaba-text);
+  font-size: var(--fs-ui);
+  font-weight: 700;
+  line-height: var(--lh-ui);
+  word-break: auto-phrase;
+}
+.pay__title { margin-block-end: var(--space-3); font-size: var(--fs-lead); }
+.pay__card { border-top: var(--border) solid var(--ink); }
+.pay__card > div { display: grid; padding-block: var(--space-3); border-bottom: 1px solid var(--line); }
+.pay__card dt { font-size: var(--fs-small); font-weight: 700; color: var(--mute); line-height: 1.6; }
+.pay__card dd { font-size: var(--fs-ui); line-height: 1.6; }
+.pay__card .pay__num { font-size: 1.625rem; font-weight: 700; letter-spacing: 0.06em; font-variant-numeric: tabular-nums; color: var(--ink); white-space: nowrap; }
+.pay__hint { margin-block-start: var(--space-3); font-size: var(--fs-small); color: var(--mute); line-height: 1.75; }
+.pay__actions { display: grid; justify-items: start; gap: var(--space-2); margin-block: var(--space-5) var(--space-6); }
+.pay__btn { padding-inline: var(--space-7); }
+.pay__real { margin-block-end: var(--space-4); padding: var(--space-4) var(--space-5); border-radius: var(--radius-control); background: var(--mist); }
+.pay__real .pay__title { margin-block-end: var(--space-1); font-size: var(--fs-ui); }
+.pay:last-child { padding-block-end: var(--space-7); }
+@media (max-width: 639px) { .pay__btn { width: 100%; padding-inline: var(--space-4); } }
+@media (min-width: 640px) {
+  .pay__card > div { grid-template-columns: 11em minmax(0, 1fr); column-gap: var(--space-4); align-items: baseline; }
+}
