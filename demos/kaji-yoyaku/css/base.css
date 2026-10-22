@@ -48,8 +48,8 @@ h1, h2, h3,
   word-break: auto-phrase;
   text-wrap: pretty;
 }
-/* 明朝はここと .topline__shop だけ */
-.title-display { font-family: var(--font-mincho); font-weight: var(--weight-mincho); letter-spacing: 0.04em; }
+/* 大見出しも見出しと同じゴシック */
+.title-display { font-family: var(--font-heading); font-weight: var(--weight-heading); letter-spacing: 0; }
 h1, .title-display { font-size: var(--fs-display); line-height: 1.4; }
 h2, .title-step { font-size: var(--fs-step); }
 h3 { font-size: var(--fs-lead); }
@@ -132,7 +132,7 @@ strong, b { font-weight: 700; }
 
 .link {
   color: var(--sugi);
-  font-weight: 700;
+  font-weight: var(--weight-medium);
   text-decoration: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: 0.3em;
@@ -157,7 +157,7 @@ strong, b { font-weight: 700; }
   border-radius: var(--radius-control);
   color: var(--sugi);
   font-size: var(--fs-ui);
-  font-weight: 700;
+  font-weight: var(--weight-medium);
   white-space: nowrap;
 }
 .back::before {
@@ -232,7 +232,7 @@ strong, b { font-weight: 700; }
   border-radius: calc(var(--radius-control) - 3px);
   color: var(--ink);
   font-size: var(--fs-small);
-  font-weight: 700;
+  font-weight: var(--weight-medium);
 }
 .scale-switch__option[aria-checked="true"] { background: var(--sugi); color: var(--paper); }
 
@@ -242,11 +242,12 @@ strong, b { font-weight: 700; }
 .field__req {
   margin-inline-start: var(--space-2);
   font-size: var(--fs-small);
-  font-weight: 400;
+  font-weight: var(--weight-medium);
   color: var(--mute);
 }
 .field__hint { font-size: var(--fs-small); color: var(--mute); line-height: 1.7; }
 .input {
+  font-weight: var(--weight-medium);
   width: 100%;
   min-height: max(56px, var(--tap));
   padding: var(--space-3) var(--space-4);
@@ -283,7 +284,7 @@ textarea.input { min-height: 8rem; resize: vertical; }
   background: var(--mist);
   border-radius: var(--radius-control);
   font-size: var(--fs-ui);
-  font-weight: 700;
+  font-weight: var(--weight-medium);
   line-height: var(--lh-ui);
   cursor: pointer;
 }
@@ -332,7 +333,7 @@ textarea.input { min-height: 8rem; resize: vertical; }
   background: var(--paper);
   color: var(--mute);
   font-family: var(--font-ui);
-  font-weight: 700;
+  font-weight: var(--weight-medium);
   font-size: calc(var(--mark) * 0.55);
   line-height: 1;
   transition: background-color var(--dur-quick) var(--ease-out), border-color var(--dur-quick) var(--ease-out);
@@ -349,7 +350,7 @@ textarea.input { min-height: 8rem; resize: vertical; }
   outline: var(--border) solid var(--ochre);
   outline-offset: 3px;
 }
-.mark-label { font-size: var(--fs-ui); font-weight: 700; line-height: var(--lh-ui); word-break: auto-phrase; }
+.mark-label { font-size: var(--fs-ui); font-weight: var(--weight-medium); line-height: var(--lh-ui); word-break: auto-phrase; }
 [data-status="open"] .mark-label, [data-open="true"] .mark-label { color: var(--wakaba-text); }
 :is([data-status="closed"], [data-open="false"]) .mark-label { color: var(--mute); font-weight: 400; }
 [aria-checked="true"] .mark-label { color: var(--ochre-text); }

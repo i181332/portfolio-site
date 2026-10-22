@@ -1,7 +1,7 @@
 /*
  * top.css — トップページ（index.html）固有のレイアウト。tokens.css・base.css・pages.css の後に読む。
  * 主役は最初の画面の ○× 縮小表（.mini）。ほかの節は「左に写真か色面、右に文」の行を積み、区切りは余白と罫1本。
- * 明朝は .title-display と店名だけ。見出し・名前はゴシック太字、字間 0。
+ * 見出し・名前はゴシック太字、字間 0。
  */
 
 /* ---------- 上部の1行：トップは本文の幅に合わせ、店名を常に出す ---------- */
@@ -250,7 +250,7 @@ a.mini__cell:active { background: var(--mist); }
  * ========================================================== */
 .foot { padding-block: var(--space-7); }
 .foot__inner { display: grid; gap: var(--space-5); }
-.foot__shop { font-family: var(--font-mincho); font-weight: var(--weight-mincho); font-size: var(--fs-lead); letter-spacing: 0.04em; }
+.foot__shop { font-family: var(--font-heading); font-weight: var(--weight-heading); font-size: var(--fs-lead); letter-spacing: 0; }
 .foot__area { font-size: var(--fs-small); color: var(--mist); }
 .foot__links { display: flex; flex-wrap: wrap; column-gap: var(--space-5); }
 .foot .link--action { font-size: var(--fs-small); color: var(--paper); text-align: start; }

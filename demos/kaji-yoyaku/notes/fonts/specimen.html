@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>書体見本</title>
+<!-- ?f=Noto+Sans+JP&w=400;700 のように書体名と太さを渡す。行間・色・文言は全書体で同一。 -->
+<script>
+  const q = new URLSearchParams(location.search);
+  const fam = q.get("f") || "Noto Sans JP";
+  const w = q.get("w") || "400;700";
+  document.write(`<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=${fam.replace(/ /g, "+")}:wght@${w}&display=block">`);
+  document.documentElement.style.setProperty("--f", `"${fam}"`);
+</script>
+<style>
+  :root { --ink: #1C2326; --sugi: #1E4A3A; --mute: #5F6B6E; --mist: #EEF3EF; --wakaba: #2F7E52; --ochre-text: #8A5E1C; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #fff; color: var(--ink); font-family: var(--f), sans-serif; line-height: 1.7; }
+  .tag { background: var(--mist); padding: 8px 16px; font-size: 14px; color: var(--mute); font-family: monospace; }
+  section { padding: 16px 16px 24px; border-bottom: 1px solid #ccd; }
+  .size { font-size: 13px; color: var(--mute); font-family: monospace; margin: 0 0 8px; }
+  h1 { font-size: 30px; line-height: 1.4; font-weight: 700; color: var(--sugi); margin: 0 0 12px; }
+  h2 { font-size: 24px; line-height: 1.4; font-weight: 700; margin: 0 0 12px; }
+  p { margin: 0 0 12px; }
+  .slot { display: flex; justify-content: space-between; align-items: center; border: 2px solid var(--wakaba); border-radius: 12px; padding: 10px 16px; margin: 0 0 12px; }
+  .slot b { color: var(--wakaba); }
+  .price { font-size: 44px; font-weight: 700; color: var(--ochre-text); line-height: 1.2; margin: 0 0 12px; }
+  .btn { display: block; text-align: center; background: var(--sugi); color: #fff; border-radius: 12px; padding: 14px; font-size: 20px; font-weight: 700; margin: 0 0 12px; }
+  .glyphs { letter-spacing: .08em; background: var(--mist); padding: 6px 10px; border-radius: 8px; }
+</style>
+</head>
+<body>
+<div class="tag" id="tag"></div>
+<template id="t">
+  <section>
+    <p class="size"></p>
+    <h1>掃除機がけと台所の片づけ。2時間からお伺いします。</h1>
+    <h2>担当と日時を選んでください</h2>
+    <div class="slot"><span>午前10時</span><b>○ 空き</b></div>
+    <div class="slot"><span>午後1時30分</span><span style="color:var(--mute)">× 予約済み</span></div>
+    <p class="price">7,000円</p>
+    <p>ご高齢の方のお住まいにも、同じ担当が毎回お伺いします。ご家族の方が代わりにご予約いただくこともできます。</p>
+    <p class="glyphs">ぱ ば は シ ツ ソ ン 0 O 1 l 7 3 8 6 9 ○ ×</p>
+    <span class="btn">この日時で予約する</span>
+  </section>
+</template>
+<div id="out"></div>
+<script>
+  document.getElementById("tag").textContent = `${fam} / wght ${w} / line-height 1.7`;
+  for (const px of [18, 21]) {
+    const n = document.getElementById("t").content.cloneNode(true);
+    n.querySelector("section").style.fontSize = px + "px";
+    n.querySelector(".size").textContent = `本文 ${px}px` + (px === 21 ? "（「大きく」相当）" : "");
+    document.getElementById("out").appendChild(n);
+  }
+</script>
+</body>
+</html>

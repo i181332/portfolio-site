@@ -23,8 +23,8 @@
   padding: var(--space-2) var(--gutter);
 }
 .topline__shop {
-  font-family: var(--font-mincho);
-  font-weight: var(--weight-mincho);
+  font-family: var(--font-heading);
+  font-weight: var(--weight-heading);
   font-size: var(--fs-small);
   letter-spacing: 0.04em;
   color: var(--sugi);
