@@ -47,8 +47,9 @@ const seedBookings = (today, t) => {
 
 // 配列の要素として読める形か（読む時に不正な要素を捨てる）
 const isObj = (v) => v != null && typeof v === "object" && !Array.isArray(v);
+const isNums = (v) => Array.isArray(v) && v.every((n) => typeof n === "number");
 const VALID = {
-  staff: (x) => isObj(x) && typeof x.id === "string",
+  staff: (x) => isObj(x) && typeof x.id === "string" && isNums(x.workDays) && typeof x.start === "number" && typeof x.end === "number",
   bookings: (x) => isObj(x) && typeof x.id === "string" && typeof x.date === "string" && typeof x.start === "number",
   daysOff: (x) => isObj(x) && typeof x.staffId === "string" && typeof x.date === "string",
 };
@@ -57,7 +58,7 @@ const compareBookings = (a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 
 const idPrefix = (date) => `A-${date.slice(5, 7)}${date.slice(8, 10)}-`;
 const nextId = (bookings, date) => {
   const prefix = idPrefix(date);
-  const nums = bookings.filter((b) => b.date === date).map((b) => Number(b.id.slice(prefix.length)) || 0);
+  const nums = bookings.filter((b) => b.id.startsWith(prefix)).map((b) => Number(b.id.slice(prefix.length)) || 0);
   return prefix + ((nums.length ? Math.max(...nums) : 0) + 1);
 };
 
@@ -65,12 +66,14 @@ export function createStore(storage, { now = () => new Date() } = {}) {
   const key = (name) => CONFIG.storagePrefix + name;
   // 書込みに失敗した値。そのページの間はこちらを優先して読む（null は「消した」）
   const unsaved = new Map();
+  let failed = false; // 書込みが一度でも失敗したら true
   const write = (name, value) => {
     try {
       storage.setItem(key(name), JSON.stringify(value));
       unsaved.delete(name);
     } catch {
-      unsaved.set(name, value);
+      failed = true;
+      unsaved.set(name, structuredClone(value));
     }
   };
   const remove = (name) => {
@@ -78,12 +81,13 @@ export function createStore(storage, { now = () => new Date() } = {}) {
       storage.removeItem(key(name));
       unsaved.delete(name);
     } catch {
+      failed = true;
       unsaved.set(name, null);
     }
   };
   // 無い・読めない値は undefined
   const read = (name) => {
-    if (unsaved.has(name)) return unsaved.get(name) ?? undefined;
+    if (unsaved.has(name)) return structuredClone(unsaved.get(name) ?? undefined);
     try {
       const raw = storage.getItem(key(name));
       return raw == null ? undefined : JSON.parse(raw);
@@ -93,7 +97,7 @@ export function createStore(storage, { now = () => new Date() } = {}) {
   };
 
   const defaults = {
-    staff: () => SEED_STAFF,
+    staff: () => structuredClone(SEED_STAFF),
     bookings: () => seedBookings(toISODate(now()), now()),
     daysOff: () => seedDaysOff(toISODate(now())),
   };
@@ -101,7 +105,10 @@ export function createStore(storage, { now = () => new Date() } = {}) {
   // 配列のキー。読めなければそのキーだけシードに戻して保存し、不正な要素は捨てる
   function list(name) {
     const v = read(name);
-    if (Array.isArray(v)) return v.filter(VALID[name]);
+    if (Array.isArray(v)) {
+      const valid = v.filter(VALID[name]);
+      if (valid.length || name !== "staff") return valid; // 担当が0人なら使えないのでシードへ
+    }
     const seeded = defaults[name]();
     write(name, seeded);
     return seeded;
@@ -130,7 +137,7 @@ export function createStore(storage, { now = () => new Date() } = {}) {
       };
       bookings.push(booking);
       write("bookings", bookings);
-      return booking;
+      return structuredClone(booking);
     },
     markPaid(id, { sessionId } = {}) {
       const patch = { status: "paid", paidAt: now().toISOString() };
@@ -160,6 +167,7 @@ export function createStore(storage, { now = () => new Date() } = {}) {
     },
     setPendingId: (id) => write("pendingId", id),
     clearPendingId: () => remove("pendingId"),
+    isPersistent: () => !failed,
     reset() {
       for (const name of RESET_KEYS) remove(name);
     },

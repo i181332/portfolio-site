@@ -1,8 +1,8 @@
-// 仕様: docs/spec-core.md「補足2」のシード・壊れたキー・書込み例外・連番・prefs
+// 仕様: docs/spec-core.md「補足2・補足3」のシード・壊れたキー・書込み例外・連番・prefs
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createStore } from "../../js/store.js";
-import { slotStatus, findConflicts } from "../../js/availability.js";
+import { slotStatus, findConflicts, slotStatusAny, dayHasOpening } from "../../js/availability.js";
 
 const NOW = new Date(2026, 9, 24, 8, 0);
 
@@ -196,16 +196,144 @@ test("書込み例外: setItem/removeItem が投げても各メソッドは例�
   assert.equal(store.getPrefs().fontScale, "large"); // prefs は reset 後も残る
 });
 
-// ---- 予約 id の連番は date で数える ----
-test("連番: 2025-10-30 の A-1030-1 が残っていても、2026-10-30 の追加は A-1030-1（次は -2）", () => {
+// ---- 予約 id の連番は id の接頭辞 A-MMDD- で数える（補足3。補足2の date 絞りは取り消し） ----
+test("連番: 2025-10-30 の A-1030-1 がある状態で 2026-10-30 を追加 → A-1030-2（次は -3、id は重複しない）", () => {
   const { storage, open } = setup();
   const old = { id: "A-1030-1", staffId: "s1", date: "2025-10-30", start: 9, hours: 2, status: "paid", amount: 7000, customer };
   storage.map.set("kajiDemo.bookings", JSON.stringify([old]));
   const again = open();
   const b = again.addBooking({ staffId: "s1", date: "2026-10-30", start: 9, hours: 2, customer });
-  assert.equal(b.id, "A-1030-1");
-  assert.equal(again.addBooking({ staffId: "s1", date: "2026-10-30", start: 12, hours: 2, customer }).id, "A-1030-2");
-  assert.equal(again.getBookings().length, 3);
+  assert.equal(b.id, "A-1030-2");
+  assert.equal(again.addBooking({ staffId: "s1", date: "2026-10-30", start: 12, hours: 2, customer }).id, "A-1030-3");
+  const ids = again.getBookings().map((x) => x.id);
+  assert.equal(ids.length, 3);
+  assert.equal(new Set(ids).size, 3);
+});
+
+test("連番: 接頭辞が違う id（A-1031-5）は数えない", () => {
+  const { storage, open } = setup();
+  const other = { id: "A-1031-5", staffId: "s1", date: "2026-10-31", start: 9, hours: 2, status: "paid", amount: 7000, customer };
+  storage.map.set("kajiDemo.bookings", JSON.stringify([other]));
+  const again = open();
+  assert.equal(again.addBooking({ staffId: "s1", date: "2026-10-30", start: 9, hours: 2, customer }).id, "A-1030-1");
+});
+
+// ---- staff の不正な要素（補足3） ----
+test("staff: [null, {id:\"s9\"}, 正しい s1] → s1 だけ残り、slotStatusAny・dayHasOpening が例外を出さない", () => {
+  const { store, storage, open } = setup();
+  const s1 = store.getStaff().find((s) => s.id === "s1");
+  storage.map.set("kajiDemo.staff", JSON.stringify([null, { id: "s9" }, s1]));
+  const again = open();
+  let list;
+  assert.doesNotThrow(() => { list = again.getStaff(); });
+  assert.deepEqual(list.map((s) => s.id), ["s1"]);
+  const args = { staffList: list, date: FAR, start: 9, hours: 2, bookings: again.getBookings(), daysOff: again.getDaysOff(), now: NOW };
+  assert.doesNotThrow(() => slotStatusAny(args));
+  assert.doesNotThrow(() => dayHasOpening({ ...args, starts: [9, 10, 11, 12, 13, 14, 15, 16] }));
+});
+
+test("staff: 型が不正な要素（id 非文字列・workDays 非数値配列・start/end 非数値）は捨てる", () => {
+  const { store, storage, open } = setup();
+  const s1 = store.getStaff().find((s) => s.id === "s1");
+  const bad = [
+    { ...s1, id: 7 },
+    { ...s1, id: "b2", workDays: "月" },
+    { ...s1, id: "b3", workDays: [1, "2"] },
+    { ...s1, id: "b4", start: "9" },
+    { ...s1, id: "b5", end: null },
+  ];
+  storage.map.set("kajiDemo.staff", JSON.stringify([...bad, s1]));
+  assert.deepEqual(open().getStaff().map((s) => s.id), ["s1"]);
+});
+
+test("staff: 有効な要素が0人（[1,2] や []）ならシードの3名に戻る", () => {
+  for (const raw of ["[1,2]", "[]"]) {
+    const { storage, open } = setup();
+    storage.map.set("kajiDemo.staff", raw);
+    assert.deepEqual(open().getStaff().map((s) => s.id), ["s1", "s2", "s3"], raw);
+  }
+});
+
+// ---- isPersistent（補足3） ----
+test("isPersistent: 普通の storage では true（書込み後も）", () => {
+  const { store } = setup();
+  assert.equal(store.isPersistent(), true);
+  store.setPrefs({ fontScale: "large" });
+  store.addBooking({ staffId: "s1", date: FAR, start: 9, hours: 2, customer });
+  assert.equal(store.isPersistent(), true);
+});
+
+test("isPersistent: setItem が投げる storage では、書込みの後 false", () => {
+  const base = fakeStorage();
+  const storage = { ...base, setItem() { throw new Error("QuotaExceededError"); } };
+  const store = createStore(storage, { now: () => new Date(NOW.getTime()) });
+  assert.doesNotThrow(() => store.addBooking({ staffId: "s1", date: FAR, start: 9, hours: 2, customer }));
+  assert.equal(store.isPersistent(), false);
+});
+
+// ---- 返り値は複製（補足3） ----
+test("複製: getStaff の結果を書き換えても次の getStaff・別の store に影響しない", () => {
+  const { store, open } = setup();
+  const first = store.getStaff();
+  first[0].name = "改ざん";
+  first[0].skills.push("X");
+  first[0].workDays.push(99);
+  first.pop();
+  const second = store.getStaff();
+  assert.equal(second.length, 3);
+  assert.notEqual(second[0].name, "改ざん");
+  assert.ok(!second[0].skills.includes("X"));
+  assert.ok(!second[0].workDays.includes(99));
+  const other = open().getStaff();
+  assert.equal(other.length, 3);
+  assert.notEqual(other[0].name, "改ざん");
+  assert.ok(!other[0].workDays.includes(99));
+  const fresh = createStore(fakeStorage(), { now: () => new Date(NOW.getTime()) }).getStaff();
+  assert.notEqual(fresh[0].name, "改ざん");
+});
+
+test("複製: getBookings の結果を書き換えても次の getBookings・別の store に影響しない", () => {
+  const { store, open } = setup();
+  const b = store.addBooking({ staffId: "s1", date: FAR, start: 9, hours: 2, customer: { ...customer } });
+  const list = store.getBookings();
+  const target = list.find((x) => x.id === b.id);
+  target.status = "cancelled";
+  target.customer.name = "改ざん";
+  list.length = 0;
+  const again = store.getBookings();
+  assert.ok(again.length >= 5);
+  const got = again.find((x) => x.id === b.id);
+  assert.equal(got.status, "pending");
+  assert.equal(got.customer.name, customer.name);
+  const other = open().getBookings().find((x) => x.id === b.id);
+  assert.equal(other.status, "pending");
+  assert.equal(other.customer.name, customer.name);
+});
+
+test("複製: addBooking の返り値を書き換えても保存された予約に影響しない", () => {
+  const { store } = setup();
+  const b = store.addBooking({ staffId: "s1", date: FAR, start: 9, hours: 2, customer: { ...customer } });
+  b.status = "paid";
+  b.customer.name = "改ざん";
+  const got = store.getBookings().find((x) => x.id === b.id);
+  assert.equal(got.status, "pending");
+  assert.equal(got.customer.name, customer.name);
+});
+
+test("複製: getDaysOff の結果を書き換えても次の getDaysOff・別の store に影響しない", () => {
+  const { store, open } = setup();
+  store.toggleDayOff("s1", FAR);
+  const n = store.getDaysOff().length;
+  const list = store.getDaysOff();
+  list[0].date = "1999-01-01";
+  list.push({ staffId: "s3", date: "1999-01-02" });
+  list.length = 0;
+  const again = store.getDaysOff();
+  assert.equal(again.length, n);
+  assert.ok(again.every((d) => d.date !== "1999-01-01" && d.date !== "1999-01-02"));
+  const other = open().getDaysOff();
+  assert.equal(other.length, n);
+  assert.ok(other.every((d) => d.date !== "1999-01-01"));
 });
 
 // ---- prefs の不正値 ----
