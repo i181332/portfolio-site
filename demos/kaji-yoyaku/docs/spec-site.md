@@ -5,6 +5,7 @@
 ## ファイル
 ```
 index.html  service.html  flow.html  area.html  faq.html  contact.html  staff.html
+payment.html（カード払いのお試し。WordPress の見本ではなく、デモ用）
 css/tokens.css  base.css（そのまま）  pages.css（全ページ共通：ヘッダー・メニュー・フッター・デモ帯・上部の1行）
 css/top.css（トップ固有）  css/site.css（ほかの6ページの共通のレイアウト）
 js/config.js（設定）  js/content.js（スタッフなどの中身）  js/ui.js（共通部品）  js/top.js  js/site.js（ほか6ページの起動）
@@ -21,6 +22,9 @@ export const CONFIG = {
   booking: {            // Square 予約の URL。空なら「準備中」のモーダル
     shop: "",            // 店全体（担当を選ぶ所から）
     staff: { s1: "", s2: "", s3: "" }, // 担当を指定した入口。作れなければ空のまま（店全体へ）
+  },
+  payment: {            // Stripe のテスト用 Payment Link（2時間 7,000円）。空なら「準備中」のモーダル
+    testLink: "",
   },
   storagePrefix: "kajiDemo.",
 };
@@ -53,12 +57,20 @@ export const CONFIG = {
 - `faq.html`：10問前後（初めての利用、家にいる必要、鍵、同じ担当、家族が予約、支払い方法、取り消し、保険・身分証「本制作時に確認」、作業時間の延長、お受けできない作業）。`<details>` で開閉
 - `contact.html`：名前・電話かメール・内容の見本フォーム。送信すると「デモのため送信しません。本番は無料のフォームサービスで届きます」のモーダル。電話番号の欄は「デモのため非掲載」
 
+- `payment.html`（カード払いのお試し）
+  - 冒頭：「Square 予約はお客様側で支払いを試せないため、デモではテスト用の支払い画面で、カード払いの操作を体験していただきます。実際の請求はありません」。本番は予約の時に Square のカード入力の画面が出る（見た目は異なるが、入れる物は同じ）
+  - テストのカード番号の案内：4242 4242 4242 4242、期限は未来の月年、セキュリティコードは3桁の任意の数字
+  - ボタン「テスト用の支払い画面を開く」（`[data-pay-test]`、同じタブ。URL は `CONFIG.payment.testLink`、空ならモーダル）
+  - 戻り：`?paid=1` で開かれた時は「テストのお支払いが完了しました。実際の請求はありません」を表示（`[data-pay-done]`）し、`history.replaceState` でクエリを消す
+  - トップの予約ボタンの近くと、flow.html の支払いの手順から、このページへのリンク（「カード払いを試す（テスト）」）を置く。メニューには入れない
+
 ## data 属性（e2e 用）
 - `header[data-chrome]`・`footer[data-chrome]`・`nav [data-nav-current]`
 - `[data-book="any|s1|s2|s3"]`、`[data-booking-note]`
 - `[data-staff-card="s1".."s3"]`（トップとスタッフ紹介）
 - `html[data-font-scale]`
 - `[data-demo-band]`
+- `[data-pay-test]`、`[data-pay-done]`、トップの `a[href="payment.html"]`
 
 ## 守ること
 - 制作者の名前・連絡先を出さない。中黒・「→」・英大文字ラベル・影・グラデーションは使わない。最小の文字は 16px（`--fs-small`）。押せる高さ 44px 以上。390・375・1440 で横スクロールなし。主ボタンはトップの最初の画面（390×844・375×667）に入る
