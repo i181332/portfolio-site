@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="ja" data-font-scale="normal">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>管理画面（デモ）</title>
+<meta name="description" content="予約の確認・取り消し、スタッフの休み設定を行う管理画面です（ご提案用のデモ）。">
+<script>
+  /* 「大きく」を選んだ方に、標準→大きくの瞬きを見せないため、モジュールより先に読む */
+  try {
+    var p = JSON.parse(localStorage.getItem("kajiDemo.prefs"));
+    if (p && p.fontScale === "large") document.documentElement.dataset.fontScale = "large";
+  } catch (e) {}
+</script>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%226%22 fill=%22%231E4A3A%22/%3E%3Ccircle cx=%2216%22 cy=%2216%22 r=%228%22 fill=%22none%22 stroke=%22%23fff%22 stroke-width=%223%22/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=Shippori+Mincho+B1:wght@600&display=swap">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/pages.css">
+<link rel="stylesheet" href="css/admin.css">
+<script type="module" src="js/admin.js"></script>
+</head>
+<body class="page-admin">
+
+<div class="topline" id="topline"></div>
+
+<main class="container admin" id="admin">
+  <header class="admin__head">
+    <h1 class="title-step admin__title">管理画面</h1>
+    <p class="admin__demo">デモ用の管理画面です。本番では Square予約の管理画面になります。ログインは設けていません。</p>
+    <p class="admin__links">
+      <a class="btn btn--primary" href="booking.html">予約画面を見る</a>
+      <a class="btn btn--secondary" href="index.html">トップへ</a>
+    </p>
+  </header>
+
+  <section class="admin__section" aria-labelledby="h-bookings">
+    <h2 class="title-step admin__h" id="h-bookings">予約の一覧</h2>
+    <p class="note admin__sub" id="bookings-summary" aria-live="polite"></p>
+    <div id="bookings"></div>
+  </section>
+
+  <section class="admin__section" aria-labelledby="h-dayoff">
+    <h2 class="title-step admin__h" id="h-dayoff">スタッフの休み</h2>
+    <p class="note admin__sub">日付を押すと、休みと出勤が切り替わります。変更はすぐ保存され、予約画面の空きに反映されます。すでに入っている予約は自動では取り消されません。</p>
+    <div id="dayoff"></div>
+  </section>
+
+  <section class="admin__section" aria-labelledby="h-week">
+    <h2 class="title-step admin__h" id="h-week">今週の空き状況</h2>
+    <p class="note admin__sub">今日から7日間の、2時間の利用で予約できる開始時刻の数です。</p>
+    <div id="week"></div>
+  </section>
+
+  <section class="admin__section admin__section--reset" aria-labelledby="h-reset">
+    <h2 class="title-step admin__h" id="h-reset">デモデータ</h2>
+    <p class="note admin__sub">予約と休みを、最初の見本の状態に戻します。文字の大きさの設定は残ります。</p>
+    <button type="button" class="btn btn--secondary" data-action="reset">デモデータを初期状態に戻す</button>
+  </section>
+</main>
+
+<footer class="container admin-foot" id="admin-foot"></footer>
+
+</body>
+</html>
