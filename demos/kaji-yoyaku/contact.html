@@ -28,10 +28,33 @@
 <header data-chrome></header>
 
 <main>
-  <!-- 枠だけのページ。中身は後の担当が、この下に節を足して書く -->
   <div class="page-head container">
     <h1>お問い合わせ</h1>
   </div>
+
+  <section class="container s-sect s-contact" aria-labelledby="h-form">
+    <h2 class="s-title" id="h-form">お問い合わせ</h2>
+    <p>予約の前に聞いておきたいことを、お送りください。（見本のフォームです）</p>
+    <form class="s-form" id="contact-form" novalidate>
+      <div class="field">
+        <label class="field__label" for="c-name">お名前</label>
+        <input class="input" id="c-name" name="name" type="text" autocomplete="name" required>
+      </div>
+      <div class="field">
+        <label class="field__label" for="c-reach">お電話番号かメールアドレス</label>
+        <input class="input" id="c-reach" name="reach" type="text" autocomplete="email" required>
+      </div>
+      <div class="field">
+        <label class="field__label" for="c-body">お問い合わせの内容</label>
+        <textarea class="input" id="c-body" name="body" rows="5" required></textarea>
+      </div>
+      <button class="btn btn--primary s-form__btn" type="submit">送信する（見本）</button>
+    </form>
+    <dl class="s-info">
+      <div><dt>電話番号</dt><dd>デモのため非掲載</dd></div>
+      <div><dt>対応エリア</dt><dd>東京都八王子市、高尾周辺</dd></div>
+    </dl>
+  </section>
 </main>
 
 <footer data-chrome></footer>

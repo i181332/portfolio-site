@@ -28,10 +28,54 @@
 <header data-chrome></header>
 
 <main>
-  <!-- 枠だけのページ。中身は後の担当が、この下に節を足して書く -->
   <div class="page-head container">
     <h1>ご利用の流れ</h1>
   </div>
+
+  <section class="container s-sect" aria-labelledby="h-steps">
+    <h2 class="s-title" id="h-steps">ご利用の流れ</h2>
+    <ol class="s-steps" role="list">
+      <li class="s-step">
+        <span class="s-step__num" aria-hidden="true">1</span>
+        <div><h3>空き状況を見て予約する</h3><p>担当と日時を選びます。予約の画面は Square 予約で、本番も同じ画面です。</p></div>
+      </li>
+      <li class="s-step">
+        <span class="s-step__num" aria-hidden="true">2</span>
+        <div>
+          <h3>Square でカードの事前払い</h3>
+          <p>予約の時に、カードでお支払いいただくと予約が決まります。当日に現金のやり取りはありません。</p>
+          <a class="link link--action" href="payment.html">カード払いを試す（テスト）</a>
+        </div>
+      </li>
+      <li class="s-step">
+        <span class="s-step__num" aria-hidden="true">3</span>
+        <div><h3>当日、担当がお伺いする</h3><p>どこから始めるかを、玄関で一緒に決めてから作業します。</p></div>
+      </li>
+      <li class="s-step">
+        <span class="s-step__num" aria-hidden="true">4</span>
+        <div><h3>作業の後にご報告する</h3><p>終えた場所と、気づいたことをお伝えします。</p></div>
+      </li>
+    </ol>
+  </section>
+
+  <section class="s-band s-band--mist" aria-labelledby="h-cancel">
+    <div class="container s-sect">
+      <h2 class="s-title" id="h-cancel">取り消しの決まり</h2>
+      <p>本制作時に正式な規定を掲載します。</p>
+    </div>
+  </section>
+
+  <section class="container s-sect" id="family" aria-labelledby="h-family">
+    <h2 class="s-title" id="h-family">ご家族が代わりに予約する時</h2>
+    <p>離れて暮らすご家族の代わりに、予約することができます。</p>
+    <ul class="s-list" role="list">
+      <li>お伺い先の住所と、連絡を受ける方を分けて入力できます。</li>
+      <li>作業の後の報告は、ご家族の方にも届きます。</li>
+      <li>同じ担当が続けて伺うので、家の中のことを毎回説明しなくて済みます。</li>
+    </ul>
+    <a class="btn btn--primary s-closing__btn" data-book="any">空き状況を見て予約する</a>
+    <span data-booking-note-slot></span>
+  </section>
 </main>
 
 <footer data-chrome></footer>

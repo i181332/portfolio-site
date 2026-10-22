@@ -41,6 +41,16 @@ function mountPayment() {
   });
 }
 
+/* ---------- お問い合わせ（contact.html）：送信せず、見本のモーダルを出す ---------- */
+function mountContact() {
+  const form = $("main form");
+  if (!form) return;
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    openModal({ title: "デモのため送信しません", body: "デモのため送信しません。本番は無料のフォームサービスで届きます。" });
+  });
+}
+
 /* ---------- 読み込み時 ---------- */
 mountChrome({ current: currentPage() });
 const staffList = $("#staff-list");
@@ -48,3 +58,4 @@ if (staffList) renderStaffList(staffList);
 document.querySelectorAll("[data-booking-note-slot]").forEach((n) => n.replaceWith(bookingNote()));
 wireBookingButtons(document);
 mountPayment();
+mountContact();

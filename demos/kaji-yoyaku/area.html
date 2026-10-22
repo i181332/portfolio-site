@@ -28,10 +28,40 @@
 <header data-chrome></header>
 
 <main>
-  <!-- 枠だけのページ。中身は後の担当が、この下に節を足して書く -->
   <div class="page-head container">
     <h1>対応エリア</h1>
   </div>
+
+  <section class="container s-sect" aria-labelledby="h-area">
+    <h2 class="s-title" id="h-area">お伺いする地域</h2>
+    <p class="s-lead">八王子市の高尾周辺にお伺いします。高尾駅、狭間駅、めじろ台駅のまわりを中心に、西八王子駅、八王子駅の近くもお受けします。</p>
+    <h3 class="s-sub">八王子市の地区</h3>
+    <ul class="s-chips" role="list">
+      <li>高尾町</li><li>東浅川町</li><li>初沢町</li><li>館町</li><li>散田町</li><li>狭間町</li>
+      <li>椚田町</li><li>長房町</li><li>元八王子町</li><li>横山町</li><li>明神町</li>
+    </ul>
+    <p class="note">ほかの地区もお受けできる場合があります。</p>
+    <h3 class="s-sub">最寄りの駅</h3>
+    <ul class="s-chips" role="list">
+      <li>高尾</li><li>狭間</li><li>めじろ台</li><li>西八王子</li><li>八王子</li>
+    </ul>
+  </section>
+
+  <section class="s-band s-band--mist" aria-labelledby="h-out">
+    <div class="container s-sect">
+      <h2 class="s-title" id="h-out">エリアの外の方へ</h2>
+      <p>エリア外もご相談ください。交通費の扱いは<span class="s-tbd">本制作時に確認</span>します。</p>
+      <a class="btn btn--secondary s-closing__btn" href="contact.html">お問い合わせ</a>
+    </div>
+  </section>
+
+  <section class="s-band s-band--mist" aria-labelledby="h-close">
+    <div class="container s-closing">
+      <h2 class="s-title" id="h-close">空いている日を見てみませんか</h2>
+      <a class="btn btn--primary s-closing__btn" data-book="any">空き状況を見て予約する</a>
+      <span data-booking-note-slot></span>
+    </div>
+  </section>
 </main>
 
 <footer data-chrome></footer>
