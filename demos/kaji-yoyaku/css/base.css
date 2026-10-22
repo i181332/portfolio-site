@@ -423,7 +423,7 @@ textarea.input { min-height: 8rem; resize: vertical; }
   background: var(--paper);
   line-height: 1.2;
 }
-.day__date { font-size: var(--fs-small); color: var(--mute); }
+.day__month { margin-inline-end: 1px; font-size: var(--fs-small); font-weight: 400; color: var(--mute); }
 .day__num { font-size: var(--fs-figure); font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
 .day__wd { font-size: var(--fs-ui); font-weight: 700; }
 .day .mark { margin-block-start: var(--space-1); }
@@ -546,6 +546,7 @@ textarea.input { min-height: 8rem; resize: vertical; }
   white-space: nowrap;
 }
 .stack > * + * { margin-block-start: var(--space-4); }
+.nowrap { white-space: nowrap; }
 
 /* ========== フォーカスの輪郭 ========== */
 :focus { outline: none; }
@@ -554,6 +555,7 @@ textarea.input { min-height: 8rem; resize: vertical; }
   outline-offset: 3px;
 }
 .input:focus-visible { outline-offset: 1px; border-color: var(--sugi); }
+.input[aria-invalid="true"]:focus-visible { border-color: var(--alert); }  /* 誤りの欄は、フォーカス中も赤枠のまま */
 .switch:has(.switch__input:focus-visible) { outline: var(--border-strong) solid var(--focus-ring); outline-offset: 3px; }
 .switch__input:focus-visible { outline: none; }
 

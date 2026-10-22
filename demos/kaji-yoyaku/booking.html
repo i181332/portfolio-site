@@ -45,26 +45,31 @@
     <h1 class="title-step booking__title" id="h-1" tabindex="-1">利用時間を選んでください</h1>
     <p class="booking__lead" id="rate-note"></p>
     <div class="choices" role="radiogroup" aria-labelledby="h-1" id="hours-list"></div>
-    <p class="note booking__aside">交通費・用具代の扱いは、本制作の時にお店と決めて記載します。</p>
-    <div class="booking__actions"><button type="button" class="btn btn--primary btn--block" data-next="1">この利用時間で進む</button></div>
+    <p class="note booking__aside">税の扱い（税込か税別か）・交通費・用具代は、本制作の時にお店と確かめて記載します。</p>
+    <div class="dock"><button type="button" class="btn btn--primary btn--block" data-next="1">この利用時間で進む</button></div>
   </section>
 
   <section data-step="2" aria-labelledby="h-2" hidden>
-    <dl class="carry" data-carry></dl>
     <h1 class="title-step booking__title booking__title--tight" id="h-2" tabindex="-1">担当と日時を選んでください</h1>
     <div class="staffpick" role="radiogroup" aria-label="担当" id="staff-list"></div>
     <div class="staffintro" id="staff-intro" aria-live="polite"></div>
     <div class="schedule" id="schedule">
-      <h2 class="booking__sub" id="h-2-date">日にち<span class="booking__subnote">横に動かすと先の日も見られます</span></h2>
+      <div class="booking__subrow">
+        <h2 class="booking__sub" id="h-2-date">日にち</h2>
+        <div class="daynav">
+          <button type="button" class="daynav__btn" id="day-prev"><span aria-hidden="true">‹</span> 前の日へ</button>
+          <button type="button" class="daynav__btn" id="day-next">次の日へ <span aria-hidden="true">›</span></button>
+        </div>
+      </div>
       <div class="datestrip" role="radiogroup" aria-labelledby="h-2-date" id="date-strip"></div>
       <h2 class="booking__sub" id="h-2-slot"><span id="slot-heading">開始時刻</span></h2>
       <p class="booking__dayinfo" id="day-info" hidden></p>
       <div class="slots" role="radiogroup" aria-labelledby="h-2-slot" id="slot-list"></div>
     </div>
     <div class="dock">
-      <p class="field__error booking__error" id="slot-error" role="alert" hidden>開始時刻を1つ選んでください。○の付いた時刻を押すと選べます。</p>
+      <p class="dock__hint" id="slot-hint"><span aria-hidden="true">↓</span> 下の時刻から1つ選んでください</p>
       <p class="dock__picked" id="picked" aria-live="polite" hidden></p>
-      <button type="button" class="btn btn--primary btn--block" data-next="2" aria-disabled="true">この時間で予約する</button>
+      <button type="button" class="btn btn--primary btn--block" data-next="2" hidden>この時間で予約する</button>
     </div>
   </section>
 
@@ -79,40 +84,41 @@
       </label>
       <p class="note booking__proxynote" id="proxy-note" hidden>お伺いする先の方と、ご連絡を受ける方を分けて入力できます。当日の連絡や作業後の報告は、ご家族の方にお届けします。</p>
 
-      <fieldset class="booking__group">
+      <fieldset class="booking__group" id="proxy-fields" hidden>
+        <legend class="booking__legend">予約されるご家族のこと</legend>
+        <div class="field">
+          <label class="field__label" for="f-proxy-name">お名前<span class="field__req">必須</span></label>
+          <input class="input" id="f-proxy-name" name="proxyName" autocomplete="section-booker name" data-required="予約されるご家族のお名前を入力してください。">
+          <p class="field__error" id="e-proxy-name" hidden></p>
+        </div>
+        <div class="field">
+          <label class="field__label" for="f-proxy-phone">ご連絡先の電話番号<span class="field__req">必須</span></label>
+          <input class="input" id="f-proxy-phone" name="proxyPhone" type="tel" inputmode="tel" autocomplete="section-booker tel" data-required="ご連絡先の電話番号を入力してください。" data-phone>
+          <p class="field__error" id="e-proxy-phone" hidden></p>
+        </div>
+      </fieldset>
+
+      <fieldset class="booking__group" id="user-fields">
         <legend class="booking__legend" id="legend-user">ご本人のこと</legend>
         <div class="field">
           <label class="field__label" for="f-name">お名前<span class="field__req">必須</span></label>
-          <input class="input" id="f-name" name="name" autocomplete="name" data-required="お名前を入力してください。">
+          <input class="input" id="f-name" name="name" autocomplete="section-visit shipping name" data-required="お名前を入力してください。">
           <p class="field__error" id="e-name" hidden></p>
         </div>
         <div class="field">
           <label class="field__label" for="f-phone"><span id="phone-label">電話番号</span><span class="field__req" id="phone-req">必須</span></label>
           <p class="field__hint" id="h-phone">当日、お伺いの前にお電話することがあります。</p>
-          <input class="input" id="f-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" aria-describedby="h-phone" data-required="電話番号を入力してください。" data-phone>
+          <input class="input" id="f-phone" name="phone" type="tel" inputmode="tel" autocomplete="section-visit shipping tel" aria-describedby="h-phone" data-required="電話番号を入力してください。" data-phone>
           <p class="field__error" id="e-phone" hidden></p>
         </div>
         <div class="field">
           <label class="field__label" for="f-address">ご住所<span class="field__req">必須</span></label>
           <p class="field__hint" id="h-address">八王子市・高尾周辺のご自宅へお伺いします。</p>
-          <input class="input" id="f-address" name="address" autocomplete="street-address" aria-describedby="h-address" data-required="ご住所を入力してください。お伺いする先です。">
+          <input class="input" id="f-address" name="address" autocomplete="section-visit shipping street-address" aria-describedby="h-address" data-required="ご住所を入力してください。お伺いする先です。">
           <p class="field__error" id="e-address" hidden></p>
         </div>
       </fieldset>
 
-      <fieldset class="booking__group" id="proxy-fields" hidden>
-        <legend class="booking__legend">予約されるご家族のこと</legend>
-        <div class="field">
-          <label class="field__label" for="f-proxy-name">お名前<span class="field__req">必須</span></label>
-          <input class="input" id="f-proxy-name" name="proxyName" autocomplete="name" data-required="予約されるご家族のお名前を入力してください。">
-          <p class="field__error" id="e-proxy-name" hidden></p>
-        </div>
-        <div class="field">
-          <label class="field__label" for="f-proxy-phone">ご連絡先の電話番号<span class="field__req">必須</span></label>
-          <input class="input" id="f-proxy-phone" name="proxyPhone" type="tel" inputmode="tel" autocomplete="tel" data-required="ご連絡先の電話番号を入力してください。" data-phone>
-          <p class="field__error" id="e-proxy-phone" hidden></p>
-        </div>
-      </fieldset>
 
       <div class="field">
         <label class="field__label" for="f-notes">ご要望<span class="field__req">なくてもかまいません</span></label>
@@ -132,8 +138,10 @@
       <button type="button" class="link link--action" data-goto="3">お客様情報を直す</button>
     </p>
     <div class="booking__paynote">
-      <p>次の画面でカードのお支払いに進みます。今回はテスト用の決済で、実際の請求はありません。テスト決済の画面は、本番のお支払い画面とは見た目が異なります。</p>
-      <p class="note">お支払いが15分以内に終わらない時は、この枠をほかの方に空けます。</p>
+      <p>次の画面でカードのお支払いに進みます。</p>
+      <p class="booking__deadline">お支払いが15分以内に終わらない時は、この時間をほかの方にお譲りします。</p>
+      <p class="booking__policy">ご予約の取り消しは、日にちによって料金がかかる場合があります。<button type="button" class="link link--action" data-policy>取り消しの決まりを見る</button></p>
+      <p class="note">（デモの説明）今回はテスト用のお支払いで、実際の請求はありません。テスト用の画面は、本番のお支払い画面とは見た目が異なります。</p>
     </div>
     <p class="field__error booking__error" id="pay-error" role="alert" hidden></p>
     <div class="booking__actions"><button type="button" class="btn btn--primary btn--block" id="pay">カードで支払う（テスト）</button></div>

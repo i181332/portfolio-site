@@ -5,7 +5,7 @@ import { CONFIG } from "./config.js";
 import { formatDate, formatHour, formatYen, yenParts, dateParts, toISODate, addDays } from "./format.js";
 import { slotStatus, slotStatusAny, assignStaff, dayHasOpening, bookingState } from "./availability.js";
 import { createStore } from "./store.js";
-import { h, reasonText, familyName, mountFontScale, mountDemoBand, aboutDemoButton, SHOP_NAME } from "./ui.js";
+import { h, reasonText, familyName, mountFontScale, mountDemoBand, aboutDemoButton, openModal, SHOP_NAME } from "./ui.js";
 
 const store = createStore(window.localStorage);
 const $ = (sel, root = document) => root.querySelector(sel);
@@ -199,6 +199,8 @@ function renderHours() {
 
 /* ================= 手順2 担当と日時（1画面） ================= */
 // 担当は横1列のタイル（どなたでも＋3名）。替えるとその場で日付と時刻の ○× が切り替わる
+// 「どなたでも」の円は文字を置かず、3人の形だけ（下の名前「どなたでも」と言葉を重ねない）
+const ANY_MARK = '<svg viewBox="0 0 40 28" width="40" height="28" fill="currentColor"><circle cx="9" cy="10" r="4.5"/><circle cx="31" cy="10" r="4.5"/><path d="M0 27c0-5 4-9 9-9s9 4 9 9zM22 27c0-5 4-9 9-9s9 4 9 9z" opacity=".65"/><circle cx="20" cy="8" r="5.5"/><path d="M9 28c0-7 5-12 11-12s11 5 11 12z"/></svg>';
 const STAFF_PHOTO = (id) => `assets/staff-${id}.webp`;
 function staffAvatar(s) {
   const initial = h("span", { class: "staffpick__initial" }, familyName(s.name)[0]);
@@ -214,11 +216,10 @@ const staffList = bindRadios($("#staff-list"), (btn) => {
   renderIntro();
   renderSchedule({ swap: true });
 });
-function renderPick() {
-  renderCarry(2);
+function renderPick() { // 利用時間は上部に残さず、時刻の見出しに入れる（最初の画面に最初の時刻の行まで収めるため）
   if (sel.staff !== "any" && !staffById(sel.staff)) sel.staff = "any";
-  const any = h("button", { type: "button", class: "staffpick__tile", role: "radio", "data-staff": "any", "aria-label": "どなたでもよい" },
-    h("span", { class: "staffpick__photo staffpick__photo--any", "aria-hidden": "true" }, h("span", { class: "staffpick__initial" }, "指名", h("br"), "なし")),
+  const any = h("button", { type: "button", class: "staffpick__tile", role: "radio", "data-staff": "any", "aria-label": "どなたでも" },
+    h("span", { class: "staffpick__photo staffpick__photo--any", "aria-hidden": "true", html: ANY_MARK }),
     h("span", { class: "staffpick__name", "aria-hidden": "true" }, "どなたでも"));
   const tiles = staffAll().map((s) => h("button", { type: "button", class: "staffpick__tile", role: "radio", "data-staff": s.id, "aria-label": s.name },
     staffAvatar(s), h("span", { class: "staffpick__name", "aria-hidden": "true" }, familyName(s.name))));
@@ -232,7 +233,7 @@ function renderIntro() {
   const box = $("#staff-intro");
   if (sel.staff === "any") {
     box.replaceChildren(
-      h("p", { class: "staffintro__text" }, h("span", { class: "staffintro__name" }, "どなたでもよい"), "その時間に空いている者がお伺いします。時刻の右に担当の名前が出ます。"));
+      h("p", { class: "staffintro__text" }, "その時間に空いている者がお伺いします。"));
     return;
   }
   const s = staffById(sel.staff);
@@ -240,7 +241,8 @@ function renderIntro() {
   box.replaceChildren(
     h("p", { class: "staffintro__text" }, h("span", { class: "staffintro__name" }, s.name), s.intro),
     h("p", { class: "staffintro__meta" }, `得意なこと　${s.skills.join("、")}`),
-    h("p", { class: "staffintro__meta staffintro__last" }, h("span", {}, `お伺いできる曜日　${days}（${formatHour(s.start)}〜${formatHour(s.end)}）`),
+    h("p", { class: "staffintro__meta staffintro__last" }, h("span", {}, `お伺いできる曜日　${days}`,
+      h("span", { class: "nowrap" }, `（${formatHour(s.start)}〜${formatHour(s.end)}）`)),
       h("span", { class: "staffintro__photonote" }, "写真は素材です（本番はご本人）")));
 }
 
@@ -250,6 +252,33 @@ const dateStrip = bindRadios($("#date-strip"), (btn) => {
   check($("#date-strip"), btn);
   renderSlots();
 });
+// 「前の日へ」「次の日へ」：選んだ日を1日ずらす（PC のマウスでも先の日へ動ける。帯は選んだ日を中央へ送る）
+function stepDay(delta) {
+  const dates = bookableDates();
+  const i = dates.indexOf(sel.date) + delta;
+  if (i < 0 || i >= dates.length) return;
+  sel.date = dates[i]; sel.keepDate = true; sel.start = null; sel.assigned = null; saveSel();
+  check(dateStrip, dateStrip.querySelector(`[data-date="${sel.date}"]`));
+  centerSelectedDay();
+  renderSlots();
+}
+function updateDayNav() {
+  const dates = bookableDates();
+  const i = dates.indexOf(sel.date);
+  $("#day-prev").setAttribute("aria-disabled", String(i <= 0));
+  $("#day-next").setAttribute("aria-disabled", String(i >= dates.length - 1));
+}
+for (const [id, d] of [["day-prev", -1], ["day-next", 1]]) {
+  $(`#${id}`).addEventListener("click", (e) => { if (e.currentTarget.getAttribute("aria-disabled") !== "true") stepDay(d); });
+}
+function centerSelectedDay() {
+  requestAnimationFrame(() => {
+    const selected = dateStrip.querySelector('[aria-checked="true"]');
+    if (!selected) return;
+    const left = selected.offsetLeft - dateStrip.offsetLeft;
+    dateStrip.scrollLeft = Math.max(0, left - (dateStrip.clientWidth - selected.offsetWidth) / 2);
+  });
+}
 const slotList = bindRadios($("#slot-list"), (btn) => {
   sel.start = Number(btn.dataset.slot);
   sel.assigned = btn.dataset.assigned;
@@ -259,19 +288,23 @@ const slotList = bindRadios($("#slot-list"), (btn) => {
   slotList.querySelectorAll(".slot[data-status=open] .mark-label").forEach((l) => {
     l.textContent = l.closest(".slot") === btn ? "選択中" : "空き";
   });
-  $("#slot-error").hidden = true;
+  // 主ボタンが出て下の固定欄が伸びるので、押した行がその後ろに隠れないように送る
+  requestAnimationFrame(() => {
+    const dockTop = $('[data-step="2"] .dock').getBoundingClientRect().top;
+    const r = btn.getBoundingClientRect();
+    if (r.bottom > dockTop - 8) window.scrollBy({ top: r.bottom - dockTop + 16 });
+  });
 });
 
-// 下部の固定ボタン：時刻を選ぶまで aria-disabled（押すと案内を出す）
+// 下部の固定欄：時刻を選ぶまでは主ボタンを出さず、「下の時刻から1つ選んでください」の案内だけ
 function updateDock() {
   const ready = sel.start != null && !!sel.assigned;
-  const btn = $('[data-next="2"]');
-  if (ready) btn.removeAttribute("aria-disabled"); else btn.setAttribute("aria-disabled", "true");
-  $("#picked").hidden = !ready; // 最初の画面に日付の帯まで収めるため、選ぶまでは出さない
+  $('[data-next="2"]').hidden = !ready;
+  $("#slot-hint").hidden = ready;
+  $("#picked").hidden = !ready;
   $("#picked").textContent = ready
     ? `${formatDate(sel.date)} ${formatHour(sel.start)}〜${formatHour(sel.start + sel.hours)}　担当：${familyName(staffLabel(sel.assigned))}`
     : "";
-  if (ready) $("#slot-error").hidden = true;
 }
 function renderSchedule({ swap = false } = {}) {
   if (swap) { // 担当を替えた時だけ短く切り替わる（reduced-motion では base.css が止める）
@@ -289,19 +322,13 @@ function renderSchedule({ swap = false } = {}) {
   dateStrip.replaceChildren(...dates.map((date, i) => {
     const p = dateParts(date);
     return h("button", { type: "button", class: "day", role: "radio", "data-date": date, "data-open": String(opens[i]) },
-      h("span", { class: "day__date" }, `${p.month}月`),
-      h("span", { class: "day__num" }, p.day),
+      h("span", { class: "day__num" }, h("span", { class: "day__month" }, `${p.month}/`), p.day),
       h("span", { class: "day__wd" }, p.dow),
       h("span", { class: "mark", "aria-hidden": "true" }),
       h("span", { class: "visually-hidden" }, opens[i] ? "空きあり" : "空きなし"));
   }));
-  const selected = dateStrip.querySelector(`[data-date="${sel.date}"]`);
-  check(dateStrip, selected);
-  requestAnimationFrame(() => {
-    const strip = dateStrip;
-    const left = selected.offsetLeft - strip.offsetLeft - 16;
-    strip.scrollLeft = Math.max(0, left - (strip.clientWidth - selected.offsetWidth) / 2 + 16);
-  });
+  check(dateStrip, dateStrip.querySelector(`[data-date="${sel.date}"]`));
+  centerSelectedDay();
   renderSlots();
 }
 
@@ -335,12 +362,12 @@ function renderSlots() {
   updateDock();
 
   const openCount = rows.filter((r) => r.dataset.status === "open").length;
-  $("#slot-heading").textContent = `${formatDate(sel.date)}の開始時刻`;
+  $("#slot-heading").textContent = `${formatDate(sel.date)}の開始時刻（${sel.hours}時間）`;
   const info = $("#day-info");
   info.hidden = openCount > 0;
   const who = sel.staff === "any" ? "" : `${familyName(staffLabel(sel.staff))}は`;
   info.textContent = openCount ? "" : `この日、${who}${sel.hours}時間で始められる時刻がありません。○の付いた日を選ぶか、担当を替えてください。`;
-  $("#slot-error").hidden = true;
+  updateDayNav();
 }
 
 /* ================= 手順3 お客様情報 ================= */
@@ -352,6 +379,7 @@ function setProxy(on) {
   $("#proxy-fields").hidden = !on;
   $("#proxy-note").hidden = !on;
   $("#legend-user").textContent = on ? "ご利用になる方（お伺い先）のこと" : "ご本人のこと";
+  $("#h-phone").textContent = on ? "ご本人に直接かけてよい場合だけご記入ください。" : "当日、お伺いの前にお電話することがあります。";
   $("#phone-label").textContent = on ? "ご利用になる方の電話番号" : "電話番号";
   $("#phone-req").textContent = on ? "なくてもかまいません" : "必須";
   $("#f-phone").toggleAttribute("data-optional", on);
@@ -429,14 +457,15 @@ function readoutOf(b) {
       ? h("p", {}, "ご連絡は、ご家族の", h("b", {}, `${c.proxy.name}様`), `（${c.proxy.phone}）にいたします。`)
       : h("p", {}, "ご連絡先は ", h("b", {}, c.phone), " です。"),
     c.notes ? h("p", {}, "ご要望は「", c.notes, "」です。") : null,
-    h("p", { class: "readout__price" }, "料金は ", h("span", { class: "figure figure--price" }, y.num, h("span", { class: "unit" }, y.unit)), " です。"),
+    h("p", { class: "readout__price" }, "料金は ", h("span", { class: "figure figure--price" }, y.num, h("span", { class: "unit" }, y.unit)), " です。",
+      h("span", { class: "readout__tax" }, "税込か税別かは、本制作の時に確かめて記載します。")),
   ];
-  return lines;
+  return lines.filter(Boolean); // replaceChildren は null を「null」の文字にするので、ここで落とす
 }
 function renderConfirm() {
   const draft = { staffId: sel.assigned, date: sel.date, start: sel.start, hours: sel.hours, customer: sel.customer };
-  const extra = sel.staff === "any" ? h("p", { class: "note" }, "「どなたでもよい」でお選びいただいたので、この時間に空いている者がお伺いします。") : null;
-  $("#readout").replaceChildren(...readoutOf(draft), extra);
+  const extra = sel.staff === "any" ? h("p", { class: "note" }, "「どなたでも」でお選びいただいたので、この時間に空いている者がお伺いします。") : null;
+  $("#readout").replaceChildren(...[...readoutOf(draft), extra].filter(Boolean));
   $("#pay-error").hidden = true;
 }
 
@@ -475,9 +504,16 @@ $("#flow").addEventListener("click", (e) => {
   const next = e.target.closest("[data-next]");
   if (next) onNext(next.dataset.next);
 });
+$("#flow").addEventListener("click", (e) => { if (e.target.closest("[data-policy]")) showPolicy(); });
+// 取り消しの決まり（正式な規定は本制作でお店と決める）
+function showPolicy() {
+  openModal({ title: "取り消しの決まり", body: [
+    "ご予約の取り消しや日時の変更について、いつまでなら無料か、いつから料金がかかるかを、ここに掲載します。",
+    "正式な規定は、本制作の時にお店と決めて掲載します（このデモでは未定です）。",
+  ] });
+}
 function onNext(step) {
   if (step === "2" && (sel.start == null || !sel.assigned)) {
-    $("#slot-error").hidden = false;
     slotList.querySelector("[data-status=open]")?.focus();
     return;
   }
@@ -528,20 +564,21 @@ function renderTestpay() {
   const b = bookingById(store.getPendingId());
   const y = yenParts(b.amount);
   $("#testpay").replaceChildren(
-    h("p", { class: "testpay__lead" }, "Stripe はまだ接続していません。接続するまでは、この画面でお支払いの流れだけを再現します。実際の請求はありません。"),
+    h("p", { class: "testpay__lead" }, "ここはデモ用のお支払いの画面です。カード番号の入力はいらず、実際の請求もありません。"),
     h("div", { class: "testpay__card" },
       h("p", { class: "testpay__amount" }, h("span", { class: "testpay__label" }, "お支払い金額"), h("span", { class: "figure figure--price" }, y.num, h("span", { class: "unit" }, y.unit))),
       h("p", { class: "testpay__row" }, h("span", { class: "testpay__label" }, "内容"), `家事代行 ${b.hours}時間（${formatDate(b.date)} ${formatHour(b.start)}から）`),
       h("p", { class: "testpay__row" }, h("span", { class: "testpay__label" }, "カード"), "テスト用のカード（番号の入力は不要です）"),
       h("p", { class: "testpay__row" }, h("span", { class: "testpay__label" }, "予約番号"), b.id)),
-    h("p", { class: "note" }, `${deadlineText(b.expiresAt)}までにお支払いがないと、この枠をほかの方に空けます。「戻る」を押すと仮の予約を取り消し、確認の画面に戻ります。`),
-    h("div", { class: "booking__actions" }, h("button", { type: "button", class: "btn btn--primary btn--block", "data-action": "testpay", onclick: () => completePayment(null) }, "支払う（テスト）")));
+    h("p", { class: "booking__deadline" }, `${deadlineText(b.expiresAt)}までにお支払いがないと、この時間をほかの方にお譲りします。「戻る」を押すと仮の予約を取り消し、確認の画面に戻ります。`),
+    h("div", { class: "booking__actions" }, h("button", { type: "button", class: "btn btn--primary btn--block", "data-action": "testpay", onclick: () => completePayment(null) }, "支払う（テスト）")),
+    h("p", { class: "note testpay__demo" }, "（デモの説明）本番では、カード決済サービス Stripe（ストライプ）のお支払い画面に移ります。"));
 }
 
 function renderUnpaid() {
   const b = bookingById(store.getPendingId());
   $("#unpaid").replaceChildren(
-    h("p", { class: "booking__lead" }, `この予約は、まだお支払いが終わっていません。${deadlineText(b.expiresAt)}までにお支払いがないと、この枠をほかの方に空けます。`),
+    h("p", { class: "booking__lead" }, `この予約は、まだお支払いが終わっていません。${deadlineText(b.expiresAt)}までにお支払いがないと、この時間をほかの方にお譲りします。`),
     bookingSummary(b),
     h("div", { class: "booking__actions booking__actions--pair" },
       h("button", { type: "button", class: "btn btn--primary btn--block", "data-action": "resume", onclick: () => toPayment(b) }, "支払いに進む"),
@@ -551,8 +588,8 @@ function renderUnpaid() {
 }
 
 const NOTICE = {
-  expired: ["お支払いの期限が過ぎました", "15分以内にお支払いが終わらなかったため、仮に押さえていた枠をほかの方に空けました。お手数ですが、もう一度お選びください。"],
-  cancelled: ["予約を取り消しました", "仮に押さえていた枠を空けました。お支払いは発生していません。"],
+  expired: ["お支払いの期限が過ぎました", "15分以内にお支払いが終わらなかったため、仮に押さえていた時間をほかの方にお譲りしました。お手数ですが、もう一度お選びください。"],
+  cancelled: ["予約を取り消しました", "仮に押さえていた時間を空けました。お支払いは発生していません。"],
   nopending: ["お支払いを確かめる予約が見つかりません", "この端末には、お支払いを待っている予約がありません。別の端末やブラウザで予約を始めた場合は、そちらの画面でご確認ください。"],
 };
 function renderNotice() {
@@ -562,20 +599,35 @@ function renderNotice() {
     h("div", { class: "booking__actions" }, h("button", { type: "button", class: "btn btn--primary btn--block", onclick: () => { resetSel(); go("1"); } }, "空き状況を見て予約する")));
 }
 
+// 完了：お客様向けに「誰の家に・いつ・誰が・誰へ連絡」と、この後の流れ・取り消しの連絡先・控え方。
+// デモの仕組み（同じ時刻が×になる・お店の管理画面）は、下の「デモの確認用」の小さな行からだけ見せる
 function renderDone() {
   const b = bookingById(doneId);
+  const c = b.customer;
+  const contact = c.proxy ? `ご家族の${c.proxy.name}様` : `${c.name}様`;
+  const sub = (text) => h("h2", { class: "done__sub" }, text);
   $("#done").replaceChildren(
-    bookingSummary(b),
-    h("div", { class: "proof" },
-      h("div", { class: "slot proof__slot", "data-status": "closed", "aria-hidden": "true" },
-        h("span", { class: "slot__time" }, formatHour(b.start)),
-        h("span", { class: "slot__state" }, h("span", { class: "mark" }), h("span", { class: "mark-label" }, "予約済み"))),
-      h("p", { class: "proof__text" }, "この枠は予約できなくなりました。予約画面でも × に変わっています。")),
-    h("div", { class: "booking__actions booking__actions--pair" },
-      h("button", { type: "button", class: "btn btn--secondary btn--block", "data-action": "see-slot", onclick: () => {
+    h("p", { class: "done__id" }, "予約番号 ", h("b", { class: "summary__id" }, b.id), h("span", { class: "done__paid" }, "お支払い済み")),
+    h("div", { class: "readout readout--done" }, readoutOf(b)),
+    sub("この後の流れ"),
+    h("ol", { class: "done__steps" },
+      h("li", {}, `前日までに、お店から${contact}へお電話で内容をお確かめします。`),
+      h("li", {}, `当日は${staffLabel(b.staffId)}がお伺いします。着く少し前に、${contact}へお電話します。`),
+      h("li", {}, `作業が終わったら、${contact}へ作業のご報告をお届けします。`)),
+    sub("取り消し・変更をしたい時"),
+    h("p", {}, "お店へお電話ください。電話番号は", h("b", {}, "本制作時に掲載"), "します（このデモでは未定です）。"),
+    h("p", {}, h("button", { type: "button", class: "link link--action", "data-policy": "" }, "取り消しの決まりを見る")),
+    sub("この内容を控えておくには"),
+    h("p", {}, "本番では、ご予約の内容を確認のメールか SMS（携帯電話のメッセージ）でお送りします。この画面を印刷するか、写真に撮って残すこともできます。"),
+    h("div", { class: "booking__actions done__actions" },
+      h("button", { type: "button", class: "btn btn--secondary btn--block", "data-action": "print", onclick: () => window.print() }, "この画面を印刷する"),
+      h("a", { class: "link link--action", href: "index.html" }, "トップページへ")),
+    h("p", { class: "done__democheck" }, "デモの確認用：",
+      h("button", { type: "button", class: "link", "data-action": "see-slot", onclick: () => {
         resetSel({ staff: b.staffId, hours: b.hours, date: b.date, keepDate: true }); go("2");
-      } }, "空き状況で確かめる"),
-      h("a", { class: "link link--action", href: "admin.html" }, "管理画面を見る")));
+      } }, "予約画面（デモ）"),
+      h("span", { "aria-hidden": "true" }, "・"),
+      h("a", { class: "link", href: "admin.html" }, "管理画面（デモ）")));
 }
 
 /* ================= 読み込み時 ================= */
