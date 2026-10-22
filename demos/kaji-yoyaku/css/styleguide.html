@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="ja" data-font-scale="normal">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>部品の一覧（確認用）</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=Shippori+Mincho+B1:wght@600&display=swap">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="base.css">
+<style>
+  /* 確認ページだけの並べ方（pages.css ではない） */
+  .sg-section { padding-block: var(--space-7); border-top: 1px solid var(--line); }
+  .sg-section:first-of-type { border-top: 0; }
+  .sg-h { font-family: var(--font-ui); font-size: var(--fs-small); font-weight: 700; color: var(--mute); letter-spacing: 0.04em; margin-block-end: var(--space-4); }
+  .sg-grid { display: grid; gap: var(--space-6); }
+  .sg-grid > * { min-width: 0; }
+  @media (min-width: 900px) { .sg-grid--2 { grid-template-columns: 1fr 1fr; align-items: start; } }
+  .sg-swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr)); gap: var(--space-4); }
+  .sg-swatch { display: grid; gap: var(--space-1); font-size: var(--fs-small); line-height: 1.5; }
+  .sg-swatch i { display: block; height: 3.5rem; border-radius: var(--radius-control); border: 1px solid var(--line); }
+  .sg-row { display: flex; flex-wrap: wrap; gap: var(--space-4); align-items: center; }
+  .sg-phone { max-width: var(--flow-max); border: 1px solid var(--line); border-radius: var(--radius-surface); overflow: hidden; }
+  .sg-phone .flow { padding-block: var(--space-5); }
+  .sg-compare-green { --ochre: var(--sugi); --ochre-text: var(--sugi); }
+  .sg-top { display: flex; flex-wrap: wrap; gap: var(--space-4); align-items: center; justify-content: space-between; padding-block: var(--space-3); }
+</style>
+</head>
+<body>
+
+<header class="container sg-top">
+  <p class="note">部品の一覧（確認用。公開ページではありません）</p>
+  <div class="scale-switch">
+    <span id="scale-label">文字の大きさ</span>
+    <div class="scale-switch__group" role="radiogroup" aria-labelledby="scale-label">
+      <button class="scale-switch__option" role="radio" aria-checked="true" data-scale="normal">標準</button>
+      <button class="scale-switch__option" role="radio" aria-checked="false" data-scale="large">大きく</button>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+
+  <section class="sg-section">
+    <h2 class="sg-h">書体と数字</h2>
+    <div class="stack">
+      <h1 class="title-display">掃除機がけと台所の片づけ。2時間からお伺いします。</h1>
+      <p class="lead">八王子・高尾のご自宅へ。1時間<span class="figure figure--price" style="font-size:1.25em">3,500<span class="unit">円</span></span>。</p>
+      <h2 class="title-step">日にちと開始時刻を選んでください</h2>
+      <p class="title-name">山本 和子</p>
+      <p>本文は BIZ UDPGothic の 18px、行間 1.9 です。手順は電話で予約する時と同じ順番で、1画面で1つだけ決めます。選んだ内容はいつでも「戻る」で直せます。</p>
+      <p class="note">補足の文字です。最短の2時間利用を前提に空きを表示しています。</p>
+      <p class="sg-row">
+        <span class="figure figure--price">7,000<span class="unit">円</span></span>
+        <span class="figure"><span class="unit unit--pre">午後</span>2<span class="unit">時</span></span>
+        <span class="figure">2<span class="unit">時間</span></span>
+      </p>
+    </div>
+  </section>
+
+  <section class="sg-section">
+    <h2 class="sg-h">色</h2>
+    <div class="sg-swatches">
+      <div class="sg-swatch"><i style="background:var(--paper)"></i>--paper #FFFFFF</div>
+      <div class="sg-swatch"><i style="background:var(--mist)"></i>--mist #EEF3EF</div>
+      <div class="sg-swatch"><i style="background:var(--ink)"></i>--ink #1C2326</div>
+      <div class="sg-swatch"><i style="background:var(--sugi)"></i>--sugi #1E4A3A</div>
+      <div class="sg-swatch"><i style="background:var(--sugi-deep)"></i>--sugi-deep #143428</div>
+      <div class="sg-swatch"><i style="background:var(--wakaba)"></i>--wakaba #2F7E52</div>
+      <div class="sg-swatch"><i style="background:var(--ochre)"></i>--ochre #B9802A（文字に使わない）</div>
+      <div class="sg-swatch"><i style="background:var(--ochre-text)"></i>--ochre-text #8A5E1C</div>
+      <div class="sg-swatch"><i style="background:var(--mute)"></i>--mute #5F6B6E</div>
+      <div class="sg-swatch"><i style="background:var(--alert)"></i>--alert #A3352B</div>
+    </div>
+  </section>
+
+  <section class="sg-section">
+    <h2 class="sg-h">ボタンと文字リンク</h2>
+    <div class="sg-grid sg-grid--2">
+      <div class="stack">
+        <button class="btn btn--primary btn--block">この時間で予約する</button>
+        <button class="btn btn--secondary btn--block">担当を選び直す</button>
+        <button class="btn btn--primary btn--block" disabled>時刻を選ぶと進めます</button>
+      </div>
+      <div class="stack">
+        <a class="link link--action" href="#">お電話で予約する（デモのため番号は非掲載）</a>
+        <p>本文の中の <a class="link" href="#">キャンセル規定</a> のような文字リンクです。</p>
+        <div class="band band--sugi surface">
+          <p>濃緑の帯の上</p>
+          <button class="btn btn--primary">空き状況を見て予約する</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sg-section">
+    <h2 class="sg-h">予約フロー（固定ヘッダー、選んだ内容、担当・時間の行）</h2>
+    <div class="sg-grid sg-grid--2">
+      <div class="sg-phone">
+        <div class="flowbar">
+          <div class="flowbar__inner">
+            <button class="back">戻る</button>
+            <p class="flowbar__step">手順 <b>1</b> / 5</p>
+          </div>
+        </div>
+        <div class="flow stack">
+          <h2 class="title-step">担当を選んでください</h2>
+          <div class="choices" role="radiogroup" aria-label="担当">
+            <button class="choice" role="radio" aria-checked="true" data-staff="any">
+              <span class="choice__body"><span class="choice__title">どなたでもよい</span><span class="choice__desc">最も早く空いている方がお伺いします</span></span>
+            </button>
+            <button class="choice" role="radio" aria-checked="false" data-staff="s1">
+              <span class="choice__body"><span class="choice__title">山本 和子</span><span class="choice__desc">台所の油汚れ、水まわり。月・水・金</span></span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="sg-phone">
+        <div class="flowbar">
+          <div class="flowbar__inner">
+            <button class="back">戻る</button>
+            <p class="flowbar__step">手順 <b>2</b> / 5</p>
+          </div>
+        </div>
+        <div class="flow">
+          <dl class="carry"><dt>担当</dt><dd>担当：どなたでもよい</dd></dl>
+          <h2 class="title-step">利用時間を選んでください</h2>
+          <div class="choices" role="radiogroup" aria-label="利用時間" style="margin-top:var(--space-4)">
+            <button class="choice" role="radio" aria-checked="false" data-hours="2">
+              <span class="choice__body"><span class="choice__title">2時間</span></span>
+              <span class="choice__aside figure figure--price">7,000<span class="unit">円</span></span>
+            </button>
+            <button class="choice" role="radio" aria-checked="true" data-hours="3">
+              <span class="choice__body"><span class="choice__title">3時間</span></span>
+              <span class="choice__aside figure figure--price">10,500<span class="unit">円</span></span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sg-section">
+    <h2 class="sg-h">○×（日付の帯と時刻の1行）</h2>
+    <div class="sg-grid sg-grid--2">
+      <div class="sg-phone">
+        <div class="flowbar">
+          <div class="flowbar__inner">
+            <button class="back">戻る</button>
+            <p class="flowbar__step">手順 <b>3</b> / 5</p>
+          </div>
+        </div>
+        <div class="flow">
+          <dl class="carry"><dt>担当</dt><dd>どなたでもよい</dd><dt>時間</dt><dd>2時間</dd></dl>
+          <h2 class="title-step">日にちを選んでください</h2>
+          <div class="datestrip" role="radiogroup" aria-label="日にち">
+            <button class="day" role="radio" aria-checked="true" data-date="2026-10-25" data-open="true"><span class="day__date">10月</span><span class="day__num">25</span><span class="day__wd">土</span><span class="mark" aria-hidden="true"></span><span class="visually-hidden">空きあり</span></button>
+            <button class="day" role="radio" aria-checked="false" data-date="2026-10-26" data-open="false"><span class="day__date">10月</span><span class="day__num">26</span><span class="day__wd">日</span><span class="mark" aria-hidden="true"></span><span class="visually-hidden">空きなし</span></button>
+            <button class="day" role="radio" aria-checked="false" data-date="2026-10-27" data-open="true"><span class="day__date">10月</span><span class="day__num">27</span><span class="day__wd">月</span><span class="mark" aria-hidden="true"></span><span class="visually-hidden">空きあり</span></button>
+            <button class="day" role="radio" aria-checked="false" data-date="2026-10-28" data-open="true"><span class="day__date">10月</span><span class="day__num">28</span><span class="day__wd">火</span><span class="mark" aria-hidden="true"></span><span class="visually-hidden">空きあり</span></button>
+            <button class="day" role="radio" aria-checked="false" data-date="2026-10-29" data-open="true"><span class="day__date">10月</span><span class="day__num">29</span><span class="day__wd">水</span><span class="mark" aria-hidden="true"></span><span class="visually-hidden">空きあり</span></button>
+            <button class="day" role="radio" aria-checked="false" data-date="2026-10-30" data-open="false"><span class="day__date">10月</span><span class="day__num">30</span><span class="day__wd">木</span><span class="mark" aria-hidden="true"></span><span class="visually-hidden">空きなし</span></button>
+          </div>
+          <h2 class="title-step" style="margin-block:var(--space-5) var(--space-4)">開始時刻を選んでください</h2>
+          <div class="slots" role="radiogroup" aria-label="開始時刻">
+            <button class="slot" role="radio" aria-checked="false" data-slot="9" data-status="open"><span class="slot__time"><span class="unit--pre">午前</span><span class="num">9</span><span class="unit">時</span></span><span class="slot__state"><span class="mark" aria-hidden="true"></span><span class="mark-label">空き</span></span><span class="slot__staff">担当：山本</span></button>
+            <button class="slot" role="radio" aria-checked="false" data-slot="10" data-status="open"><span class="slot__time"><span class="unit--pre">午前</span><span class="num">10</span><span class="unit">時</span></span><span class="slot__state"><span class="mark" aria-hidden="true"></span><span class="mark-label">空き</span></span><span class="slot__staff">担当：佐藤</span></button>
+            <button class="slot" role="radio" aria-checked="false" aria-disabled="true" data-slot="11" data-status="closed" data-reason="BOOKED"><span class="slot__time"><span class="unit--pre">午前</span><span class="num">11</span><span class="unit">時</span></span><span class="slot__state"><span class="mark" aria-hidden="true"></span><span class="mark-label">予約済み</span></span></button>
+            <button class="slot" role="radio" aria-checked="false" aria-disabled="true" data-slot="12" data-status="closed" data-reason="OFF"><span class="slot__time"><span class="unit--pre">午後</span><span class="num">0</span><span class="unit">時</span></span><span class="slot__state"><span class="mark" aria-hidden="true"></span><span class="mark-label">お休み</span></span></button>
+            <button class="slot" role="radio" aria-checked="true" data-slot="13" data-status="open"><span class="slot__time"><span class="unit--pre">午後</span><span class="num">1</span><span class="unit">時</span></span><span class="slot__state"><span class="mark" aria-hidden="true"></span><span class="mark-label">選択中</span></span><span class="slot__staff">担当：山本</span></button>
+            <button class="slot" role="radio" aria-checked="false" aria-disabled="true" data-slot="14" data-status="closed" data-reason="SHORT"><span class="slot__time"><span class="unit--pre">午後</span><span class="num">2</span><span class="unit">時</span></span><span class="slot__state"><span class="mark" aria-hidden="true"></span><span class="mark-label">時間が足りません</span></span></button>
+          </div>
+          <div style="margin-top:var(--space-5)"><button class="btn btn--primary btn--block">この時間で予約する</button></div>
+        </div>
+      </div>
+
+      <div class="stack">
+        <p class="note">比べる用：選択中を黄土にした場合（左）と、杉緑の濃淡＋若葉の3色にした場合（下）</p>
+        <div class="slots sg-compare-green">
+          <button class="slot" role="radio" aria-checked="false" data-status="open"><span class="slot__time"><span class="unit--pre">午後</span><span class="num">1</span><span class="unit">時</span></span><span class="slot__state"><span class="mark" aria-hidden="true"></span><span class="mark-label">空き</span></span></button>
+          <button class="slot" role="radio" aria-checked="true" data-status="open"><span class="slot__time"><span class="unit--pre">午後</span><span class="num">2</span><span class="unit">時</span></span><span class="slot__state"><span class="mark" aria-hidden="true"></span><span class="mark-label">選択中</span></span><span class="slot__staff">担当：山本</span></button>
+          <button class="slot" role="radio" aria-checked="false" aria-disabled="true" data-status="closed"><span class="slot__time"><span class="unit--pre">午後</span><span class="num">3</span><span class="unit">時</span></span><span class="slot__state"><span class="mark" aria-hidden="true"></span><span class="mark-label">予約済み</span></span></button>
+        </div>
+        <p class="note">印だけ（凡例）</p>
+        <p class="sg-row">
+          <span class="slot__state" data-status="open"><span class="mark" aria-hidden="true"></span><span class="mark-label">空き</span></span>
+          <span class="slot__state" data-status="closed"><span class="mark" aria-hidden="true"></span><span class="mark-label">予約済み</span></span>
+          <span class="slot__state" aria-checked="true"><span class="mark" aria-hidden="true"></span><span class="mark-label">選択中</span></span>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sg-section">
+    <h2 class="sg-h">入力欄と切替</h2>
+    <form class="flow" style="margin-inline:0;padding-inline:0" novalidate>
+      <div class="field">
+        <label class="switch">
+          <span>ご家族の方が代わりに予約</span>
+          <input class="switch__input" type="checkbox" role="switch" id="proxy">
+        </label>
+      </div>
+      <div class="field">
+        <label class="field__label" for="name">お名前<span class="field__req">必須</span></label>
+        <input class="input" id="name" type="text" autocomplete="name" placeholder="例：高尾 花子">
+      </div>
+      <div class="field">
+        <label class="field__label" for="tel">電話番号<span class="field__req">必須</span></label>
+        <p class="field__hint" id="tel-hint">当日の連絡に使います。ハイフンは無くても構いません。</p>
+        <input class="input" id="tel" type="tel" inputmode="tel" autocomplete="tel" aria-invalid="true" aria-describedby="tel-hint tel-error">
+        <p class="field__error" id="tel-error">電話番号を入れてください。数字10桁か11桁です。</p>
+      </div>
+      <div class="field">
+        <label class="field__label" for="notes">ご要望</label>
+        <textarea class="input" id="notes" placeholder="例：台所の換気扇も見てほしい"></textarea>
+      </div>
+    </form>
+  </section>
+
+  <section class="sg-section">
+    <h2 class="sg-h">表（料金と管理画面）</h2>
+    <div class="sg-grid sg-grid--2">
+      <table class="table table--price">
+        <caption>交通費・用具代は本制作時に確認します。</caption>
+        <thead><tr><th scope="col">利用時間</th><th scope="col" class="num-cell">料金（税込）</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">2時間</th><td class="num-cell"><span class="figure figure--price">7,000<span class="unit">円</span></span></td></tr>
+          <tr><th scope="row">3時間</th><td class="num-cell"><span class="figure figure--price">10,500<span class="unit">円</span></span></td></tr>
+          <tr><th scope="row">4時間</th><td class="num-cell"><span class="figure figure--price">14,000<span class="unit">円</span></span></td></tr>
+        </tbody>
+      </table>
+      <div class="table-wrap">
+        <table class="table table--admin">
+          <thead><tr><th scope="col">予約番号</th><th scope="col">日時</th><th scope="col">担当</th><th scope="col">状態</th><th scope="col"><span class="visually-hidden">操作</span></th></tr></thead>
+          <tbody>
+            <tr data-booking-id="A-1025-1" data-state="paid"><td>A-1025-1</td><td>10月25日（土）午前10時</td><td>山本</td><td><span class="state">支払い済み</span></td><td><button class="btn btn--secondary btn--small" data-action="cancel">取り消す</button></td></tr>
+            <tr data-booking-id="A-1025-2" data-state="pending"><td>A-1025-2</td><td>10月25日（土）午後1時</td><td>佐藤</td><td><span class="state">決済待ち</span></td><td><button class="btn btn--secondary btn--small" data-action="cancel">取り消す</button></td></tr>
+            <tr data-booking-id="A-1024-3" data-state="expired"><td>A-1024-3</td><td>10月24日（金）午前9時</td><td>山本</td><td><span class="state">期限切れ</span></td><td></td></tr>
+            <tr data-booking-id="A-1023-1" data-state="cancelled"><td>A-1023-1</td><td>10月23日（木）午後2時</td><td>田中</td><td><span class="state">取り消し</span></td><td></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="sg-section">
+    <h2 class="sg-h">モーダルと手順の切替</h2>
+    <div class="sg-row">
+      <button class="btn btn--secondary" id="open-modal">特定商取引法に基づく表記</button>
+      <button class="btn btn--secondary" id="next-step">次の手順へ（横スライド）</button>
+    </div>
+    <div class="flow" id="steps" style="margin-inline:0;padding-inline:0;margin-top:var(--space-5)">
+      <section data-step="1"><p class="title-step">手順1の画面</p></section>
+      <section data-step="2" hidden><p class="title-step">手順2の画面</p></section>
+    </div>
+    <dialog class="modal" id="modal" aria-labelledby="modal-title">
+      <div class="modal__body">
+        <h2 class="title-step modal__title" id="modal-title">特定商取引法に基づく表記</h2>
+        <p>本制作時に正式な文面を作成します。このデモでは見出しのみを表示しています。</p>
+      </div>
+      <form class="modal__actions" method="dialog"><button class="btn btn--primary">閉じる</button></form>
+    </dialog>
+  </section>
+
+</main>
+
+<div class="demo-band" role="note"><p>ご提案用のデモです。実際の請求はありません。店名・スタッフは架空です。</p></div>
+
+<script>
+  const root = document.documentElement;
+  document.querySelectorAll('[data-scale]').forEach((b) => b.addEventListener('click', () => {
+    root.dataset.fontScale = b.dataset.scale;
+    document.querySelectorAll('[data-scale]').forEach((o) => o.setAttribute('aria-checked', String(o === b)));
+  }));
+  document.querySelectorAll('[role="radiogroup"]').forEach((g) => g.addEventListener('click', (e) => {
+    const opt = e.target.closest('[role="radio"]');
+    if (!opt || opt.getAttribute('aria-disabled') === 'true' || opt.dataset.scale) return;
+    g.querySelectorAll('[role="radio"]').forEach((o) => o.setAttribute('aria-checked', String(o === opt)));
+  }));
+  document.getElementById('open-modal').addEventListener('click', () => document.getElementById('modal').showModal());
+  document.getElementById('next-step').addEventListener('click', () => {
+    const steps = document.getElementById('steps');
+    const [a, b] = steps.querySelectorAll('[data-step]');
+    const forward = !a.hidden;
+    steps.dataset.dir = forward ? 'forward' : 'back';
+    a.hidden = forward; b.hidden = !forward;
+  });
+</script>
+</body>
+</html>

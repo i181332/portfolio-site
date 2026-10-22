@@ -1,0 +1,104 @@
+/*
+ * tokens.css — 家事代行 予約デモの設計値（色・書体・寸法・角丸・余白・動き）
+ * 他のファイルに依存しない。WordPress の「追加 CSS」へこのまま移せる。
+ * 文字サイズ「大きく」は <html data-font-scale="large"> で切り替える。
+ */
+
+:root {
+  /* ---- 色 ---- */
+  --paper: #FFFFFF;        /* 基調の白 */
+  --mist: #EEF3EF;         /* 薄い緑灰。帯・入力欄の面 */
+  --ink: #1C2326;          /* 本文 */
+  --sugi: #1E4A3A;         /* 主色。見出し・主ボタン・濃い帯 */
+  --sugi-deep: #143428;    /* 押下・ホバー、フッター */
+  --wakaba: #2F7E52;       /* 空き○の線・完了（非テキスト、白地の文字は可） */
+  --wakaba-text: #28704A;  /* 空きの文字。薄緑の面でも 5.3:1 */
+  --ochre: #B9802A;        /* 非テキスト専用：選択中の塗りと線 */
+  --ochre-text: #8A5E1C;   /* 価格の数字など文字に使う時のみ（白 5.7:1） */
+  --mute: #5F6B6E;         /* 補足文、予約済み×（白 5.5:1 / 薄緑 4.9:1） */
+  --alert: #A3352B;        /* 入力の誤りの案内（白 6.8:1 / 薄緑 6.0:1） */
+  --line: #C9D3CD;         /* 罫・枠（非テキスト） */
+  --line-strong: #7C8A84;  /* 入力欄の枠（白地で 3.6:1、非テキストの基準 3:1 以上） */
+  --scrim: rgb(28 35 38 / 0.55); /* モーダルの背面 */
+  --focus-ring: var(--sugi);
+
+  /* ---- 書体 ---- */
+  --font-mincho: "Shippori Mincho B1", "Hiragino Mincho ProN", "Yu Mincho", "YuMincho", serif;
+  --font-ui: "BIZ UDPGothic", "Hiragino Sans", "Yu Gothic", "YuGothic", sans-serif;
+  --weight-mincho: 600;
+
+  /* 文字の大きさ（標準）。rem は利用者のブラウザ設定に従う */
+  --fs-small: 0.9375rem;   /* 15px 注記・帯 */
+  --fs-body: 1.125rem;     /* 18px 本文 */
+  --fs-ui: 1.125rem;       /* 18px 入力欄・行の文字 */
+  --fs-button: 1.25rem;    /* 20px ボタン */
+  --fs-lead: 1.25rem;      /* 20px 副文 */
+  --fs-step: clamp(1.625rem, 1.4rem + 1vw, 1.875rem);  /* 26〜30px 手順見出し */
+  --fs-display: clamp(2rem, 1.35rem + 2.6vw, 3rem);    /* 32〜48px トップ見出し */
+  --fs-name: clamp(1.75rem, 1.5rem + 1vw, 2.25rem);    /* スタッフ名 */
+  --fs-figure: 1.75rem;    /* 料金・時刻の数字 */
+  --unit-scale: 0.62em;    /* 「円」「時」を数字に対して小さく */
+
+  --lh-body: 1.9;
+  --lh-ui: 1.5;
+  --lh-heading: 1.45;
+  --tracking-body: 0.02em;
+  --measure: 38em;         /* 行長の上限（約38字） */
+
+  /* ---- 寸法 ---- */
+  --tap: 3.5rem;           /* 56px 押せる所の最小の高さ */
+  --slot-h: 4rem;          /* 64px 時刻の1行 */
+  --mark: 2.5rem;          /* 40px ○×の円 */
+  --header-h: 3.75rem;     /* 60px 固定ヘッダー */
+  --band-h: 2.25rem;       /* 36px デモ注記の帯 */
+  --flow-max: 520px;       /* 予約フローの最大幅 */
+  --page-max: 1120px;
+  --border: 2px;
+  --border-strong: 3px;
+
+  /* ---- 角丸（2段階のみ） ---- */
+  --radius-control: 12px;  /* ボタン・入力欄・行 */
+  --radius-surface: 20px;  /* 写真・色面・モーダル */
+
+  /* ---- 余白（8px 基準） ---- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4.5rem;
+  --gutter: 1rem;
+
+  /* ---- 動き ---- */
+  --dur-quick: 140ms;      /* 押下・塗り */
+  --dur-step: 240ms;       /* 手順の横スライド */
+  --dur-modal: 200ms;
+  --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --slide-distance: 24px;
+}
+
+@media (min-width: 768px) {
+  :root { --gutter: 2rem; }
+}
+
+/* 文字サイズ「大きく」：文字・行間・押せる所が一段大きくなる */
+html[data-font-scale="large"] {
+  --fs-small: 1.0625rem;   /* 17px */
+  --fs-body: 1.3125rem;    /* 21px */
+  --fs-ui: 1.3125rem;
+  --fs-button: 1.4375rem;  /* 23px */
+  --fs-lead: 1.4375rem;
+  --fs-step: clamp(1.75rem, 1.5rem + 1vw, 2.125rem);
+  --fs-display: clamp(2.125rem, 1.5rem + 2.6vw, 3.25rem);
+  --fs-name: clamp(1.875rem, 1.6rem + 1vw, 2.5rem);
+  --fs-figure: 2rem;
+  --lh-body: 2;
+  --lh-ui: 1.55;
+  --tap: 4rem;             /* 64px */
+  --slot-h: 4.5rem;        /* 72px */
+  --mark: 2.75rem;         /* 44px */
+  --header-h: 4.25rem;
+  --band-h: 2.5rem;
+}

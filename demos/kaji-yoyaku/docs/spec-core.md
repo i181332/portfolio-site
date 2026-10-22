@@ -24,8 +24,8 @@ export const CONFIG = {
 ## js/format.js
 | 関数 | 例 |
 |---|---|
-| `formatDate(iso)` | `"2026-10-25"` → `"10月25日（土）"` |
-| `dateParts(iso)` | `"2026-10-25"` → `{ month: 10, day: 25, dow: "土" }` |
+| `formatDate(iso)` | `"2026-10-24"` → `"10月24日（土）"`、`"2026-10-25"` → `"10月25日（日）"` |
+| `dateParts(iso)` | `"2026-10-25"` → `{ month: 10, day: 25, dow: "日" }` |
 | `formatHour(h)` | `9`→`"午前9時"`、`11`→`"午前11時"`、`12`→`"午後0時"`、`13`→`"午後1時"`、`16`→`"午後4時"` |
 | `formatRange(start, hours)` | `(10, 2)` → `"午前10時〜午後0時"` |
 | `formatYen(n)` | `7000` → `"7,000円"` |
@@ -78,3 +78,20 @@ export const CONFIG = {
 - トップ縮小表のセル `[data-mini-cell][data-staff][data-date]`（中に ○ の数）
 - 管理画面の予約行 `[data-booking-id][data-state="paid|pending|expired|cancelled"]`、取り消し `[data-action="cancel"]`、休みトグル `[data-dayoff][data-staff][data-date]`、初期化 `[data-action="reset"]`
 - 文字サイズ `[data-font-scale="normal|large"]`（`<html>` に `data-font-scale` を付ける）
+
+## 補足（テスト作成時の解釈を正式化）
+- `workDays` は `getDay()` の数値（0=日〜6=土）の配列
+- 保存キー：`kajiDemo.staff` / `.bookings` / `.daysOff` / `.prefs` / `.pendingId`。すべて JSON で保存（pendingId も `JSON.stringify`）。未設定の `getPendingId()` は `null`
+- `markPaid` / `cancelBooking` は更新後の予約を返す。存在しない id は `null` を返し、何も変えない
+- `reset()` は prefs 以外の全キー（pendingId を含む）を消してシードし直す
+- `findConflicts` は重なった paid 同士なら両方の id を含める
+- シードの予約の `hours` は 2/3/4 のいずれか
+
+## 補足2（レビュー指摘への対応。上の記述と食い違えばこちらが優先）
+- 理由 `OUTSIDE_HOURS`：`start < staff.start` または `start >= staff.end`。`INSUFFICIENT_TIME` は勤務時間内に始まるが `start + hours > staff.end` の時だけ
+- `slotStatusAny` で全員 × の時の理由：`BOOKED` が1人でもあれば `BOOKED`、次に `INSUFFICIENT_TIME` が1人でもあればそれ、それ以外は優先順で最も前。`staffList` が空なら `DAY_OFF`
+- シード：予約は**担当の勤務曜日・勤務時間内**だけに置き、休み設定と重ならない。今日の曜日がどれでも、1〜3日後に `BOOKED` として見える予約が3件以上ある。休みは2〜6日後の**担当の勤務日**に2件
+- 読めないキーは**そのキーだけ**を既定に戻す（staff → シードのスタッフ、bookings → シードの予約、daysOff → シードの休み、prefs → 既定、pendingId → null）。他のキーは書き換えない。配列の中の不正な要素（オブジェクトでない、id・date・start が無いなど）は読む時に捨てる
+- 書込み（setItem / removeItem）の例外は外に出さない。store は値を内部にも持ち、書けなくてもそのページの間は動き続ける
+- 予約 id の連番は、予約の `date` が同じものだけで数える（id の文字列ではなく `date` で絞る）
+- `getPrefs()` の `fontScale` は `"normal" | "large"` 以外なら `"normal"`
