@@ -1,9 +1,9 @@
 // トップページ（index.html）の画面ロジック。
-// 最初の画面の ○× 縮小表（今日から3日 × スタッフ3名）、料金表、担当スタッフの行、フッターのモーダル。
+// 最初の画面の ○× 縮小表（今日から3日 × スタッフ3名。今日の受付が全員終わっていれば明日から3日）、料金表、担当スタッフの行、フッターのモーダル。
 // 縮小表の数は予約画面と同じ判定（openStarts・最短の利用時間）で、localStorage の予約・休みと連動する。
 import { CONFIG } from "./config.js";
 import { dateParts, formatDate, formatHour, yenParts, toISODate, addDays } from "./format.js";
-import { openStarts } from "./availability.js";
+import { openStarts, dayHasOpening } from "./availability.js";
 import { createStore } from "./store.js";
 import { h, familyName, mountFontScale, mountDemoBand, aboutDemoButton, openModal, SHOP_NAME } from "./ui.js";
 
@@ -12,7 +12,7 @@ const $ = (sel, root = document) => root.querySelector(sel);
 
 const MINI_DAYS = 3;
 const MIN_HOURS = CONFIG.hoursOptions[0]; // 予約画面の受け口（?staff=&date=）も最短の利用時間で始まる
-const DAY_WORD = ["今日", "明日", "あさって"];
+const DAY_WORD = ["今日", "明日", "あさって", "3日後"];
 const WEEK_ORDER = [1, 2, 3, 4, 5, 6, 0];
 const DOW = ["日", "月", "火", "水", "木", "金", "土"];
 
@@ -29,33 +29,38 @@ const staffPhoto = (s, cls) => {
 function renderMini() {
   const now = new Date();
   const today = toISODate(now);
-  const dates = Array.from({ length: MINI_DAYS }, (_, i) => addDays(today, i));
   const data = { bookings: store.getBookings(), daysOff: store.getDaysOff(), now };
+  const staffList = store.getStaff();
+  // 今日はもう誰も受けられない（受付の時刻を過ぎた・埋まった・休み）時は、明日から3日分を出す
+  const offset = dayHasOpening({ staffList, date: today, hours: MIN_HOURS, starts: CONFIG.slotStarts, ...data }) ? 0 : 1;
+  const dates = Array.from({ length: MINI_DAYS }, (_, i) => addDays(today, offset + i));
+  $("#mini-title").textContent = `${DAY_WORD[offset]}から3日間の空き`;
 
   const head = h("tr", {}, h("td", { class: "mini__corner" }),
     dates.map((iso, i) => {
       const { day, dow } = dateParts(iso);
       return h("th", { scope: "col", class: "mini__day" },
-        h("span", { class: "mini__rel" }, DAY_WORD[i]),
+        h("span", { class: "mini__rel" }, DAY_WORD[offset + i]),
         h("span", { class: "mini__date" }, `${day}日`, h("span", { class: "mini__dow" }, `（${dow}）`)));
     }));
 
-  const rows = store.getStaff().map((s) => h("tr", {},
+  const rows = staffList.map((s) => h("tr", {},
     h("th", { scope: "row", class: "mini__staff" }, staffPhoto(s, "mini__photo"), h("span", { class: "mini__name" }, familyName(s.name))),
     dates.map((iso) => {
       const n = openStarts({ staff: s, date: iso, hours: MIN_HOURS, starts: CONFIG.slotStarts, ...data }).length;
       const open = n > 0;
       const attrs = { class: "mini__cell", "data-mini-cell": "", "data-staff": s.id, "data-date": iso, "data-open": String(open), "data-count": n };
-      const body = [h("span", { class: "mark", "aria-hidden": "true" }),
-        h("span", { class: "mini__count", "aria-hidden": "true" }, open ? `${n}枠` : "空きなし")];
+      const mark = h("span", { class: "mark", "aria-hidden": "true" });
       const spoken = `${familyName(s.name)}、${formatDate(iso)}、`;
+      // 空きなしは × だけを見せ、「空きなし」は読み上げにだけ渡す（行と列の見出しが担当と日を伝える）
       return h("td", {}, open
-        ? h("a", { ...attrs, href: bookingUrl({ staff: s.id, date: iso }), "aria-label": `${spoken}空き${n}枠。この担当と日にちで予約に進む` }, body)
-        : h("span", { ...attrs, "aria-label": `${spoken}空きなし` }, body));
+        ? h("a", { ...attrs, href: bookingUrl({ staff: s.id, date: iso }), "aria-label": `${spoken}空き${n}枠。この担当と日にちで予約に進む` },
+          mark, h("span", { class: "mini__count", "aria-hidden": "true" }, `${n}枠`))
+        : h("span", attrs, mark, h("span", { class: "visually-hidden" }, "空きなし")));
     })));
 
   $("#mini").replaceChildren(h("table", { class: "mini__grid" },
-    h("caption", { class: "visually-hidden" }, `${formatDate(today)}から3日間、担当ごとの空き枠の数`),
+    h("caption", { class: "visually-hidden" }, `${formatDate(dates[0])}から3日間、担当ごとの空き枠の数`),
     h("thead", {}, head), h("tbody", {}, rows)));
 }
 
@@ -82,7 +87,8 @@ function renderPeople() {
       h("p", { class: "people__intro" }, s.intro),
       h("dl", { class: "people__facts" },
         h("div", {}, h("dt", {}, "得意なこと"), h("dd", {}, s.skills.join("、"))),
-        h("div", {}, h("dt", {}, "お伺いする日"), h("dd", {}, `${workDaysText(s.workDays)}　${formatHour(s.start)}〜${formatHour(s.end)}`)))),
+        h("div", {}, h("dt", {}, "お伺いする日"),
+          h("dd", {}, h("span", {}, workDaysText(s.workDays)), "　", h("span", {}, `${formatHour(s.start)}〜${formatHour(s.end)}`))))),
     h("a", { class: "btn btn--secondary people__btn", href: bookingUrl({ staff: s.id }), "aria-label": `${familyName(s.name)}さんで予約する` }, "この人で予約する"))));
 }
 
