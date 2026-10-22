@@ -26,7 +26,7 @@
   font-family: var(--font-mincho);
   font-weight: var(--weight-mincho);
   font-size: var(--fs-small);
-  letter-spacing: 0.08em;
+  letter-spacing: 0.04em;
   color: var(--sugi);
   text-decoration: none;
 }
@@ -52,11 +52,11 @@
 /* 手順3の小見出し（日にち・開始時刻）。操作の見出しなのでゴシック */
 .booking__sub {
   margin-block: var(--space-5) var(--space-2);
-  font-family: var(--font-ui);
+  font-family: var(--font-heading);
   font-size: var(--fs-ui);
-  font-weight: 700;
+  font-weight: var(--weight-heading);
   color: var(--ink);
-  letter-spacing: 0.04em;
+  letter-spacing: 0;
 }
 .booking__subnote { display: inline-block; margin-inline-start: var(--space-3); font-size: var(--fs-small); font-weight: 400; color: var(--mute); }
 .booking__dayinfo {
@@ -113,17 +113,17 @@
   overflow: hidden;
   background: var(--sugi);
   color: var(--paper);
-  font-family: var(--font-mincho);
-  font-weight: var(--weight-mincho);
+  font-family: var(--font-heading);
+  font-weight: var(--weight-heading);
   font-size: 1.625rem;
   line-height: 1;
 }
 .staffpick__photo--any .staffpick__initial {
   font-family: var(--font-ui);
   font-weight: 700;
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   line-height: 1.25;
-  letter-spacing: 0.04em;
+  letter-spacing: 0;
   text-align: center;
 }
 .staffpick__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
@@ -147,13 +147,13 @@
 .staffintro p { max-width: none; }
 .staffintro__name {
   margin-inline-end: var(--space-3);
-  font-family: var(--font-mincho);
-  font-weight: var(--weight-mincho);
+  font-family: var(--font-heading);
+  font-weight: var(--weight-heading);
   font-size: var(--fs-ui);
-  letter-spacing: 0.1em;
+  letter-spacing: 0;
   color: var(--sugi);
 }
-.staffintro__photonote { font-family: var(--font-ui); font-weight: 400; font-size: 0.75rem; letter-spacing: 0; color: var(--mute); }
+.staffintro__photonote { font-family: var(--font-ui); font-weight: 400; font-size: 0.875rem; letter-spacing: 0; color: var(--mute); }
 .staffintro__meta { color: var(--ink); word-break: auto-phrase; }
 .staffintro__text { word-break: auto-phrase; }
 .staffintro__last { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0 var(--space-3); }
@@ -197,11 +197,11 @@
   margin-block-end: var(--space-4);
   padding-block-end: var(--space-2);
   border-bottom: 1px solid var(--line);
-  font-family: var(--font-mincho);
-  font-weight: var(--weight-mincho);
+  font-family: var(--font-heading);
+  font-weight: var(--weight-heading);
   font-size: var(--fs-lead);
   color: var(--sugi);
-  letter-spacing: 0.06em;
+  letter-spacing: 0;
 }
 .booking__group + .field { margin-block-start: var(--space-2); }
 .booking__sample { margin-block-start: var(--space-2); font-size: var(--fs-small); }

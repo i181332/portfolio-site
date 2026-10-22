@@ -26,6 +26,8 @@
   --font-mincho: "Shippori Mincho B1", "Hiragino Mincho ProN", "Yu Mincho", "YuMincho", serif;
   --font-ui: "BIZ UDPGothic", "Hiragino Sans", "Yu Gothic", "YuGothic", sans-serif;
   --weight-mincho: 600;
+  --font-heading: var(--font-ui);   /* 見出し・小見出し・名前。本番で明朝に戻す時はここ1つ（--font-mincho と --weight-mincho） */
+  --weight-heading: 700;
 
   /* 文字の大きさ（標準）。rem は利用者のブラウザ設定に従う */
   --fs-small: 0.9375rem;   /* 15px 注記・帯 */
