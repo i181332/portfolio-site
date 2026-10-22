@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="ja" data-font-scale="normal">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>ご予約（デモ）</title>
+<meta name="description" content="利用時間・担当と日時を選んで、家事代行を予約します（ご提案用のデモ）。">
+<script>
+  /* 「大きく」を選んだ方に、標準→大きくの瞬きを見せないため、モジュールより先に読む */
+  try {
+    var p = JSON.parse(localStorage.getItem("kajiDemo.prefs"));
+    if (p && p.fontScale === "large") document.documentElement.dataset.fontScale = "large";
+  } catch (e) {}
+</script>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%226%22 fill=%22%231E4A3A%22/%3E%3Ccircle cx=%2216%22 cy=%2216%22 r=%228%22 fill=%22none%22 stroke=%22%23fff%22 stroke-width=%223%22/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=Shippori+Mincho+B1:wght@600&display=swap">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/pages.css">
+<script type="module" src="js/booking.js"></script>
+</head>
+<body class="page-booking">
+
+<div class="topline">
+  <div class="topline__inner">
+    <a class="topline__shop" href="index.html" data-shop-name>家事代行のご予約</a>
+    <div id="font-scale"></div>
+  </div>
+</div>
+
+<header class="flowbar">
+  <div class="flowbar__inner">
+    <button type="button" class="back" id="back">戻る</button>
+    <p class="flowbar__step" id="step-label">手順 <b>1</b> / 4</p>
+  </div>
+</header>
+
+<main class="flow booking" id="flow">
+  <p class="visually-hidden" id="announce" aria-live="polite"></p>
+
+  <section data-step="1" aria-labelledby="h-1">
+    <h1 class="title-step booking__title" id="h-1" tabindex="-1">利用時間を選んでください</h1>
+    <p class="booking__lead" id="rate-note"></p>
+    <div class="choices" role="radiogroup" aria-labelledby="h-1" id="hours-list"></div>
+    <p class="note booking__aside">交通費・用具代の扱いは、本制作の時にお店と決めて記載します。</p>
+    <div class="booking__actions"><button type="button" class="btn btn--primary btn--block" data-next="1">この利用時間で進む</button></div>
+  </section>
+
+  <section data-step="2" aria-labelledby="h-2" hidden>
+    <dl class="carry" data-carry></dl>
+    <h1 class="title-step booking__title booking__title--tight" id="h-2" tabindex="-1">担当と日時を選んでください</h1>
+    <div class="staffpick" role="radiogroup" aria-label="担当" id="staff-list"></div>
+    <div class="staffintro" id="staff-intro" aria-live="polite"></div>
+    <div class="schedule" id="schedule">
+      <h2 class="booking__sub" id="h-2-date">日にち<span class="booking__subnote">横に動かすと先の日も見られます</span></h2>
+      <div class="datestrip" role="radiogroup" aria-labelledby="h-2-date" id="date-strip"></div>
+      <h2 class="booking__sub" id="h-2-slot"><span id="slot-heading">開始時刻</span></h2>
+      <p class="booking__dayinfo" id="day-info" hidden></p>
+      <div class="slots" role="radiogroup" aria-labelledby="h-2-slot" id="slot-list"></div>
+    </div>
+    <div class="dock">
+      <p class="field__error booking__error" id="slot-error" role="alert" hidden>開始時刻を1つ選んでください。○の付いた時刻を押すと選べます。</p>
+      <p class="dock__picked" id="picked" aria-live="polite" hidden></p>
+      <button type="button" class="btn btn--primary btn--block" data-next="2" aria-disabled="true">この時間で予約する</button>
+    </div>
+  </section>
+
+  <section data-step="3" aria-labelledby="h-3" hidden>
+    <dl class="carry" data-carry></dl>
+    <h1 class="title-step booking__title" id="h-3" tabindex="-1">お客様のことを教えてください</h1>
+    <form id="customer-form" class="booking__form" novalidate>
+      <label class="switch">
+        <span>ご家族の方が代わりに予約</span>
+        <span class="booking__switchend"><span class="switch__state" id="proxy-state">いいえ</span>
+        <input type="checkbox" class="switch__input" role="switch" id="proxy" name="proxy"></span>
+      </label>
+      <p class="note booking__proxynote" id="proxy-note" hidden>お伺いする先の方と、ご連絡を受ける方を分けて入力できます。当日の連絡や作業後の報告は、ご家族の方にお届けします。</p>
+
+      <fieldset class="booking__group">
+        <legend class="booking__legend" id="legend-user">ご本人のこと</legend>
+        <div class="field">
+          <label class="field__label" for="f-name">お名前<span class="field__req">必須</span></label>
+          <input class="input" id="f-name" name="name" autocomplete="name" data-required="お名前を入力してください。">
+          <p class="field__error" id="e-name" hidden></p>
+        </div>
+        <div class="field">
+          <label class="field__label" for="f-phone"><span id="phone-label">電話番号</span><span class="field__req" id="phone-req">必須</span></label>
+          <p class="field__hint" id="h-phone">当日、お伺いの前にお電話することがあります。</p>
+          <input class="input" id="f-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" aria-describedby="h-phone" data-required="電話番号を入力してください。" data-phone>
+          <p class="field__error" id="e-phone" hidden></p>
+        </div>
+        <div class="field">
+          <label class="field__label" for="f-address">ご住所<span class="field__req">必須</span></label>
+          <p class="field__hint" id="h-address">八王子市・高尾周辺のご自宅へお伺いします。</p>
+          <input class="input" id="f-address" name="address" autocomplete="street-address" aria-describedby="h-address" data-required="ご住所を入力してください。お伺いする先です。">
+          <p class="field__error" id="e-address" hidden></p>
+        </div>
+      </fieldset>
+
+      <fieldset class="booking__group" id="proxy-fields" hidden>
+        <legend class="booking__legend">予約されるご家族のこと</legend>
+        <div class="field">
+          <label class="field__label" for="f-proxy-name">お名前<span class="field__req">必須</span></label>
+          <input class="input" id="f-proxy-name" name="proxyName" autocomplete="name" data-required="予約されるご家族のお名前を入力してください。">
+          <p class="field__error" id="e-proxy-name" hidden></p>
+        </div>
+        <div class="field">
+          <label class="field__label" for="f-proxy-phone">ご連絡先の電話番号<span class="field__req">必須</span></label>
+          <input class="input" id="f-proxy-phone" name="proxyPhone" type="tel" inputmode="tel" autocomplete="tel" data-required="ご連絡先の電話番号を入力してください。" data-phone>
+          <p class="field__error" id="e-proxy-phone" hidden></p>
+        </div>
+      </fieldset>
+
+      <div class="field">
+        <label class="field__label" for="f-notes">ご要望<span class="field__req">なくてもかまいません</span></label>
+        <p class="field__hint" id="h-notes">特に手をかけてほしい場所、駐車場の有無、ペットのことなど。</p>
+        <textarea class="input" id="f-notes" name="notes" rows="4" aria-describedby="h-notes"></textarea>
+      </div>
+      <p class="booking__sample"><button type="button" class="link" id="fill-sample">見本の内容を入れる（デモ用）</button></p>
+      <div class="booking__actions"><button type="submit" class="btn btn--primary btn--block">入力内容を確かめる</button></div>
+    </form>
+  </section>
+
+  <section data-step="4" aria-labelledby="h-4" hidden>
+    <h1 class="title-step booking__title" id="h-4" tabindex="-1">この内容で予約します</h1>
+    <div class="readout" id="readout"></div>
+    <p class="booking__edit">
+      <button type="button" class="link link--action" data-goto="2">担当・日時を変える</button>
+      <button type="button" class="link link--action" data-goto="3">お客様情報を直す</button>
+    </p>
+    <div class="booking__paynote">
+      <p>次の画面でカードのお支払いに進みます。今回はテスト用の決済で、実際の請求はありません。テスト決済の画面は、本番のお支払い画面とは見た目が異なります。</p>
+      <p class="note">お支払いが15分以内に終わらない時は、この枠をほかの方に空けます。</p>
+    </div>
+    <p class="field__error booking__error" id="pay-error" role="alert" hidden></p>
+    <div class="booking__actions"><button type="button" class="btn btn--primary btn--block" id="pay">カードで支払う（テスト）</button></div>
+  </section>
+
+  <section data-step="testpay" aria-labelledby="h-testpay" hidden>
+    <h1 class="title-step booking__title" id="h-testpay" tabindex="-1">テスト決済</h1>
+    <div class="testpay" id="testpay"></div>
+  </section>
+
+  <section data-step="unpaid" aria-labelledby="h-unpaid" hidden>
+    <h1 class="title-step booking__title" id="h-unpaid" tabindex="-1">お支払いが終わっていません</h1>
+    <div id="unpaid"></div>
+  </section>
+
+  <section data-step="notice" aria-labelledby="h-notice" hidden>
+    <h1 class="title-step booking__title" id="h-notice" tabindex="-1"></h1>
+    <div id="notice"></div>
+  </section>
+
+  <section data-step="done" aria-labelledby="h-done" hidden>
+    <h1 class="title-display done__title" id="h-done" tabindex="-1">ご予約を承りました。</h1>
+    <div id="done"></div>
+  </section>
+</main>
+
+<footer class="flow booking-foot" id="booking-foot"></footer>
+
+</body>
+</html>
