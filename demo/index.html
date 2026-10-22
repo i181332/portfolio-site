@@ -1,0 +1,727 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>予約デモ 家事代行</title>
+<meta name="description" content="家事代行サービス向け スタッフ別予約・決済のご提案用デモ（架空の店舗・実際の請求なし）">
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #f6f8f7;
+    --surface: #ffffff;
+    --text: #1f2a2e;
+    --muted: #4d5c62;
+    --line: #d5dddb;
+    --primary: #1b7f72;
+    --primary-dark: #145f56;
+    --primary-soft: #e2f3f0;
+    --accent: #e8711c;
+    --accent-dark: #c45c10;
+    --ok: #1b7f72;
+    --ng: #b42318;
+    --ng-soft: #fdecea;
+    --warn-soft: #fff4e0;
+    --radius: 14px;
+    --fs: 18px;
+  }
+  * { box-sizing: border-box; }
+  html { font-size: var(--fs); -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic", Meiryo, system-ui, sans-serif;
+    line-height: 1.7;
+  }
+  a { color: var(--primary-dark); }
+  button { font: inherit; }
+
+  .demo-banner {
+    background: #243b47;
+    color: #fff;
+    text-align: center;
+    font-size: 0.85rem;
+    padding: 8px 16px;
+    line-height: 1.5;
+  }
+  header.site {
+    background: var(--surface);
+    border-bottom: 1px solid var(--line);
+    padding: 14px 16px;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; max-width: 720px; margin: 0 auto; }
+  .brand .mark {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: var(--primary); color: #fff;
+    display: grid; place-items: center; font-weight: 700; font-size: 1.1rem; flex: none;
+  }
+  .brand .name { font-weight: 700; font-size: 1.05rem; line-height: 1.3; }
+  .brand .sub { font-size: 0.8rem; color: var(--muted); }
+
+  main { max-width: 720px; margin: 0 auto; padding: 16px 16px 48px; }
+
+  /* ステップ表示 */
+  .steps { display: flex; gap: 4px; margin: 4px 0 18px; padding: 0; list-style: none; }
+  .steps li {
+    flex: 1; text-align: center; font-size: 0.72rem; color: var(--muted);
+    padding-top: 8px; border-top: 5px solid var(--line); line-height: 1.3;
+  }
+  .steps li.done { border-color: var(--primary); color: var(--primary-dark); }
+  .steps li.current { border-color: var(--accent); color: var(--text); font-weight: 700; }
+
+  h1 { font-size: 1.35rem; margin: 0 0 6px; }
+  h2 { font-size: 1.2rem; margin: 0 0 12px; }
+  h3 { font-size: 1rem; margin: 18px 0 8px; }
+  p { margin: 0 0 12px; }
+  .lead { color: var(--muted); font-size: 0.95rem; }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 18px 16px; margin-bottom: 16px;
+  }
+
+  /* 選択ボタン（大きく押しやすく） */
+  .choice {
+    display: flex; align-items: center; gap: 14px; width: 100%;
+    min-height: 64px; padding: 12px 14px; margin-bottom: 10px;
+    background: var(--surface); border: 2px solid var(--line); border-radius: var(--radius);
+    text-align: left; color: var(--text); cursor: pointer;
+  }
+  .choice:hover { border-color: var(--primary); }
+  .choice[aria-pressed="true"] { border-color: var(--primary); background: var(--primary-soft); }
+  .choice:focus-visible, .btn:focus-visible, .slot:focus-visible, .day:focus-visible {
+    outline: 3px solid var(--accent); outline-offset: 2px;
+  }
+  .choice .avatar {
+    width: 56px; height: 56px; border-radius: 50%; flex: none;
+    display: grid; place-items: center; font-weight: 700; font-size: 1.2rem; color: #fff;
+  }
+  .choice .title { font-weight: 700; font-size: 1.05rem; }
+  .choice .desc { font-size: 0.85rem; color: var(--muted); line-height: 1.5; }
+  .choice .price { margin-left: auto; font-weight: 700; white-space: nowrap; }
+
+  /* 日付の横並び */
+  .days { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 8px; }
+  .day {
+    border: 2px solid var(--line); border-radius: 12px; background: var(--surface);
+    padding: 8px 4px; text-align: center; cursor: pointer; color: var(--text); line-height: 1.3;
+  }
+  .day .d { font-weight: 700; font-size: 1.05rem; display: block; }
+  .day .w { font-size: 0.8rem; color: var(--muted); display: block; }
+  .day .mark { font-size: 1.1rem; display: block; margin-top: 2px; }
+  .day[aria-pressed="true"] { border-color: var(--primary); background: var(--primary-soft); }
+  .day:disabled { background: #f0f2f1; color: #9aa5a8; cursor: not-allowed; }
+  .day:disabled .w { color: #9aa5a8; }
+  .day .mark.ok { color: var(--ok); }
+  .day .mark.ng { color: var(--ng); }
+  .sat .w { color: #1d5fbf; }
+  .sun .w { color: var(--ng); }
+
+  /* 時間枠 */
+  .slots { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; }
+  .slot {
+    min-height: 56px; border: 2px solid var(--line); border-radius: 12px; background: var(--surface);
+    font-size: 1rem; font-weight: 700; cursor: pointer; color: var(--text);
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .slot[aria-pressed="true"] { border-color: var(--primary); background: var(--primary-soft); }
+  .slot:disabled { background: #f0f2f1; color: #9aa5a8; cursor: not-allowed; font-weight: 400; }
+  .slot .mark.ok { color: var(--ok); }
+  .slot .mark.ng { color: var(--ng); }
+  .legend { font-size: 0.85rem; color: var(--muted); margin: 8px 0 0; }
+
+  /* フォーム */
+  label.field { display: block; margin-bottom: 14px; font-weight: 700; }
+  label.field span.req { color: var(--ng); font-size: 0.8rem; margin-left: 6px; }
+  .field input, .field textarea, .field select {
+    display: block; width: 100%; margin-top: 6px; padding: 12px 12px; font: inherit;
+    border: 2px solid var(--line); border-radius: 10px; background: #fff; color: var(--text);
+  }
+  .field input:focus, .field textarea:focus, .field select:focus { border-color: var(--primary); outline: none; }
+  .hint { font-weight: 400; font-size: 0.85rem; color: var(--muted); }
+  .error { color: var(--ng); font-size: 0.9rem; margin: -6px 0 12px; }
+
+  /* ボタン */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    min-height: 58px; width: 100%; padding: 12px 18px; border-radius: var(--radius);
+    border: 2px solid transparent; font-weight: 700; font-size: 1.05rem; cursor: pointer;
+    text-decoration: none;
+  }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: var(--accent-dark); }
+  .btn-secondary { background: var(--surface); color: var(--primary-dark); border-color: var(--primary); }
+  .btn-secondary:hover { background: var(--primary-soft); }
+  .btn-ghost { background: transparent; color: var(--muted); border-color: var(--line); min-height: 48px; font-weight: 400; }
+  .btn-danger { background: var(--surface); color: var(--ng); border-color: var(--ng); min-height: 44px; width: auto; font-size: 0.9rem; padding: 6px 12px; }
+  .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+  .btn-row { display: grid; gap: 10px; margin-top: 16px; }
+
+  /* 確認テーブル */
+  .summary { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
+  .summary th, .summary td { text-align: left; padding: 10px 6px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  .summary th { width: 32%; color: var(--muted); font-weight: 400; font-size: 0.9rem; }
+  .summary td.total { font-size: 1.3rem; font-weight: 700; }
+
+  .notice { background: var(--warn-soft); border: 1px solid #f0d19a; border-radius: 10px; padding: 12px 14px; font-size: 0.9rem; margin-bottom: 14px; }
+  .notice.danger { background: var(--ng-soft); border-color: #f1b3ad; }
+  .notice.ok { background: var(--primary-soft); border-color: #a9d8d0; }
+
+  .done-mark { width: 84px; height: 84px; border-radius: 50%; background: var(--primary); color: #fff; display: grid; place-items: center; font-size: 2.4rem; margin: 6px auto 14px; }
+
+  /* 模擬決済画面 */
+  .mock-pay { max-width: 460px; margin: 0 auto; }
+  .mock-pay .brandline { display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; color: var(--muted); margin-bottom: 12px; }
+  .mock-pay .amount { font-size: 1.8rem; font-weight: 700; margin-bottom: 14px; }
+
+  /* 管理画面 */
+  .admin table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  .admin th, .admin td { border-bottom: 1px solid var(--line); padding: 8px 4px; text-align: left; vertical-align: top; }
+  .admin th { color: var(--muted); font-weight: 400; white-space: nowrap; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 0.75rem; font-weight: 700; white-space: nowrap; }
+  .badge.paid { background: var(--primary-soft); color: var(--primary-dark); }
+  .badge.pending { background: var(--warn-soft); color: #8a4b00; }
+  .badge.cancelled, .badge.expired { background: #eceff0; color: #5b6b70; }
+  .table-wrap { overflow-x: auto; }
+  .admin .row-cancelled td { color: #9aa5a8; text-decoration: line-through; }
+  .admin .row-cancelled td.actions { text-decoration: none; }
+  .inline-form { display: grid; grid-template-columns: 1fr 1fr auto; gap: 8px; align-items: end; }
+  .inline-form .field { margin: 0; }
+  .inline-form .btn { min-height: 50px; width: auto; }
+  @media (max-width: 480px) { .inline-form { grid-template-columns: 1fr; } }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+  .chip { background: var(--primary-soft); color: var(--primary-dark); border-radius: 999px; padding: 4px 10px; font-size: 0.85rem; display: inline-flex; gap: 6px; align-items: center; }
+  .chip button { border: none; background: transparent; color: var(--ng); font-weight: 700; cursor: pointer; padding: 0 2px; }
+
+  footer.site { text-align: center; font-size: 0.8rem; color: var(--muted); padding: 24px 16px 40px; border-top: 1px solid var(--line); }
+  footer.site a { margin: 0 8px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+</style>
+</head>
+<body>
+<div class="demo-banner">ご提案用のデモ画面です。店名・スタッフは架空で、実際の請求は発生しません。</div>
+<header class="site">
+  <div class="brand">
+    <div class="mark" aria-hidden="true">家</div>
+    <div>
+      <div class="name" id="brandName">やさしい家事代行 はちおうじ</div>
+      <div class="sub">八王子・高尾エリアの家事代行（架空の店舗）</div>
+    </div>
+  </div>
+</header>
+
+<main id="app" aria-live="polite"></main>
+
+<footer class="site">
+  <a href="#" data-nav="home">予約画面</a>｜<a href="#admin" data-nav="admin">管理画面（デモ用）</a>
+  <div style="margin-top:8px">料金・内容はすべて仮の設定です。</div>
+</footer>
+
+<script>
+/* ============================================================
+ *  設定（ここだけ書き換えれば動きます）
+ * ------------------------------------------------------------
+ *  Stripe テストモードの Payment Link を利用時間ごとに貼ってください。
+ *  空欄のままだと、画面内の「模擬決済画面」で動作します（Stripe不要）。
+ *
+ *  Stripe側の「支払い後のリダイレクト先」には、このデモの公開URLに
+ *  「?paid=1&session_id={CHECKOUT_SESSION_ID}」を付けたものを設定してください。
+ *  例: https://xxxx.pages.dev/?paid=1&session_id={CHECKOUT_SESSION_ID}
+ * ============================================================ */
+const CONFIG = {
+  storeName: 'やさしい家事代行 はちおうじ',
+  pricePerHour: 3500,              // 1時間あたり（円）※税込/税抜は要確認
+  minHours: 2,
+  hourOptions: [2, 3, 4],
+  paymentLinks: {                  // Stripe テストモード Payment Link
+    2: '',                         // 7,000円
+    3: '',                         // 10,500円
+    4: '',                         // 14,000円
+  },
+  bookableDays: 14,                // 何日先まで予約できるか
+  pendingExpireMinutes: 30,        // 未決済の予約を自動取消するまでの分数
+  staff: [
+    { id: 'sato',   name: '佐藤 みどり', color: '#1b7f72', start: 9,  end: 17, offWeekdays: [0],
+      desc: '家事代行歴8年。水回りの掃除が得意です。' },
+    { id: 'tanaka', name: '田中 ひろし', color: '#2d6fb3', start: 10, end: 18, offWeekdays: [0, 3],
+      desc: '元ビルメンテナンス。床・窓の清掃が得意です。' },
+    { id: 'suzuki', name: '鈴木 あかね', color: '#b3572d', start: 9,  end: 15, offWeekdays: [6, 0],
+      desc: '整理収納アドバイザー。片づけのご相談もどうぞ。' },
+  ],
+};
+
+/* ============================================================
+ *  データ保存（ブラウザ内 localStorage）
+ *  ※本番は予約システム側のサーバーに保存されます。
+ * ============================================================ */
+const STORE_KEY = 'kaji-demo-v1';
+const WEEK = ['日', '月', '火', '水', '木', '金', '土'];
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch (e) { /* 無視 */ }
+  return seedState();
+}
+function saveState() {
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) { /* 無視 */ }
+}
+function seedState() {
+  // デモ用に「すでに予約が入っている枠」をいくつか用意しておく
+  const d1 = addDays(today(), 1), d2 = addDays(today(), 2), d3 = addDays(today(), 4);
+  const mk = (staffId, date, start, hours, name) => ({
+    id: 'bk_' + Math.random().toString(36).slice(2, 8), staffId, date: ymd(date), start, hours,
+    name, phone: '042-000-0000', address: '八王子市○○町', note: '', amount: hours * CONFIG.pricePerHour,
+    status: 'paid', createdAt: Date.now() - 86400000, paidAt: Date.now() - 86400000, sessionId: 'sample',
+  });
+  return {
+    bookings: [
+      mk('sato', d1, 10, 2, '山田 花子'),
+      mk('sato', d1, 14, 3, '小林 太郎'),
+      mk('tanaka', d2, 13, 2, '高橋 良子'),
+      mk('suzuki', d3, 9, 4, '渡辺 正'),
+    ],
+    daysOff: { sato: [ymd(addDays(today(), 3))], tanaka: [], suzuki: [] },
+  };
+}
+
+/* ---------- 日付ユーティリティ ---------- */
+function today() { const d = new Date(); d.setHours(0, 0, 0, 0); return d; }
+function addDays(d, n) { const x = new Date(d); x.setDate(x.getDate() + n); return x; }
+function ymd(d) {
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+function parseYmd(s) { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); }
+function fmtDate(s) { const d = parseYmd(s); return `${d.getMonth() + 1}月${d.getDate()}日（${WEEK[d.getDay()]}）`; }
+function fmtTime(h) { return `${h}:00`; }
+function fmtRange(start, hours) { return `${fmtTime(start)}〜${fmtTime(start + hours)}`; }
+function yen(n) { return n.toLocaleString('ja-JP') + '円'; }
+function staffById(id) { return CONFIG.staff.find(s => s.id === id); }
+function escapeHtml(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+
+/* ---------- 空き状況の判定 ---------- */
+function expirePending() {
+  const limit = Date.now() - CONFIG.pendingExpireMinutes * 60000;
+  let changed = false;
+  state.bookings.forEach(b => {
+    if (b.status === 'pending' && b.createdAt < limit) { b.status = 'expired'; changed = true; }
+  });
+  if (changed) saveState();
+}
+function activeBookings(staffId, date) {
+  return state.bookings.filter(b => b.staffId === staffId && b.date === date && (b.status === 'paid' || b.status === 'pending'));
+}
+function isDayOff(staff, date) {
+  const d = parseYmd(date);
+  if (staff.offWeekdays.includes(d.getDay())) return true;
+  return (state.daysOff[staff.id] || []).includes(date);
+}
+function slotFree(staff, date, start, hours) {
+  if (start < staff.start || start + hours > staff.end) return false;
+  const end = start + hours;
+  return !activeBookings(staff.id, date).some(b => start < b.start + b.hours && b.start < end);
+}
+function startTimes(staff, hours) {
+  const list = [];
+  for (let h = staff.start; h + hours <= staff.end; h++) list.push(h);
+  return list;
+}
+function dayHasFree(staff, date, hours) {
+  if (isDayOff(staff, date)) return false;
+  return startTimes(staff, hours).some(h => slotFree(staff, date, h, hours));
+}
+
+/* ============================================================
+ *  画面の状態
+ * ============================================================ */
+let state = loadState();
+const sel = { staffId: null, hours: null, date: null, start: null, name: '', phone: '', address: '', note: '' };
+let view = 'staff';   // staff | hours | datetime | customer | pay | mockpay | done | admin
+let doneBookingId = null;
+let formError = '';
+
+const STEP_LABELS = ['スタッフ', '利用時間', '日時', 'お客様情報', 'お支払い', '完了'];
+const STEP_INDEX = { staff: 0, hours: 1, datetime: 2, customer: 3, pay: 4, mockpay: 4, done: 5 };
+
+function go(v) { view = v; window.scrollTo({ top: 0 }); render(); }
+
+/* ---------- 決済から戻ってきたときの処理 ---------- */
+function handleReturn() {
+  const params = new URLSearchParams(location.search);
+  if (params.get('paid') === '1') {
+    const pending = state.bookings.filter(b => b.status === 'pending').sort((a, b) => b.createdAt - a.createdAt)[0];
+    if (pending) {
+      pending.status = 'paid';
+      pending.paidAt = Date.now();
+      pending.sessionId = params.get('session_id') || 'test';
+      saveState();
+      doneBookingId = pending.id;
+      view = 'done';
+    }
+    history.replaceState(null, '', location.pathname + (location.hash || ''));
+  }
+  if (location.hash === '#admin') view = 'admin';
+}
+
+/* ============================================================
+ *  描画
+ * ============================================================ */
+const app = document.getElementById('app');
+
+function render() {
+  expirePending();
+  const map = { staff: renderStaff, hours: renderHours, datetime: renderDatetime, customer: renderCustomer, pay: renderPay, mockpay: renderMockPay, done: renderDone, admin: renderAdmin };
+  app.innerHTML = (view === 'admin' ? '' : renderSteps()) + renderPendingNotice() + map[view]();
+  bind();
+}
+
+function renderSteps() {
+  const cur = STEP_INDEX[view];
+  return '<ol class="steps">' + STEP_LABELS.map((l, i) =>
+    `<li class="${i < cur ? 'done' : i === cur ? 'current' : ''}">${i + 1}<br>${l}</li>`).join('') + '</ol>';
+}
+
+function renderPendingNotice() {
+  if (view === 'done' || view === 'admin' || view === 'mockpay') return '';
+  const p = state.bookings.find(b => b.status === 'pending');
+  if (!p) return '';
+  const s = staffById(p.staffId);
+  return `<div class="notice" data-pending="${p.id}">
+    お支払いが完了していない予約があります（${s.name}／${fmtDate(p.date)} ${fmtRange(p.start, p.hours)}）。<br>
+    <div class="btn-row" style="grid-template-columns:1fr 1fr">
+      <button class="btn btn-secondary" style="min-height:48px" data-action="resume-pay">お支払いに進む</button>
+      <button class="btn btn-ghost" data-action="cancel-pending">この予約を取り消す</button>
+    </div></div>`;
+}
+
+function renderStaff() {
+  return `<h1>ご予約</h1>
+  <p class="lead">ご希望のスタッフをお選びください。<br>料金は1時間 ${yen(CONFIG.pricePerHour)}、${CONFIG.minHours}時間からご利用いただけます。</p>
+  ${CONFIG.staff.map(s => `
+    <button class="choice" data-action="pick-staff" data-id="${s.id}" aria-pressed="${sel.staffId === s.id}">
+      <span class="avatar" style="background:${s.color}" aria-hidden="true">${s.name.slice(0, 1)}</span>
+      <span><span class="title">${s.name}</span><br>
+      <span class="desc">${s.desc}<br>対応時間 ${fmtTime(s.start)}〜${fmtTime(s.end)}／定休 ${s.offWeekdays.map(w => WEEK[w]).join('・') || 'なし'}曜</span></span>
+    </button>`).join('')}
+  <div class="btn-row"><button class="btn btn-primary" data-action="next" data-to="hours" ${sel.staffId ? '' : 'disabled'}>次へ（利用時間を選ぶ）</button></div>`;
+}
+
+function renderHours() {
+  const s = staffById(sel.staffId);
+  return `<h2>利用時間をお選びください</h2>
+  <p class="lead">担当：${s.name}</p>
+  ${CONFIG.hourOptions.map(h => `
+    <button class="choice" data-action="pick-hours" data-h="${h}" aria-pressed="${sel.hours === h}">
+      <span><span class="title">${h}時間</span><br><span class="desc">${h === 2 ? '掃除機がけ＋水回り1か所など' : h === 3 ? 'お部屋全体の掃除など' : 'お部屋全体＋片づけ・洗濯など'}</span></span>
+      <span class="price">${yen(h * CONFIG.pricePerHour)}</span>
+    </button>`).join('')}
+  <div class="btn-row">
+    <button class="btn btn-primary" data-action="next" data-to="datetime" ${sel.hours ? '' : 'disabled'}>次へ（日時を選ぶ）</button>
+    <button class="btn btn-ghost" data-action="next" data-to="staff">戻る</button>
+  </div>`;
+}
+
+function renderDatetime() {
+  const s = staffById(sel.staffId);
+  const days = [];
+  for (let i = 1; i <= CONFIG.bookableDays; i++) {
+    const d = addDays(today(), i), key = ymd(d), free = dayHasFree(s, key, sel.hours);
+    const cls = d.getDay() === 6 ? 'sat' : d.getDay() === 0 ? 'sun' : '';
+    days.push(`<button class="day ${cls}" data-action="pick-date" data-date="${key}" aria-pressed="${sel.date === key}" ${free ? '' : 'disabled'}
+      aria-label="${fmtDate(key)} ${free ? '空きあり' : '空きなし'}">
+      <span class="d">${d.getMonth() + 1}/${d.getDate()}</span><span class="w">${WEEK[d.getDay()]}</span>
+      <span class="mark ${free ? 'ok' : 'ng'}" aria-hidden="true">${free ? '○' : '×'}</span></button>`);
+  }
+  let slots = '';
+  if (sel.date) {
+    slots = `<h3>開始時刻（${fmtDate(sel.date)}）</h3><div class="slots">` +
+      startTimes(s, sel.hours).map(h => {
+        const free = slotFree(s, sel.date, h, sel.hours);
+        return `<button class="slot" data-action="pick-start" data-h="${h}" aria-pressed="${sel.start === h}" ${free ? '' : 'disabled'}
+          aria-label="${fmtRange(h, sel.hours)} ${free ? '空きあり' : '予約済み'}">
+          <span class="mark ${free ? 'ok' : 'ng'}" aria-hidden="true">${free ? '○' : '×'}</span>${fmtRange(h, sel.hours)}</button>`;
+      }).join('') + '</div><p class="legend">× は予約済み、または対応時間外の枠です。</p>';
+  }
+  return `<h2>日時をお選びください</h2>
+  <p class="lead">担当：${s.name}／${sel.hours}時間（${yen(sel.hours * CONFIG.pricePerHour)}）</p>
+  <h3>日付</h3>
+  <div class="days">${days.join('')}</div>
+  <p class="legend">○ 空きあり　× 空きなし（お休み・満席）　※ご予約は前日まで</p>
+  ${slots}
+  <div class="btn-row">
+    <button class="btn btn-primary" data-action="next" data-to="customer" ${sel.date && sel.start !== null ? '' : 'disabled'}>次へ（お客様情報）</button>
+    <button class="btn btn-ghost" data-action="next" data-to="hours">戻る</button>
+  </div>`;
+}
+
+function renderCustomer() {
+  return `<h2>お客様情報</h2>
+  <p class="lead">ご連絡とご訪問のために必要な情報です。</p>
+  <form id="customerForm" novalidate>
+    ${formError ? `<p class="error">${formError}</p>` : ''}
+    <label class="field">お名前<span class="req">必須</span><input name="name" type="text" autocomplete="name" value="${escapeHtml(sel.name)}" placeholder="例：八王子 花子"></label>
+    <label class="field">電話番号<span class="req">必須</span><input name="phone" type="tel" autocomplete="tel" inputmode="tel" value="${escapeHtml(sel.phone)}" placeholder="例：042-000-0000"><span class="hint">当日のご連絡に使用します</span></label>
+    <label class="field">ご住所<span class="req">必須</span><input name="address" type="text" autocomplete="street-address" value="${escapeHtml(sel.address)}" placeholder="例：八王子市高尾町○-○-○"></label>
+    <label class="field">ご要望・ご質問<span class="hint">（任意）</span><textarea name="note" rows="3" placeholder="例：寝室とお風呂を中心にお願いします">${escapeHtml(sel.note)}</textarea></label>
+    <div class="btn-row">
+      <button class="btn btn-primary" type="submit">次へ（内容の確認）</button>
+      <button class="btn btn-ghost" type="button" data-action="next" data-to="datetime">戻る</button>
+    </div>
+  </form>`;
+}
+
+function renderPay() {
+  const s = staffById(sel.staffId), amount = sel.hours * CONFIG.pricePerHour;
+  const link = CONFIG.paymentLinks[sel.hours];
+  return `<h2>ご予約内容の確認</h2>
+  <div class="card">
+    <table class="summary">
+      <tr><th>担当スタッフ</th><td>${s.name}</td></tr>
+      <tr><th>日時</th><td>${fmtDate(sel.date)}<br>${fmtRange(sel.start, sel.hours)}（${sel.hours}時間）</td></tr>
+      <tr><th>お名前</th><td>${escapeHtml(sel.name)} 様</td></tr>
+      <tr><th>電話番号</th><td>${escapeHtml(sel.phone)}</td></tr>
+      <tr><th>ご住所</th><td>${escapeHtml(sel.address)}</td></tr>
+      ${sel.note ? `<tr><th>ご要望</th><td>${escapeHtml(sel.note)}</td></tr>` : ''}
+      <tr><th>お支払い金額</th><td class="total">${yen(amount)}</td></tr>
+    </table>
+  </div>
+  <div class="notice">
+    お支払いはクレジットカードの事前決済です。<br>
+    <strong>デモのため実際の請求はありません。</strong>テスト用カード番号 <strong>4242 4242 4242 4242</strong>（有効期限は未来の任意の月、CVCは任意の3桁）でお試しください。
+  </div>
+  <p class="lead" style="font-size:0.85rem">キャンセル規定（例）：前日まで無料、当日は料金の50%。※本番サイトでは正式な規定を掲載します。</p>
+  <div class="btn-row">
+    <button class="btn btn-primary" data-action="pay">カードで支払う${link ? '' : '（模擬画面）'}</button>
+    <button class="btn btn-ghost" data-action="next" data-to="customer">戻る</button>
+  </div>`;
+}
+
+function renderMockPay() {
+  const p = state.bookings.find(b => b.status === 'pending');
+  if (!p) return renderStaff();
+  return `<div class="mock-pay card">
+    <div class="brandline"><span>🔒 テスト決済画面（模擬）</span><span>${CONFIG.storeName}</span></div>
+    <div class="amount">${yen(p.amount)}</div>
+    <p class="lead" style="font-size:0.85rem">Stripeの Payment Link が未設定のため、画面内の模擬画面で動作しています。設定後は本物のテスト決済画面（Stripe）に切り替わります。</p>
+    <label class="field">カード番号<input type="text" value="4242 4242 4242 4242" readonly inputmode="numeric"></label>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <label class="field">有効期限<input type="text" value="12 / 34" readonly></label>
+      <label class="field">CVC<input type="text" value="123" readonly></label>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" data-action="mock-pay-done">${yen(p.amount)} を支払う</button>
+      <button class="btn btn-ghost" data-action="next" data-to="pay">戻る</button>
+    </div>
+  </div>`;
+}
+
+function renderDone() {
+  const b = state.bookings.find(x => x.id === doneBookingId) || state.bookings.filter(x => x.status === 'paid').sort((a, c) => (c.paidAt || 0) - (a.paidAt || 0))[0];
+  if (!b) return renderStaff();
+  const s = staffById(b.staffId);
+  return `<div class="card" style="text-align:center">
+    <div class="done-mark" aria-hidden="true">✓</div>
+    <h2>ご予約が完了しました</h2>
+    <p>お支払いを確認しました。当日はよろしくお願いいたします。</p>
+  </div>
+  <div class="card">
+    <table class="summary">
+      <tr><th>予約番号</th><td>${b.id}</td></tr>
+      <tr><th>担当スタッフ</th><td>${s.name}</td></tr>
+      <tr><th>日時</th><td>${fmtDate(b.date)}<br>${fmtRange(b.start, b.hours)}（${b.hours}時間）</td></tr>
+      <tr><th>お名前</th><td>${escapeHtml(b.name)} 様</td></tr>
+      <tr><th>お支払い</th><td>${yen(b.amount)}（カード決済済み・テスト）</td></tr>
+    </table>
+  </div>
+  <div class="notice ok">
+    <strong>デモのポイント：</strong>いま予約した枠は、予約画面で自動的に「×」になります。管理画面にも予約と決済状況が反映されています。
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-secondary" data-action="check-slot" data-id="${b.id}">同じ日の空き状況を見る（×になっています）</button>
+    <a class="btn btn-ghost" href="#admin" data-nav="admin">管理画面で確認する</a>
+    <button class="btn btn-ghost" data-action="restart">最初に戻る</button>
+  </div>`;
+}
+
+const STATUS_LABEL = { paid: '決済済み', pending: '未決済', cancelled: '取消', expired: '期限切れ' };
+
+function renderAdmin() {
+  const rows = [...state.bookings].sort((a, b) => (a.date + String(a.start).padStart(2, '0')).localeCompare(b.date + String(b.start).padStart(2, '0')));
+  const paidTotal = rows.filter(b => b.status === 'paid').reduce((n, b) => n + b.amount, 0);
+  return `<div class="admin">
+  <h1>管理画面（デモ用）</h1>
+  <p class="lead">本番では予約システムの管理画面（スマホアプリあり）で同じことができます。</p>
+
+  <div class="card">
+    <h2>予約一覧</h2>
+    <p class="lead" style="font-size:0.85rem">決済済み ${rows.filter(b => b.status === 'paid').length}件／売上（テスト）${yen(paidTotal)}</p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>日時</th><th>スタッフ</th><th>お客様</th><th>金額</th><th>決済</th><th></th></tr></thead>
+      <tbody>${rows.length ? rows.map(b => `
+        <tr class="${b.status === 'cancelled' || b.status === 'expired' ? 'row-cancelled' : ''}">
+          <td>${fmtDate(b.date)}<br>${fmtRange(b.start, b.hours)}</td>
+          <td>${staffById(b.staffId).name}</td>
+          <td>${escapeHtml(b.name)}<br><span style="font-size:0.75rem;color:var(--muted)">${escapeHtml(b.phone)}</span></td>
+          <td>${yen(b.amount)}</td>
+          <td><span class="badge ${b.status}">${STATUS_LABEL[b.status]}</span>${b.sessionId && b.status === 'paid' ? `<br><span style="font-size:0.7rem;color:var(--muted)">ID: ${escapeHtml(String(b.sessionId).slice(0, 14))}…</span>` : ''}</td>
+          <td class="actions">${b.status === 'paid' || b.status === 'pending' ? `<button class="btn btn-danger" data-action="admin-cancel" data-id="${b.id}">取り消し</button>` : ''}</td>
+        </tr>`).join('') : '<tr><td colspan="6">予約はまだありません</td></tr>'}
+      </tbody></table></div>
+    <p class="legend">取り消すと、その枠はすぐに予約可能（○）に戻ります。本番では返金処理も管理画面から行えます。</p>
+  </div>
+
+  <div class="card">
+    <h2>スタッフのお休み設定</h2>
+    <p class="lead" style="font-size:0.85rem">お休みにした日は、予約画面で「×」になります。</p>
+    <form id="dayOffForm" class="inline-form">
+      <label class="field">スタッフ<select name="staffId">${CONFIG.staff.map(s => `<option value="${s.id}">${s.name}</option>`).join('')}</select></label>
+      <label class="field">日付<input type="date" name="date" min="${ymd(addDays(today(), 1))}" required></label>
+      <button class="btn btn-secondary" type="submit">お休みにする</button>
+    </form>
+    ${CONFIG.staff.map(s => `<h3>${s.name} <span class="hint">定休：${s.offWeekdays.map(w => WEEK[w]).join('・') || 'なし'}曜</span></h3>
+      <div class="chips">${(state.daysOff[s.id] || []).length ? (state.daysOff[s.id] || []).sort().map(d => `<span class="chip">${fmtDate(d)}<button type="button" data-action="remove-dayoff" data-staff="${s.id}" data-date="${d}" aria-label="${fmtDate(d)}のお休みを解除">×</button></span>`).join('') : '<span class="hint">臨時のお休みはありません</span>'}</div>`).join('')}
+  </div>
+
+  <div class="card">
+    <h2>デモ設定</h2>
+    <p class="lead" style="font-size:0.85rem">Stripe Payment Link：${CONFIG.hourOptions.map(h => `${h}時間 ${CONFIG.paymentLinks[h] ? '設定済み' : '未設定（模擬画面）'}`).join('／')}</p>
+    <div class="btn-row" style="grid-template-columns:1fr 1fr">
+      <a class="btn btn-secondary" href="#" data-nav="home">予約画面へ</a>
+      <button class="btn btn-ghost" data-action="reset">データを初期化</button>
+    </div>
+  </div>
+  </div>`;
+}
+
+/* ============================================================
+ *  操作
+ * ============================================================ */
+function bind() {
+  app.querySelectorAll('[data-action]').forEach(el => el.addEventListener('click', onAction));
+  const cf = document.getElementById('customerForm');
+  if (cf) cf.addEventListener('submit', onCustomerSubmit);
+  const df = document.getElementById('dayOffForm');
+  if (df) df.addEventListener('submit', onDayOffSubmit);
+}
+
+function onAction(e) {
+  const el = e.currentTarget, a = el.dataset.action;
+  switch (a) {
+    case 'pick-staff': sel.staffId = el.dataset.id; sel.date = null; sel.start = null; render(); break;
+    case 'pick-hours': sel.hours = Number(el.dataset.h); sel.date = null; sel.start = null; render(); break;
+    case 'pick-date': sel.date = el.dataset.date; sel.start = null; render(); break;
+    case 'pick-start': sel.start = Number(el.dataset.h); render(); break;
+    case 'next': formError = ''; go(el.dataset.to); break;
+    case 'pay': startPayment(); break;
+    case 'resume-pay': resumePayment(); break;
+    case 'cancel-pending': {
+      const p = state.bookings.find(b => b.status === 'pending');
+      if (p) { p.status = 'cancelled'; saveState(); }
+      render(); break;
+    }
+    case 'mock-pay-done': {
+      const p = state.bookings.find(b => b.status === 'pending');
+      if (!p) { go('staff'); break; }
+      // 本物のStripeと同じく、リダイレクトで戻ってくる形にする
+      location.href = location.pathname + '?paid=1&session_id=mock_' + Math.random().toString(36).slice(2, 12);
+      break;
+    }
+    case 'check-slot': {
+      const b = state.bookings.find(x => x.id === el.dataset.id);
+      if (b) { sel.staffId = b.staffId; sel.hours = b.hours; sel.date = b.date; sel.start = null; go('datetime'); }
+      break;
+    }
+    case 'restart': resetSelection(); go('staff'); break;
+    case 'admin-cancel': {
+      const b = state.bookings.find(x => x.id === el.dataset.id);
+      if (b && confirm(`${escapeHtml(b.name)} 様の予約（${fmtDate(b.date)} ${fmtRange(b.start, b.hours)}）を取り消しますか？`)) {
+        b.status = 'cancelled'; saveState(); render();
+      }
+      break;
+    }
+    case 'remove-dayoff': {
+      const list = state.daysOff[el.dataset.staff] || [];
+      state.daysOff[el.dataset.staff] = list.filter(d => d !== el.dataset.date);
+      saveState(); render(); break;
+    }
+    case 'reset':
+      if (confirm('デモのデータを初期状態に戻しますか？')) { state = seedState(); saveState(); resetSelection(); render(); }
+      break;
+  }
+}
+
+function resetSelection() { Object.assign(sel, { staffId: null, hours: null, date: null, start: null, name: '', phone: '', address: '', note: '' }); doneBookingId = null; formError = ''; }
+
+function onCustomerSubmit(e) {
+  e.preventDefault();
+  const f = new FormData(e.currentTarget);
+  sel.name = f.get('name').trim(); sel.phone = f.get('phone').trim(); sel.address = f.get('address').trim(); sel.note = f.get('note').trim();
+  if (!sel.name || !sel.phone || !sel.address) { formError = 'お名前・電話番号・ご住所をご入力ください。'; render(); return; }
+  if (!/^[0-9０-９\-－() ]{10,14}$/.test(sel.phone)) { formError = '電話番号は数字（ハイフン可）でご入力ください。'; render(); return; }
+  formError = '';
+  go('pay');
+}
+
+function onDayOffSubmit(e) {
+  e.preventDefault();
+  const f = new FormData(e.currentTarget);
+  const staffId = f.get('staffId'), date = f.get('date');
+  if (!date) return;
+  const list = state.daysOff[staffId] || (state.daysOff[staffId] = []);
+  if (!list.includes(date)) list.push(date);
+  saveState(); render();
+}
+
+function startPayment() {
+  const s = staffById(sel.staffId);
+  // 直前に同じ枠が埋まっていないか確認（二重予約の防止）
+  if (!slotFree(s, sel.date, sel.start, sel.hours)) {
+    alert('申し訳ありません。この枠はたった今、別のご予約で埋まりました。別の時間をお選びください。');
+    sel.start = null; go('datetime'); return;
+  }
+  // 未決済の古い予約があれば取り消してから新規作成
+  state.bookings.forEach(b => { if (b.status === 'pending') b.status = 'cancelled'; });
+  const booking = {
+    id: 'bk_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5),
+    staffId: sel.staffId, date: sel.date, start: sel.start, hours: sel.hours,
+    name: sel.name, phone: sel.phone, address: sel.address, note: sel.note,
+    amount: sel.hours * CONFIG.pricePerHour, status: 'pending', createdAt: Date.now(), paidAt: null, sessionId: null,
+  };
+  state.bookings.push(booking);
+  saveState();
+  redirectToPayment(booking);
+}
+
+function resumePayment() {
+  const p = state.bookings.find(b => b.status === 'pending');
+  if (p) redirectToPayment(p);
+}
+
+function redirectToPayment(booking) {
+  const link = CONFIG.paymentLinks[booking.hours];
+  if (link) {
+    // Stripe Payment Link に予約番号を添えて遷移（client_reference_id は Stripe側の決済詳細に表示される）
+    location.href = link + (link.includes('?') ? '&' : '?') + 'client_reference_id=' + encodeURIComponent(booking.id);
+  } else {
+    go('mockpay');
+  }
+}
+
+/* ---------- フッターのナビ ---------- */
+document.querySelectorAll('[data-nav]').forEach(a => a.addEventListener('click', e => {
+  e.preventDefault();
+  const to = e.currentTarget.dataset.nav;
+  history.replaceState(null, '', location.pathname + (to === 'admin' ? '#admin' : ''));
+  if (to === 'admin') go('admin'); else { if (view === 'admin' || view === 'done') resetSelection(); go('staff'); }
+}));
+window.addEventListener('hashchange', () => { if (location.hash === '#admin') go('admin'); else if (view === 'admin') { resetSelection(); go('staff'); } });
+
+/* ---------- 起動 ---------- */
+handleReturn();
+render();
+</script>
+</body>
+</html>
