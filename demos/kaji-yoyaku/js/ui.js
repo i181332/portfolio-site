@@ -134,6 +134,8 @@ const navList = (cls, current) => h("ul", { class: cls, role: "list" },
     "data-nav-current": n.href === current ? "" : null,
   }, n.label))));
 
+const MOBILE_MAX = 720;   // スマホの幅の上限（css/pages.css の @media と同じ）
+
 const bookLink = (cls, label) => h("a", { class: `btn btn--primary ${cls}`, "data-book": "any" }, label);
 
 // <header data-chrome>・<footer data-chrome> の中を組み、文字サイズ切替、スマホの下の予約ボタン、デモ注記帯を置く。
@@ -154,11 +156,27 @@ export function mountChrome({ current } = {}) {
       h("div", { class: "topline" }, h("div", { class: "topline__inner" },
         h("a", { class: "topline__shop", href: "index.html" }, CONFIG.shopName),
         telSlot("topline__tel"),
-        scale, toggle,
-        bookLink("topline__book", "予約する"))),
+        scale, toggle)),
       h("nav", { class: "gnav", "aria-label": "メニュー" }, h("div", { class: "gnav__inner" },
         list, telSlot("gnav__tel"))));
     mountFontScale(scale);
+    // スマホ（≤720px）：ヘッダーに予約ボタンを置かず、文字の大きさの切替をメニューの中へ移す（部品は1つ、置き場所だけ変える）
+    const book = bookLink("topline__book", "予約する");
+    const topInner = header.querySelector(".topline__inner");
+    const menuInner = header.querySelector(".gnav__inner");
+    const mobile = matchMedia(`(max-width: ${MOBILE_MAX}px)`);
+    const place = () => {
+      if (mobile.matches) {
+        book.remove();
+        menuInner.insertBefore(scale, menuInner.querySelector(".gnav__tel"));
+      } else {
+        topInner.insertBefore(scale, toggle);
+        topInner.append(book);
+      }
+      wireBookingButtons(header);
+    };
+    place();
+    mobile.addEventListener("change", place);
   }
 
   if (footer) {
@@ -186,4 +204,19 @@ export function mountChrome({ current } = {}) {
   }
   wireBookingButtons(header || document.body);
   wireBookingButtons(document.querySelector(".dock"));
+  watchHeroBook();
+}
+
+// トップだけ：最初の画面の「予約する」が見えている間は、下の固定ボタンを隠す（見えるのは主ボタン1つだけ）
+function watchHeroBook() {
+  const heroBtn = document.querySelector("[data-hero] [data-book]");
+  const sticky = document.querySelector("[data-sticky-book]");
+  if (!heroBtn || !sticky || !("IntersectionObserver" in window)) return;
+  const setHidden = (hidden) => {
+    sticky.classList.toggle("dock__book--hidden", hidden);
+    sticky.setAttribute("aria-hidden", String(hidden));
+    for (const a of sticky.querySelectorAll("a")) a.tabIndex = hidden ? -1 : 0;
+  };
+  setHidden(true);
+  new IntersectionObserver(([entry]) => setHidden(entry.isIntersecting)).observe(heroBtn);
 }

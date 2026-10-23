@@ -119,6 +119,16 @@
   .gnav__list a { min-height: 3.25rem; }
   .gnav__list [aria-current="page"]::before { content: ""; width: 4px; align-self: stretch; margin-block: var(--space-3); margin-inline-end: var(--space-3); border-radius: 2px; background: var(--sugi); }
 }
+/* スマホ（≤720px）：ヘッダーは1行（左に店名、右にメニュー）。予約は下の固定ボタンと最初の画面が受け持ち、
+   文字の大きさの切替はメニューを開いた中（ui.js が置き場所を移す） */
+@media (max-width: 720px) {
+  .topline__inner {
+    grid-template-areas: "shop menu";
+    padding-block: var(--space-1);
+  }
+  .gnav__toggle { justify-self: end; }
+  .gnav__inner > .topline__scale { padding-block: var(--space-3); border-top: 1px solid var(--line); }
+}
 /* 420px 未満：「文字の大きさ」の字は見た目から消し、読み上げには残す（group の名前） */
 @media (max-width: 419px) {
   .topline__shop { min-width: 0; font-size: min(var(--fs-small), 1rem); letter-spacing: 0; line-height: 1.3; word-break: auto-phrase; }
@@ -202,6 +212,9 @@ html[data-font-scale="large"] .page-head h1 { font-size: clamp(2rem, 1.4rem + 2v
 .dock { position: sticky; bottom: 0; z-index: 30; margin-block-start: auto; }
 .dock .demo-band { position: static; margin: 0; }
 .dock__book { padding: var(--space-2) var(--gutter); background: var(--paper); border-top: 1px solid var(--line); }
+.dock__book--hidden { position: absolute; inset-inline: 0; top: 0; opacity: 0; transform: translateY(0.5rem); visibility: hidden; pointer-events: none; }
+.dock__book { transition: opacity 150ms ease-out, transform 150ms ease-out, visibility 150ms; }
+@media (prefers-reduced-motion: reduce) { .dock__book { transition: none; } }
 .dock__btn { display: flex; width: 100%; min-height: 2.75rem; padding-block: var(--space-1); font-size: var(--fs-ui); }
 @media (min-width: 960px) { .dock__book { display: none; } }
 

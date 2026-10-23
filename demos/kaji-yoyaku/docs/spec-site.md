@@ -90,12 +90,17 @@ export const CONFIG = {
 
 ## data 属性（e2e 用）
 - `header[data-chrome]`・`footer[data-chrome]`・`nav [data-nav-current]`
-- `[data-book="any|s1|s2|s3"]`、`[data-booking-note]`
+- `[data-book="any|s1|s2|s3"]`
 - `[data-staff-card="s1".."s3"]`（トップとスタッフ紹介）
 - `html[data-font-scale]`
 - `[data-demo-band]`
-- `[data-pay-test]`、`[data-pay-done]`、トップの `a[href="payment.html"]`
-- ヘッダーの予約ボタン `header [data-book="any"]`、スマホの下の固定ボタン `[data-sticky-book]`（390px で見え、1440px では隠れてよい）
+- ヘッダーの予約ボタン `header [data-book="any"]`：1440px で見える。スマホ（≤720px）のヘッダーには置かない（下の固定ボタンが受け持つ）
+- スマホの下の固定ボタン `[data-sticky-book]`：トップでは、最初の画面の `[data-hero] [data-book]` が画面に見えている間は隠し（`hidden` か `aria-hidden` ＋見えない）、そこを過ぎて下へ送ったら出す。トップ以外のページでは最初から見える。1440px では隠れてよい
+- スマホ（≤720px）の最初の画面（2026-10-23 利用者の指摘「開いた瞬間のファーストインプレッションが悪い」への手当て）：
+  - 見えている「予約する」は1つだけ（最初の画面の主ボタン）
+  - ヘッダーは1行（高さ 64px 以下）：左に店名、右にメニューのボタン。文字の大きさの切り替え（標準／大きく）はメニューの中へ移す（1440px はヘッダーのまま）
+  - 最初の画面の上に作業の写真（`[data-hero] img`）を画面の幅いっぱいに置き、その下に見出し・料金・ボタン。390x664（iPhone の Safari で見える高さ）で、写真・h1・料金・主ボタンがすべて画面に入る
+  - デモ帯は1行のまま、画面の下に置く
 - トップ：最初の画面 `[data-hero]`（h1 に「家事代行」と「八王子」を含む、「3,500円」と「2時間から」を含む、写真 `img` を含む）、できること `[data-service-item]` が4つ（各 img と作業名）、安心の材料 `[data-assurance]`、料金 `[data-price]`、流れ `[data-flow-step]` が3つ、よくある質問 `[data-faq-item]` が3つ、エリア `[data-area]`、お知らせ `[data-news-item]` が2つ
 - スタッフの写真 `[data-staff-card] img` は、同じページの3枚で表示の幅と高さが揃う（差 1px 以内）
 - フッターに `a[href="company.html"]`・`a[href="law.html"]`・`a[href="privacy.html"]`

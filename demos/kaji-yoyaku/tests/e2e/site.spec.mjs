@@ -214,21 +214,39 @@ for (const file of ["index.html", "staff.html"]) {
 }
 
 /* ---- ヘッダーの予約ボタンとスマホの下の固定ボタン ---- */
-for (const file of PAGES) {
-  test(`${file}：header [data-book=any] が常に見える（390 と 1440）`, async (t) => {
-    for (const v of [{ width: 390, height: 844 }, { width: 1440, height: 900 }]) {
-      const { page } = await open(t, file, v);
-      const btn = page.locator('header [data-book="any"]').first();
-      assert.ok((await btn.count()) >= 1, "header [data-book=any]");
-      assert.ok(await btn.isVisible(), `見えない ${v.width}px`);
-    }
-  });
+// 見えている（CSS で隠れていず、不透明で、画面に少しでも重なる）要素の数・判定は、ブラウザの中で行う
+const shownInViewport = (el) => {
+  if (!el.checkVisibility({ checkVisibilityCSS: true, opacityProperty: true })) return false;
+  if (el.closest('[aria-hidden="true"]')) return false;
+  const r = el.getBoundingClientRect();
+  return r.width > 0 && r.height > 0 && r.bottom > 0 && r.top < innerHeight && r.right > 0 && r.left < innerWidth;
+};
+const stickyShown = (page) => page.evaluate(`(${((f) => { const el = document.querySelector("[data-sticky-book]"); return !!el && f(el); }).toString()})(${shownInViewport.toString()})`);
+const waitSticky = async (page, want, ms = 3000) => {
+  const end = Date.now() + ms;
+  let v;
+  while (Date.now() < end) { v = await stickyShown(page); if (v === want) return true; await new Promise((r) => setTimeout(r, 100)); }
+  return false;
+};
 
-  test(`${file}：[data-sticky-book] が 390px で見え、画面の下の側にある`, async (t) => {
+for (const file of PAGES) {
+  test(`${file}：header [data-book=any] が 1440px で見え、390px では header の中の [data-book] が見えない`, async (t) => {
+    const wide = await open(t, file, { width: 1440, height: 900 });
+    const btn = wide.page.locator('header [data-book="any"]').first();
+    assert.ok((await btn.count()) >= 1, "header [data-book=any]");
+    assert.ok(await btn.isVisible(), "見えない 1440px");
+    const { page } = await open(t, file, { width: 390, height: 844 });
+    const n = await page.locator("header [data-book]").evaluateAll((els, f) => els.filter((e) => new Function("return " + f)()(e) && e.checkVisibility({ checkVisibilityCSS: true })).length, shownInViewport.toString());
+    assert.equal(n, 0, "390px で header の中に見える [data-book] がある");
+  });
+}
+
+for (const file of PAGES.filter((f) => f !== "index.html")) {
+  test(`${file}：[data-sticky-book] が 390px で最初から見え、画面の下の側にある`, async (t) => {
     const { page } = await open(t, file, { width: 390, height: 844 });
     const el = page.locator("[data-sticky-book]").first();
     assert.ok((await el.count()) >= 1, "[data-sticky-book]");
-    assert.ok(await el.isVisible(), "見えない");
+    assert.ok(await waitSticky(page, true), "見えない");
     const b = await el.boundingBox();
     assert.ok(b.y + b.height <= 844 + 1 && b.y >= 844 / 2, `画面の下にない: y ${b.y} h ${b.height}`);
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
@@ -236,6 +254,74 @@ for (const file of PAGES) {
     assert.ok(b2 && b2.y + b2.height <= 844 + 1 && b2.y >= 844 / 2, "スクロールの後も画面の下に出ている");
   });
 }
+
+test("index.html：[data-sticky-book] は 390px で読み込み直後は見えず、最初の画面の主ボタンを過ぎると画面の下に見える", async (t) => {
+  const { page } = await open(t, "index.html", { width: 390, height: 664 });
+  await page.waitForLoadState("load");
+  assert.ok((await page.locator("[data-sticky-book]").count()) >= 1, "[data-sticky-book]");
+  assert.equal(await stickyShown(page), false, "読み込み直後に見えている");
+  await page.evaluate(() => window.scrollTo(0, 1200));
+  assert.ok(await waitSticky(page, true), "1200px 送っても見えない");
+  const b = await page.locator("[data-sticky-book]").first().boundingBox();
+  assert.ok(b.y + b.height <= 664 + 1 && b.y >= 664 / 2, `画面の下にない: y ${b.y} h ${b.height}`);
+});
+
+/* ---- スマホ（≤720px）の最初の画面（390x664） ---- */
+test("index.html 390x664：見えている「予約する」[data-book] がちょうど1つ", async (t) => {
+  const { page } = await open(t, "index.html", { width: 390, height: 664 });
+  await page.waitForLoadState("load");
+  const shown = await page.$$eval("[data-book]", (els, f) => els.filter((e) => new Function("return " + f)()(e)).map((e) => `${e.tagName.toLowerCase()}[${e.getAttribute("data-book")}] ${(e.textContent || "").trim().slice(0, 20)}`), shownInViewport.toString());
+  assert.equal(shown.length, 1, `見えている [data-book]: ${JSON.stringify(shown)}`);
+});
+
+test("index.html 390x664：header の高さが 64px 以下で、中に「標準」「大きく」が見えない", async (t) => {
+  const { page } = await open(t, "index.html", { width: 390, height: 664 });
+  await page.waitForLoadState("load");
+  const b = await page.locator("header[data-chrome]").boundingBox();
+  assert.ok(b.height <= 64, `header の高さ ${b.height}px`);
+  const seen = await page.$$eval("header *", (els) => els.filter((e) => /^\s*(標準|大きく)\s*$/.test(e.textContent || "") && e.checkVisibility({ checkVisibilityCSS: true })).map((e) => e.textContent.trim()));
+  assert.deepEqual(seen, [], "header の中に見える文字サイズの切り替え");
+});
+
+test("index.html 390x664：[data-hero] の写真・h1・「3,500」・主ボタンがすべて画面の中（固定の段より上）に入り、写真の幅が画面の95%以上", async (t) => {
+  const H = 664;
+  const { page } = await open(t, "index.html", { width: 390, height: H });
+  await page.waitForLoadState("load");
+  const r = await page.evaluate((H) => {
+    let limit = H;
+    for (const d of document.querySelectorAll(".dock")) {
+      if (d.checkVisibility({ checkVisibilityCSS: true })) limit = Math.min(limit, d.getBoundingClientRect().top);
+    }
+    const hero = document.querySelector("[data-hero]");
+    const deepest = [...hero.querySelectorAll("*")].filter((e) => (e.textContent || "").includes("3,500") && ![...e.children].some((c) => (c.textContent || "").includes("3,500")));
+    const rect = (e) => { const b = e.getBoundingClientRect(); return { top: b.top, bottom: b.bottom, width: b.width }; };
+    return {
+      limit,
+      img: hero.querySelector("img") && rect(hero.querySelector("img")),
+      h1: hero.querySelector("h1") && rect(hero.querySelector("h1")),
+      price: deepest.map(rect),
+      btn: hero.querySelector("[data-book]") && rect(hero.querySelector("[data-book]")),
+    };
+  }, H);
+  assert.ok(r.img, "[data-hero] img");
+  assert.ok(r.h1, "[data-hero] h1");
+  assert.ok(r.price.length >= 1, "「3,500」を含む要素");
+  assert.ok(r.btn, "[data-hero] [data-book]");
+  const inside = (name, b) => assert.ok(b.top >= 0 && b.bottom <= r.limit + 0.5, `${name} が画面の外: top ${b.top} bottom ${b.bottom} / 上限 ${r.limit}`);
+  inside("[data-hero] img", r.img);
+  inside("h1", r.h1);
+  r.price.forEach((b) => inside("「3,500」の要素", b));
+  inside("[data-hero] [data-book]", r.btn);
+  assert.ok(r.img.width >= 390 * 0.95, `写真の幅 ${r.img.width}px（390 の 95% 以上）`);
+});
+
+test("index.html 1440x900：header の中に「標準」「大きく」が見える", async (t) => {
+  const { page } = await open(t, "index.html", { width: 1440, height: 900 });
+  for (const name of ["標準", "大きく"]) {
+    const n = await page.locator("header").getByRole("button", { name }).evaluateAll((els) => els.filter((e) => e.checkVisibility({ checkVisibilityCSS: true })).length);
+    assert.ok(n >= 1, `header の中に「${name}」が見えない`);
+  }
+});
 
 /* ---- トップの中身（data 属性の節） ---- */
 test("トップ [data-hero]：h1 に「家事代行」「八王子」、「3,500円」「2時間から」、写真 img", async (t) => {
@@ -334,7 +420,7 @@ test("404.html：トップへのリンクがある（ヘッダーとフッター
 
 /* ---- 文字サイズ ---- */
 test("「大きく」で html[data-font-scale=large]、再読み込みと別ページの後も残る", async (t) => {
-  const { page } = await open(t, "index.html");
+  const { page } = await open(t, "index.html", { width: 1440, height: 900 }); // 390 では「大きく」はメニューの中
   await page.getByRole("button", { name: /大きく/ }).first().click();
   assert.equal(await page.locator("html").getAttribute("data-font-scale"), "large");
   await page.reload();
