@@ -1,0 +1,276 @@
+/* 案A「写真」：暮らしの写真で語る雑誌の誌面。書体は Noto Sans JP だけ。 */
+
+:root {
+  --white: #FFFFFF;
+  --sugi: #23412F;     /* 主色：店名・見出し・予約ボタン */
+  --shoji: #F2F1EC;    /* 帯と面 */
+  --sumi: #1A1F1C;     /* 本文 */
+  --odo: #B8862B;      /* 選択中の印だけ（文字には使わない） */
+  --mute: #545B57;     /* 注記（白地で 6.9:1） */
+  --rule: #D6D4CC;
+  --gutter: 16px;
+  --font: "Noto Sans JP", "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif;
+}
+
+/* 動きは共有要素の写真1枚だけ。頁全体は入れ替えるだけ */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition { navigation: auto; }
+}
+::view-transition-old(root),
+::view-transition-new(root) { animation: none; }
+::view-transition-group(photo-s1),
+::view-transition-group(photo-s2),
+::view-transition-group(photo-s3) {
+  animation-duration: 0.45s;
+  animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
+}
+::view-transition-old(photo-s1), ::view-transition-new(photo-s1),
+::view-transition-old(photo-s2), ::view-transition-new(photo-s2),
+::view-transition-old(photo-s3), ::view-transition-new(photo-s3) {
+  height: 100%;
+  object-fit: cover;
+}
+
+html { font-size: 100%; -webkit-text-size-adjust: 100%; }
+html[data-font-scale="large"] { font-size: 118.75%; }
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--white);
+  color: var(--sumi);
+  font-family: var(--font);
+  font-size: 1.125rem;
+  line-height: 1.8;
+  overflow-x: clip;
+}
+
+img { display: block; max-width: 100%; height: auto; }
+h1, h2, h3, p, ul, ol, figure { margin: 0; }
+a { color: inherit; }
+
+:focus-visible {
+  outline: 3px solid var(--sugi);
+  outline-offset: 3px;
+}
+
+.nb { white-space: nowrap; }
+.small, .credit { font-size: 1rem; color: var(--mute); }
+
+/* ---- デモ注記の帯 ---- */
+.demo-band {
+  background: var(--shoji);
+  padding: 6px var(--gutter);
+  font-size: 1rem;
+  text-align: center;
+}
+
+/* ---- ヘッダー ---- */
+.chrome {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 4px 24px;
+  padding: 12px var(--gutter);
+  background: var(--white);
+}
+.chrome__name {
+  font-weight: 700;
+  font-size: 1.125rem;
+  color: var(--sugi);
+  text-decoration: none;
+}
+.chrome__nav {
+  flex-basis: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 20px;
+}
+.chrome__nav a {
+  font-size: 1rem;
+  font-weight: 500;
+  text-decoration: none;
+  padding: 6px 0;
+  border-bottom: 3px solid transparent;
+}
+.chrome__nav a:hover { border-bottom-color: var(--rule); }
+.chrome__nav a[aria-current="page"] { border-bottom-color: var(--odo); }
+
+.scale { display: flex; align-items: center; gap: 4px; font-size: 1rem; }
+.scale span { margin-right: 4px; }
+.scale button {
+  font: inherit;
+  font-weight: 500;
+  min-height: 44px;
+  padding: 0 10px;
+  background: none;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  color: var(--sumi);
+  cursor: pointer;
+}
+.scale button[aria-pressed="true"] { border-bottom-color: var(--odo); }
+
+@media (min-width: 900px) {
+  .chrome { flex-wrap: nowrap; padding: 14px 40px; }
+  .chrome__nav { flex-basis: auto; order: 2; margin-left: auto; }
+  .scale { order: 3; }
+}
+
+/* ---- 予約ボタン ---- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 56px;
+  padding: 0 28px;
+  background: var(--sugi);
+  color: var(--white);
+  font-size: 1.125rem;
+  font-weight: 700;
+  text-decoration: none;
+  border-radius: 2px;
+}
+.btn:hover { background: var(--sumi); }
+
+/* ---- 最初の画面：写真いっぱい、店名と1行と予約ボタンだけ ---- */
+.first {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100svh;
+}
+.cover {
+  position: relative;
+  flex: 1;
+  min-height: 420px;
+}
+.cover__photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.cover__panel {
+  position: absolute;
+  left: var(--gutter);
+  right: var(--gutter);
+  bottom: var(--gutter);
+  padding: 24px 20px;
+  background: var(--white);
+}
+.cover__name {
+  font-size: clamp(1.75rem, 1.2rem + 2.4vw, 3rem);
+  line-height: 1.3;
+  font-weight: 700;
+  color: var(--sugi);
+  letter-spacing: 0.04em;
+}
+.cover__line { margin: 8px 0 20px; font-size: 1.125rem; }
+.cover .btn { width: 100%; }
+
+@media (min-width: 900px) {
+  .cover__panel { left: 40px; right: auto; bottom: 40px; padding: 36px 40px; max-width: 32rem; }
+  .cover .btn { width: auto; }
+}
+
+/* ---- 見出し：名詞1つ ---- */
+.head {
+  font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2.25rem);
+  line-height: 1.3;
+  font-weight: 700;
+  color: var(--sugi);
+  letter-spacing: 0.06em;
+}
+
+/* ---- スタッフ：大きさの違う写真を誌面のように ---- */
+.staff { padding: 72px var(--gutter) 56px; max-width: 1200px; margin: 0 auto; }
+.staff .head { margin-bottom: 32px; }
+.spread { list-style: none; padding: 0; display: grid; gap: 48px; }
+.person { display: block; text-decoration: none; }
+.person__photo { width: 100%; aspect-ratio: 1; object-fit: cover; }
+.person__name { display: block; margin-top: 14px; font-size: 1.375rem; font-weight: 700; }
+.person:hover .person__name { text-decoration: underline; text-underline-offset: 6px; }
+.spread__item--2 { margin-left: 18%; }
+.spread__item--3 { margin-right: 12%; }
+.credit { margin-top: 32px; }
+
+@media (min-width: 900px) {
+  .spread {
+    grid-template-columns: repeat(12, 1fr);
+    column-gap: 32px;
+    align-items: start;
+  }
+  .spread__item--1 { grid-column: 1 / 6; }
+  .spread__item--2 { grid-column: 7 / 11; grid-row: 1; margin: 120px 0 0; }
+  .spread__item--3 { grid-column: 3 / 7; grid-row: 2; margin: 24px 0 0; }
+}
+
+/* ---- 写真と文の見開き（料金・流れ） ---- */
+.page-pair { display: grid; background: var(--shoji); }
+.page-pair--flip { background: var(--white); }
+.page-pair__photo { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+.page-pair__text { padding: 40px var(--gutter) 56px; }
+.page-pair .head { margin-bottom: 24px; }
+
+@media (min-width: 900px) {
+  .page-pair { grid-template-columns: 1fr 1fr; align-items: center; }
+  .page-pair__photo { height: 100%; aspect-ratio: auto; min-height: 480px; }
+  .page-pair__text { padding: 64px 72px; }
+  .page-pair--flip .page-pair__photo { order: 2; }
+}
+
+.note { font-size: 1.25rem; font-weight: 500; }
+.price { border-collapse: collapse; width: 100%; max-width: 22rem; margin-bottom: 16px; }
+.price th, .price td { padding: 12px 0; border-bottom: 1px solid var(--rule); text-align: left; font-weight: 500; }
+.price td { text-align: right; font-size: 1.375rem; font-weight: 700; }
+
+.steps { list-style: none; padding: 0; display: grid; gap: 18px; }
+.steps li { display: flex; align-items: baseline; gap: 16px; font-size: 1.25rem; font-weight: 500; }
+.steps__n { font-size: 1.75rem; font-weight: 700; color: var(--sugi); min-width: 1.2em; }
+
+/* ---- 締め：写真の上に予約ボタン ---- */
+.close { position: relative; min-height: 240px; display: flex; align-items: flex-end; }
+.close__photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.close__panel {
+  position: relative;
+  margin: var(--gutter);
+  padding: 16px;
+  background: var(--white);
+  width: calc(100% - 2 * var(--gutter));
+}
+.close .btn { width: 100%; }
+@media (min-width: 900px) {
+  .close { justify-content: flex-end; }
+  .close { min-height: 260px; }
+  .close__panel { margin: 40px; width: auto; padding: 24px 32px; }
+}
+
+/* ---- フッター ---- */
+.foot { padding: 40px var(--gutter) 56px; background: var(--sugi); color: var(--white); }
+.foot .small { color: var(--white); margin-top: 12px; }
+.foot__name { font-weight: 700; }
+.foot :focus-visible { outline-color: var(--white); }
+
+/* ---- スタッフ紹介 ---- */
+.members { max-width: 1200px; margin: 0 auto; padding: 56px var(--gutter) 72px; }
+.head--page { margin-bottom: 40px; }
+.member { display: grid; gap: 20px; margin-bottom: 72px; scroll-margin-top: 24px; }
+.member__photo { width: 100%; aspect-ratio: 1; object-fit: cover; }
+.member__name { font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem); font-weight: 700; line-height: 1.3; }
+.member__name { margin-bottom: 16px; }
+.member__label { font-size: 1rem; font-weight: 700; color: var(--sugi); }
+.skills { list-style: none; padding: 0; margin: 4px 0 28px; }
+.skills li { display: inline; }
+.skills li:not(:last-child)::after { content: "、"; }
+.member .btn { width: 100%; }
+
+@media (min-width: 900px) {
+  .member { grid-template-columns: minmax(0, 420px) 1fr; gap: 56px; align-items: center; margin-bottom: 96px; }
+  .member--flip { grid-template-columns: 1fr minmax(0, 420px); }
+  .member--flip .member__photo { order: 2; }
+  .member .btn { width: auto; }
+}

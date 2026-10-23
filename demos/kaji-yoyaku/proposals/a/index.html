@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="ja" data-font-scale="normal">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>高尾の家事手伝い みどり（デモ 案A）</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="style.css">
+<!-- 遷移先の要素が揃うまで最初の描画を待つ（共有要素の名前を付けるため） -->
+<link rel="expect" href="#page-end" blocking="render">
+<script src="app.js"></script>
+</head>
+<body>
+
+<div class="first">
+  <p class="demo-band">ご提案用のデモです。実際の請求はありません</p>
+
+  <header class="chrome">
+    <a class="chrome__name" href="index.html">高尾の家事手伝い <span class="nb">みどり</span></a>
+    <div class="scale" role="group" aria-labelledby="scale-label">
+      <span id="scale-label">文字の大きさ</span>
+      <button type="button" data-scale="normal" aria-pressed="true">標準</button>
+      <button type="button" data-scale="large" aria-pressed="false">大きく</button>
+    </div>
+    <nav class="chrome__nav" aria-label="メニュー">
+      <a href="staff.html">スタッフ</a>
+      <a href="#price">料金</a>
+      <a href="#flow">ご利用の流れ</a>
+    </nav>
+  </header>
+
+  <section class="cover" aria-labelledby="h-top">
+    <img class="cover__photo" src="../../assets/tatami-light.webp" alt="畳の部屋に差し込む朝の光（写真は素材）" fetchpriority="high">
+    <div class="cover__panel">
+      <h1 class="cover__name" id="h-top">高尾の家事手伝い <span class="nb">みどり</span></h1>
+      <p class="cover__line"><span class="nb">八王子市 高尾周辺のご自宅へ。</span><span class="nb">1時間3,500円</span><span class="nb">、2時間から</span></p>
+      <a class="btn" href="https://book.squareup.com/appointments/yty8z30rub8b6y/location/L54G6PFCMRTWP">予約する</a>
+    </div>
+  </section>
+</div>
+
+<main>
+  <section class="staff" id="staff" aria-labelledby="h-staff">
+    <h2 class="head" id="h-staff">スタッフ</h2>
+    <ul class="spread" role="list">
+      <li class="spread__item spread__item--1">
+        <a class="person" href="staff.html#s1" data-person="s1">
+          <img class="person__photo" src="../../assets/staff-s1.webp" alt="" width="480" height="480">
+          <span class="person__name">山本 さち子</span>
+        </a>
+      </li>
+      <li class="spread__item spread__item--2">
+        <a class="person" href="staff.html#s2" data-person="s2">
+          <img class="person__photo" src="../../assets/staff-s2.webp" alt="" width="480" height="480">
+          <span class="person__name">小林 和美</span>
+        </a>
+      </li>
+      <li class="spread__item spread__item--3">
+        <a class="person" href="staff.html#s3" data-person="s3">
+          <img class="person__photo" src="../../assets/staff-s3.webp" alt="" width="480" height="480">
+          <span class="person__name">森田 恵</span>
+        </a>
+      </li>
+    </ul>
+    <p class="credit">写真は素材です（本番はご本人）</p>
+  </section>
+
+  <section class="page-pair" id="price" aria-labelledby="h-price">
+    <img class="page-pair__photo" src="../../assets/kitchen-wood.webp" alt="木の台所（写真は素材）" width="1400" height="928" loading="lazy">
+    <div class="page-pair__text">
+      <h2 class="head" id="h-price">料金</h2>
+      <table class="price">
+        <tbody>
+          <tr><th scope="row">1時間</th><td class="nb">3,500円</td></tr>
+        </tbody>
+      </table>
+      <p class="note">ご利用は2時間から</p>
+    </div>
+  </section>
+
+  <section class="page-pair page-pair--flip" id="flow" aria-labelledby="h-flow">
+    <img class="page-pair__photo" src="../../assets/cloth-hand.webp" alt="布巾を持つ手（写真は素材）" width="1200" height="801" loading="lazy">
+    <div class="page-pair__text">
+      <h2 class="head" id="h-flow">ご利用の流れ</h2>
+      <ol class="steps">
+        <li><span class="steps__n" aria-hidden="true">1</span>予約</li>
+        <li><span class="steps__n" aria-hidden="true">2</span>担当がお伺い</li>
+        <li><span class="steps__n" aria-hidden="true">3</span>終わったらご報告</li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="close" aria-label="予約">
+    <img class="close__photo" src="../../assets/window-green.webp" alt="緑の見える窓辺（写真は素材）" loading="lazy">
+    <div class="close__panel">
+      <a class="btn" href="https://book.squareup.com/appointments/yty8z30rub8b6y/location/L54G6PFCMRTWP">予約する</a>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <p class="foot__name">高尾の家事手伝い <span class="nb">みどり</span></p>
+  <p>東京都八王子市の高尾周辺</p>
+</footer>
+<div id="page-end"></div>
+</body>
+</html>

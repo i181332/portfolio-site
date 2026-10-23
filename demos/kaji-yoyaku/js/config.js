@@ -5,7 +5,7 @@ export const CONFIG = {
   hourlyRate: 3500,
   hoursOptions: [2, 3, 4],
   booking: {            // Square 予約の URL。空なら「準備中」のモーダル
-    shop: "",            // 店全体（担当を選ぶ所から）
+    shop: "https://book.squareup.com/appointments/yty8z30rub8b6y/location/L54G6PFCMRTWP", // 店全体（担当を選ぶ所から）
     staff: { s1: "", s2: "", s3: "" }, // 担当を指定した入口。空なら店全体へ
   },
   payment: {            // Stripe のテスト用 Payment Link（2時間 7,000円）。空なら「準備中」のモーダル

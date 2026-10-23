@@ -1,0 +1,160 @@
+/* 案B「予定表」— 家族の冷蔵庫に貼る週の予定表 */
+:root {
+  --paper: #FBFBF8;
+  --ai: #22335A;        /* 藍：文字・ボタン */
+  --pencil: #56647A;    /* 鉛筆：曜日・補足 */
+  --wakakusa: #5E8A4C;  /* 若草：勤務の印 */
+  --rule: #DADDE3;      /* 罫 */
+  --gutter: 1rem;
+  --name-col: 6.75rem;
+  --max: 60rem;
+  font-family: "Noto Sans JP", "Hiragino Sans", "Yu Gothic", sans-serif;
+  font-size: 100%;
+  color: var(--ai);
+  background: var(--paper);
+}
+html[data-font-scale="large"] { font-size: 112.5%; }
+
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); line-height: 1.8; font-size: 1.125rem; }
+img { display: block; max-width: 100%; }
+a { color: inherit; }
+h1, h2, h3, p, ul, ol, dl, dd { margin: 0; padding: 0; }
+ul, ol { list-style: none; }
+
+:focus-visible { outline: 3px solid var(--ai); outline-offset: 3px; border-radius: 4px; }
+
+.vh {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip-path: inset(50%); white-space: nowrap;
+}
+.wrap { max-width: var(--max); margin-inline: auto; padding-inline: var(--gutter); }
+
+/* デモ注記の帯 */
+.demo {
+  background: var(--ai); color: var(--paper);
+  font-size: 1rem; text-align: center; padding: .375rem var(--gutter); line-height: 1.5;
+}
+
+/* ヘッダー */
+.head { border-bottom: 1px solid var(--rule); }
+.head__in {
+  display: flex; flex-wrap: wrap; align-items: center; gap: .25rem 1.25rem;
+  padding-block: .625rem;
+}
+.brand { font-weight: 700; font-size: 1.125rem; text-decoration: none; margin-right: auto; }
+.scale { display: flex; align-items: center; gap: .25rem; font-size: 1rem; color: var(--pencil); }
+.scale button {
+  font: inherit; font-size: 1rem; color: var(--ai); background: none;
+  border: 1px solid var(--rule); border-radius: 4px; padding: .125rem .625rem; min-height: 2.25rem; cursor: pointer;
+}
+.scale button[aria-pressed="true"] { background: var(--ai); color: var(--paper); border-color: var(--ai); }
+.nav { display: flex; gap: 1.25rem; width: 100%; font-size: 1rem; }
+.nav a { text-decoration: none; padding-block: .25rem; }
+.nav a:hover, .nav a[aria-current="page"] { text-decoration: underline; text-decoration-color: var(--wakakusa); text-decoration-thickness: 3px; text-underline-offset: 6px; }
+
+@media (min-width: 720px) {
+  .nav { width: auto; order: 2; }
+  .scale { order: 3; }
+}
+
+/* 最初の画面 */
+.lead { font-size: clamp(1.375rem, 1.1rem + 1.4vw, 2rem); font-weight: 700; line-height: 1.5; padding-block: 1.25rem .875rem; }
+.lead span { display: inline-block; }
+
+/* 予定表 */
+.week { border-top: 3px solid var(--ai); }
+.week__days, .week__row {
+  display: grid;
+  grid-template-columns: var(--name-col) repeat(7, minmax(0, 1fr));
+  align-items: center;
+}
+.week__days { color: var(--pencil); font-size: 1rem; text-align: center; border-bottom: 1px solid var(--rule); padding-block: .25rem; }
+.week__days > span:nth-child(7), .week__days > span:nth-child(8) { color: var(--ai); }
+.week__row { border-bottom: 1px solid var(--rule); background: var(--paper); }
+.week__who {
+  display: flex; flex-direction: column; align-items: flex-start; gap: .125rem;
+  padding-block: .625rem; text-decoration: none; min-width: 0;
+}
+.week__who img { width: 2.75rem; height: 2.75rem; border-radius: 50%; object-fit: cover; }
+.week__name { font-weight: 700; font-size: 1rem; line-height: 1.3; white-space: nowrap; }
+a.week__who .week__name { text-decoration: underline; text-decoration-color: var(--wakakusa); text-decoration-thickness: 2px; text-underline-offset: 4px; }
+.week__cap { text-align: left; font-weight: 700; color: var(--ai); }
+.week__name .mei { display: none; }
+.week__hours { font-size: 1rem; color: var(--pencil); line-height: 1.2; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.week__who:hover .week__name { text-decoration-thickness: 4px; }
+.week__day { display: grid; place-items: center; min-width: 0; height: 100%; border-left: 1px solid var(--rule); }
+.maru { width: min(2.25rem, 90%); aspect-ratio: 1; color: var(--wakakusa); }
+.week__day:nth-child(3n) .maru { transform: rotate(-14deg); }
+.week__day:nth-child(3n+1) .maru { transform: rotate(9deg) scale(.95); }
+.week__day:nth-child(4n) .maru { transform: rotate(31deg) scale(1.04); }
+
+@media (min-width: 600px) {
+  :root { --name-col: 14rem; }
+  .week__who { flex-direction: row; align-items: center; gap: .875rem; }
+  .week__who img { width: 3.5rem; height: 3.5rem; }
+  .week__name { font-size: 1.125rem; }
+  .week__name .mei { display: inline; }
+  .week__days { font-size: 1.125rem; }
+}
+
+.photo-note { font-size: 1rem; color: var(--pencil); padding-top: .5rem; }
+
+.book {
+  display: flex; align-items: center; justify-content: center;
+  min-height: 3.5rem; padding: .5rem 2rem; margin-top: 1rem;
+  background: var(--ai); color: var(--paper); text-decoration: none;
+  font-size: 1.25rem; font-weight: 700; border-radius: 6px;
+}
+.book:hover { background: #18264A; }
+@media (min-width: 600px) { .book { display: inline-flex; } }
+
+/* 料金・流れ */
+.sect { padding-block: 3rem 0; }
+.sect h2 { font-size: 1.5rem; font-weight: 700; padding-bottom: .5rem; border-bottom: 3px solid var(--ai); }
+.price { display: grid; }
+.price div { display: flex; justify-content: space-between; align-items: baseline; padding-block: .625rem; border-bottom: 1px solid var(--rule); }
+.price dd { font-weight: 700; font-size: 1.5rem; font-variant-numeric: tabular-nums; }
+.price dd small { font-size: 1rem; font-weight: 500; }
+.flow { counter-reset: s; }
+.flow li { display: flex; gap: 1rem; align-items: baseline; padding-block: .75rem; border-bottom: 1px solid var(--rule); }
+.flow li::before { counter-increment: s; content: counter(s); font-weight: 700; color: var(--pencil); min-width: 1.25rem; }
+@media (min-width: 900px) {
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; }
+}
+
+.closing { padding-block: 3rem 4rem; text-align: center; }
+.closing .book { margin-top: 0; }
+
+.foot { border-top: 1px solid var(--rule); padding-block: 1.25rem 2rem; font-size: 1rem; color: var(--pencil); }
+
+/* スタッフ紹介 */
+.page-title { font-size: 1.75rem; font-weight: 700; padding-block: 1.25rem .75rem; }
+.person { padding-bottom: 2.5rem; scroll-margin-top: 1rem; }
+.person .week__name .mei { display: inline; }
+.person + .person .week__row { border-top: 1px solid var(--rule); }
+.person + .person { padding-top: 1rem; }
+.person__body { display: grid; gap: 1.25rem; padding-top: 1.25rem; }
+.person__photo { width: 100%; max-width: 22rem; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 4px; }
+.person dl { display: grid; gap: .5rem; }
+.person dl div { display: grid; grid-template-columns: 3.5rem 1fr; gap: .75rem; border-bottom: 1px solid var(--rule); padding-bottom: .5rem; }
+.person dt { color: var(--pencil); font-size: 1rem; padding-top: .125rem; }
+.person .book { margin-top: .25rem; }
+@media (min-width: 720px) {
+  .person__body { grid-template-columns: 18rem 1fr; gap: 2.5rem; align-items: start; }
+}
+
+/* 画面遷移：押した行だけが横に滑ってスタッフの欄になる */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition { navigation: auto; }
+  .person:target .week__row { view-transition-name: row; }
+
+  ::view-transition-old(root),
+  ::view-transition-new(root) { animation-duration: 160ms; }
+
+  ::view-transition-group(row) { animation-duration: 420ms; animation-timing-function: cubic-bezier(.2, .7, .2, 1); }
+  ::view-transition-old(row) { animation: row-out 420ms cubic-bezier(.2, .7, .2, 1) both; }
+  ::view-transition-new(row) { animation: row-in 420ms cubic-bezier(.2, .7, .2, 1) both; }
+}
+@keyframes row-out { to { transform: translateX(-35%); opacity: 0; } }
+@keyframes row-in { from { transform: translateX(35%); opacity: 0; } }
