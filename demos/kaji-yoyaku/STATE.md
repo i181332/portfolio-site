@@ -12,11 +12,11 @@
   - オーナーはオンライン予約を off
 
 ## 停止点（次にやること）
-1. サイト内の予約 book.html（仕様 docs/spec-booking.md、手本 notes/square-ux/）：実装・試験（tests/e2e/book.spec.mjs）済み、レビューの指摘を直し中。次は試験 → スクショを親が確認 → 利用者に見せる → 承認後に再公開
-2. Stripe（テスト）：2/3/4時間のリンク（config.js の payment.links）。戻り先は3本とも https://kaji-yoyaku-demo.pages.dev/book?paid=1（2026-10-23 設定）。公開中の旧サイトは payment.html への戻りを失っている（再公開で解消）
+1. サイト内の予約 book.html：公開済み（2026-10-23）。公開サイトで予約→完了、手元から Stripe テスト決済→公開の /book?paid=1 へ戻りを確認済み（notes/shots/live/）。残りは利用者の iPhone での確認と、文面の送信
+2. Stripe（テスト）：2/3/4時間のリンク（config.js の payment.links）。戻り先は3本とも https://kaji-yoyaku-demo.pages.dev/book?paid=1（2026-10-23 設定）。
 3. Square：予約サイト公開済み（config.js の booking.square）。デモの主の流れではなく、book.html の下のリンクで実物を見せる
 4. 公開 https://kaji-yoyaku-demo.pages.dev/ （再公開：`sh scripts/build-dist.sh && npx wrangler@3 pages deploy dist --project-name kaji-yoyaku-demo --branch main --commit-dirty=true`）。再公開の後、公開サイトで予約→支払い→完了を1回通す
-5. 送る文面 notes/message-draft.md：新しい流れに直した。費用の内訳 {{COST_BREAKDOWN_NOTE}} は利用者の判断待ち。送信は利用者
+5. 送る文面 notes/message-draft.md：新しい流れに直した。費用の内訳は記入済み（22,000/8,800/2,200）。送信は利用者
 - 手元のサーバー：127.0.0.1:8765（dist）、:8766（作業場所）、0.0.0.0:8770（スマホ確認用）
 - 戻し方：予約ページ前 `efaa786`、仕様 `ab1b325`
 
