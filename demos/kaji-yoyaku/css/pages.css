@@ -1,6 +1,6 @@
 /*
  * pages.css — 全ページ共通の組み（tokens.css・base.css の後に読む）
- * ui.js の mountChrome が組むヘッダー・メニュー・フッター、デモ帯、予約ボタンの注記。
+ * ui.js の mountChrome が組むヘッダー・メニュー・フッター、画面の下の予約ボタンとデモ帯、予約ボタンの注記。
  */
 
 /* ==========================================================
@@ -74,47 +74,69 @@
 .gnav__list a:hover { color: var(--sugi); text-decoration: underline; text-underline-offset: 0.3em; }
 .gnav__list [aria-current="page"] { color: var(--sugi); font-weight: 700; }
 
-/* スマホ：店名と切替の1行の下に「メニュー」。開くと縦の一覧が下に出る */
+/* 予約ボタン（常に見える） */
+.topline__book { min-height: 2.75rem; padding: var(--space-1) var(--space-4); font-size: var(--fs-small); letter-spacing: 0.02em; white-space: nowrap; }
+
+/* 電話番号の置き場所（ui.js の telSlot、contact.html）。番号は本番で掲載。番号が入る枠を点線で見せる */
+.tel-slot {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: var(--space-1);
+  max-width: 100%;
+  padding: var(--space-2) var(--space-4);
+  border: var(--border) dashed var(--line-strong);
+  border-radius: var(--radius-control);
+  background: var(--paper);
+  color: var(--ink);
+  font-size: var(--fs-ui);
+  font-weight: 500;
+  line-height: var(--lh-ui);
+}
+.tel-slot__label { font-weight: 700; }
+.topline__tel { padding-block: var(--space-1); font-size: var(--fs-small); }
+.gnav__tel { margin-block: var(--space-3) var(--space-4); }
+.foot__tel { margin-block-start: var(--space-4); border-color: var(--mist); background: transparent; color: var(--paper); }
+
+/* スマホ：1段目に店名と予約ボタン、2段目にメニューと文字の大きさ。電話の欄はメニューを開いた中 */
 @media (max-width: 959px) {
   .topline__inner {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
-    grid-template-areas: "shop scale" "menu menu";
-    gap: 0 var(--space-2);
-    padding-block: var(--space-1) 0;
+    grid-template-areas: "shop book" "menu scale";
+    gap: var(--space-1) var(--space-2);
+    padding-block: var(--space-2);
   }
   .topline__shop { grid-area: shop; }
+  .topline__book { grid-area: book; }
   .topline__scale { grid-area: scale; }
-  .gnav__toggle {
-    grid-area: menu;
-    justify-content: space-between;
-    flex-direction: row-reverse;
-    margin-inline: calc(var(--gutter) * -1);
-    padding-inline: var(--gutter);
-    border-top: 1px solid var(--line);
-  }
+  .topline__tel { display: none; }
+  .gnav__toggle { grid-area: menu; justify-self: start; }
   .chrome:has(.gnav__toggle[aria-expanded="false"]) .gnav { display: none; }
   .gnav { border-top: 1px solid var(--line); background: var(--mist); }
-  .gnav__list { padding-block: var(--space-2) var(--space-4); }
+  .gnav__list { padding-block: var(--space-2) 0; }
   .gnav__list li + li { border-top: 1px solid var(--line); }
   .gnav__list a { min-height: 3.25rem; }
-  .gnav__list [aria-current="page"]::before { content: ""; width: 4px; align-self: stretch; margin-block: var(--space-3); margin-inline-end: var(--space-3); border-radius: 2px; background: var(--ochre); }
+  .gnav__list [aria-current="page"]::before { content: ""; width: 4px; align-self: stretch; margin-block: var(--space-3); margin-inline-end: var(--space-3); border-radius: 2px; background: var(--sugi); }
 }
-/* 420px 未満：店名と切替を1段に。「文字の大きさ」の字は見た目から消し、読み上げには残す（group の名前） */
+/* 420px 未満：「文字の大きさ」の字は見た目から消し、読み上げには残す（group の名前） */
 @media (max-width: 419px) {
   .topline__shop { min-width: 0; font-size: min(var(--fs-small), 1rem); letter-spacing: 0; line-height: 1.3; word-break: auto-phrase; }
+  .topline__book { font-size: 1rem; padding-inline: var(--space-3); }
   .topline .scale-switch > span:first-child {
     position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap;
   }
   .topline .scale-switch__option { min-width: 0; min-height: 2.75rem; padding-inline: var(--space-3); }
 }
-/* PC：上部の1行の下に、メニューを横1列 */
+/* PC：上の1行に店名、電話、文字の大きさ、予約ボタン。その下にメニューを横1列 */
 @media (min-width: 960px) {
-  .gnav__toggle { display: none; }
+  .topline__shop { font-size: var(--fs-lead); }
+  .topline__tel { margin-inline-start: auto; }
+  .gnav__toggle, .gnav__tel { display: none; }
   .gnav { border-top: 1px solid var(--line); }
   .gnav__list { display: flex; flex-wrap: wrap; column-gap: var(--space-6); }
   .gnav__list a { min-height: 3.25rem; font-size: var(--fs-small); border-block: 3px solid transparent; }
-  .gnav__list [aria-current="page"] { border-bottom-color: var(--ochre); }
+  .gnav__list [aria-current="page"] { border-bottom-color: var(--sugi); }
 }
 
 /* ==========================================================
@@ -153,16 +175,19 @@ html[data-font-scale="large"] .page-head h1 { font-size: clamp(2rem, 1.4rem + 2v
 .foot { padding-block: var(--space-7); }
 .foot__inner { display: grid; gap: var(--space-5); }
 .foot__shop { font-family: var(--font-heading); font-weight: var(--weight-heading); font-size: var(--fs-lead); letter-spacing: 0; }
-.foot__area { font-size: var(--fs-small); color: var(--mist); }
+.foot__facts { margin-block-start: var(--space-3); }
+.foot__facts > div { display: grid; grid-template-columns: 6em minmax(0, 1fr); column-gap: var(--space-3); font-size: var(--fs-small); line-height: 1.75; }
+.foot__facts dt { color: var(--mist); }
 .foot__navlist { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--space-5); }
 .foot__navlist a { display: flex; align-items: center; min-height: 3rem; color: var(--paper); font-size: var(--fs-small); text-decoration: none; }
 .foot__navlist a:hover { text-decoration: underline; text-underline-offset: 0.3em; }
 .foot__links { display: flex; flex-wrap: wrap; column-gap: var(--space-5); padding-block-start: var(--space-3); border-top: 1px solid rgb(255 255 255 / 0.25); }
 .foot .link--action { font-size: var(--fs-small); color: var(--paper); text-align: start; }
+.foot__copy { font-size: var(--fs-small); color: var(--mist); }
 @media (min-width: 960px) {
   .foot__inner { grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); column-gap: var(--space-8); align-items: start; }
   .foot__navlist { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .foot__links { grid-column: 1 / -1; }
+  .foot__links, .foot__copy { grid-column: 1 / -1; }
 }
 
 /* ==========================================================
@@ -170,3 +195,45 @@ html[data-font-scale="large"] .page-head h1 { font-size: clamp(2rem, 1.4rem + 2v
  * ========================================================== */
 /* 「大きく」でも 390px で1行に収める（帯は本文ではないので 16px で止める） */
 .demo-band { font-size: min(var(--fs-small), 1rem); letter-spacing: 0; }
+
+/* ==========================================================
+ * 画面の下の段：スマホの予約ボタン＋デモ注記帯（ui.js の mountChrome）
+ * body の末尾で sticky にするので、本文とフッターは段の上で終わり、隠れない
+ * ========================================================== */
+.dock { position: sticky; bottom: 0; z-index: 30; margin-block-start: auto; }
+.dock .demo-band { position: static; margin: 0; }
+.dock__book { padding: var(--space-2) var(--gutter); background: var(--paper); border-top: 1px solid var(--line); }
+.dock__btn { display: flex; width: 100%; min-height: 2.75rem; padding-block: var(--space-1); font-size: var(--fs-ui); }
+@media (min-width: 960px) { .dock__book { display: none; } }
+
+/* ==========================================================
+ * よくある質問の開け閉め（トップの .qa__item と faq.html の .s-qa__item で共通）
+ * summary を flex にするとブラウザの三角が消えるので、山形の印を右端に描く。開くと上向き
+ * ========================================================== */
+:is(.qa__item, .s-qa__item) summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  min-height: 3.5rem;
+  padding-block: var(--space-3);
+  font-size: var(--fs-ui);
+  font-weight: 700;
+  line-height: var(--lh-ui);
+  cursor: pointer;
+  list-style: none;
+}
+:is(.qa__item, .s-qa__item) summary::-webkit-details-marker { display: none; }
+:is(.qa__item, .s-qa__item) summary::after {
+  content: "";
+  flex: none;
+  width: 0.6em;
+  height: 0.6em;
+  margin-inline-end: var(--space-2);
+  border-right: var(--border) solid var(--sugi);
+  border-bottom: var(--border) solid var(--sugi);
+  transform: translateY(-0.15em) rotate(45deg);
+  transition: transform var(--dur-quick) var(--ease-out);
+}
+:is(.qa__item, .s-qa__item)[open] summary::after { transform: translateY(0.15em) rotate(-135deg); }
+:is(.qa__item, .s-qa__item) summary:hover { color: var(--sugi); }

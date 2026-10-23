@@ -5,7 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>お問い合わせ｜高尾の家事手伝い みどり（デモ）</title>
-<meta name="description" content="八王子市の高尾周辺の家事代行へのお問い合わせ。ご利用の前に聞いておきたいことを、フォームからお送りください。">
+<meta name="description" content="八王子市の高尾周辺の家事代行へのお問い合わせです。予約の前に確かめたいことをお送りください。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="お問い合わせ｜高尾の家事手伝い みどり（デモ）">
+<meta property="og:description" content="八王子市の高尾周辺の家事代行へのお問い合わせです。予約の前に確かめたいことをお送りください。">
+<meta property="og:image" content="assets/work-hero.webp">
 <script>
   /* 「大きく」を選んだ方に、標準→大きくの瞬きを見せないため、モジュールより先に読む */
   try {
@@ -13,7 +17,7 @@
     if (p && p.fontScale === "large") document.documentElement.dataset.fontScale = "large";
   } catch (e) {}
 </script>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%226%22 fill=%22%231E4A3A%22/%3E%3Ccircle cx=%2216%22 cy=%2216%22 r=%228%22 fill=%22none%22 stroke=%22%23fff%22 stroke-width=%223%22/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%226%22 fill=%22%2323412F%22/%3E%3Ccircle cx=%2216%22 cy=%2216%22 r=%228%22 fill=%22none%22 stroke=%22%23fff%22 stroke-width=%223%22/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap">
@@ -32,9 +36,16 @@
     <h1>お問い合わせ</h1>
   </div>
 
-  <section class="container s-sect s-contact" aria-labelledby="h-form">
-    <h2 class="s-title" id="h-form">お問い合わせ</h2>
-    <p>予約の前に聞いておきたいことを、お送りください。（見本のフォームです）</p>
+  <section class="container s-split s-contact" aria-label="お問い合わせの方法">
+    <div class="s-split__col s-split__col--mist">
+      <h2 class="s-title" id="h-tel">お電話</h2>
+      <dl class="s-info">
+        <div><dt>電話番号</dt><dd><p class="tel-slot" data-tel-slot><span class="tel-slot__label">お電話番号</span><span>（本番で掲載）</span></p></dd></div>
+        <div><dt>受付の時間</dt><dd data-hours></dd></div>
+      </dl>
+    </div>
+    <div class="s-split__col">
+    <p>見本のフォームです。送信はしません。</p>
     <form class="s-form" id="contact-form" novalidate>
       <div class="field">
         <label class="field__label" for="c-name">お名前</label>
@@ -50,10 +61,7 @@
       </div>
       <button class="btn btn--primary s-form__btn" type="submit">送信する（見本）</button>
     </form>
-    <dl class="s-info">
-      <div><dt>電話番号</dt><dd>デモのため非掲載</dd></div>
-      <div><dt>対応エリア</dt><dd>東京都八王子市、高尾周辺</dd></div>
-    </dl>
+    </div>
   </section>
 </main>
 

@@ -1,7 +1,7 @@
 // 全ページの共通部品。各ページはこれを呼ぶだけ。
 // ヘッダーとフッター（mountChrome）、文字サイズ切替、デモ注記帯、予約ボタン（Square 予約へ）、モーダル、DOM を組む小さな道具。
 import { CONFIG } from "./config.js";
-import { NAV } from "./content.js";
+import { NAV, LEGAL_LINKS, HOURS } from "./content.js";
 
 /* ---------- DOM を組む道具 ---------- */
 // h("button", { class: "btn", onclick: fn, dataset: { step: 1 } }, "文字", 子要素…)
@@ -90,13 +90,13 @@ export function openModal({ title, body, actions = [{ label: "閉じる", value:
 export const DEMO_BAND_TEXT = "ご提案用のデモです。実際の請求はありません";
 export const ABOUT_DEMO = [
   "このサイトは、ご提案のために作ったデモです。店名、スタッフ、料金の条件は、すべて架空です。",
-  "予約は、予約システム（Square 予約）の実際の画面で行います。架空の店のため、予約してもお伺いはしません。",
+  "予約は、予約システム（Square 予約）の実際の画面で行います。本番も同じ画面です。架空の店のため、予約してもお伺いはしません。",
   "カード払いは、テスト用の支払い画面で試せます。実際の請求はありません。",
 ];
 
-export function mountDemoBand() {
+export function mountDemoBand(parent = document.body) {
   if (document.querySelector("[data-demo-band]")) return;
-  document.body.append(h("div", { class: "demo-band", role: "note", "data-demo-band": "" }, h("p", {}, DEMO_BAND_TEXT)));
+  parent.append(h("div", { class: "demo-band", role: "note", "data-demo-band": "" }, h("p", {}, DEMO_BAND_TEXT)));
 }
 
 // フッターに置く「このデモについて」のボタン（モーダルで ABOUT_DEMO を出す）
@@ -125,6 +125,8 @@ const BOOKING_PENDING = {
 // [data-book="any|s1|s2|s3"] のリンクとボタンに予約の URL を付ける。URL が無い間は、押すと準備中のモーダル
 export function wireBookingButtons(root = document) {
   for (const el of root.querySelectorAll("[data-book]")) {
+    if (el.hasAttribute("data-book-wired")) continue; // 2度呼ばれても、押した時の処理を重ねない
+    el.setAttribute("data-book-wired", "");
     const id = el.dataset.book;
     const url = bookingHref(id === "any" ? null : id);
     if (url && el.tagName === "A") { el.href = url; continue; }
@@ -137,16 +139,27 @@ export function wireBookingButtons(root = document) {
   }
 }
 
-// 予約ボタンの直前か直後に置く、小さな注記
+// ページ最後の予約ボタンの下に1回だけ置く、小さな注記（「本番も同じ画面」は ABOUT_DEMO に置く）
 export function bookingNote() {
-  return h("p", { class: "booking-note", "data-booking-note": "" }, "ここから先は予約システム（Square 予約）の画面です。本番も同じ画面です");
+  return h("p", { class: "booking-note", "data-booking-note": "" }, "予約は Square 予約の画面で行います");
+}
+
+/* ---------- カード払いのお試し（payment.html）への導線 ---------- */
+// テスト用の支払いリンク（config の payment.testLink）が入っている時だけ、導線を出す。payment.html 自体は残す
+export const hasPaymentTest = () => Boolean(CONFIG.payment.testLink);
+
+// [data-pay-link]（HTML では hidden で置く）を、リンクがあれば見せ、無ければ DOM から外す
+export function wirePaymentLinks(root = document) {
+  for (const el of root.querySelectorAll("[data-pay-link]")) {
+    if (hasPaymentTest()) el.hidden = false;
+    else el.remove();
+  }
 }
 
 /* ---------- ヘッダーとフッター ---------- */
-const LEGAL = {
-  law: { title: "特定商取引法に基づく表記", body: ["事業者名、所在地、連絡先、料金とお支払いの方法、取り消しの決まりなどを掲載します。", "本制作時に、お店の情報をもとに正式な文面を作成します。"] },
-  privacy: { title: "プライバシーポリシー", body: ["お預かりするお名前、ご住所、電話番号の使い道と、管理の方法を掲載します。", "本制作時に、お店の運用に合わせて正式な文面を作成します。"] },
-};
+// 電話番号は本番で掲載（架空の番号は他人につながるので出さない）。番号の置き場所だけを点線の枠で見せる
+const telSlot = (cls) => h("p", { class: `tel-slot ${cls}`, "data-tel-slot": "" },
+  h("span", { class: "tel-slot__label" }, "お電話番号"), h("span", {}, "（本番で掲載）"));
 
 const navList = (cls, current) => h("ul", { class: cls, role: "list" },
   NAV.map((n) => h("li", {}, h("a", {
@@ -155,7 +168,10 @@ const navList = (cls, current) => h("ul", { class: cls, role: "list" },
     "data-nav-current": n.href === current ? "" : null,
   }, n.label))));
 
-// <header data-chrome>・<footer data-chrome> の中を組み、文字サイズ切替とデモ注記帯を置く。current はメニューの今のページ
+const bookLink = (cls, label) => h("a", { class: `btn btn--primary ${cls}`, "data-book": "any" }, label);
+
+// <header data-chrome>・<footer data-chrome> の中を組み、文字サイズ切替、スマホの下の予約ボタン、デモ注記帯を置く。
+// current はメニューの今のページ。予約ボタンは nav の外に置く（nav の中はサイト内のリンクだけ）
 export function mountChrome({ current } = {}) {
   const header = document.querySelector("header[data-chrome]");
   const footer = document.querySelector("footer[data-chrome]");
@@ -170,8 +186,12 @@ export function mountChrome({ current } = {}) {
     header.classList.add("chrome");
     header.replaceChildren(
       h("div", { class: "topline" }, h("div", { class: "topline__inner" },
-        h("a", { class: "topline__shop", href: "index.html" }, CONFIG.shopName), toggle, scale)),
-      h("nav", { class: "gnav", "aria-label": "メニュー" }, h("div", { class: "gnav__inner" }, list)));
+        h("a", { class: "topline__shop", href: "index.html" }, CONFIG.shopName),
+        telSlot("topline__tel"),
+        scale, toggle,
+        bookLink("topline__book", "予約する"))),
+      h("nav", { class: "gnav", "aria-label": "メニュー" }, h("div", { class: "gnav__inner" },
+        list, telSlot("gnav__tel"))));
     mountFontScale(scale);
   }
 
@@ -180,13 +200,24 @@ export function mountChrome({ current } = {}) {
     footer.replaceChildren(h("div", { class: "container foot__inner" },
       h("div", { class: "foot__id" },
         h("p", { class: "foot__shop" }, CONFIG.shopName),
-        h("p", { class: "foot__area" }, `対応エリア　${CONFIG.area}`)),
+        h("dl", { class: "foot__facts" },
+          h("div", {}, h("dt", {}, "対応エリア"), h("dd", {}, CONFIG.area)),
+          h("div", {}, h("dt", {}, "営業時間"), h("dd", {}, HOURS))),
+        telSlot("foot__tel")),
       h("nav", { class: "foot__nav", "aria-label": "サイトの案内" }, navList("foot__navlist")),
       h("ul", { class: "foot__links", role: "list" },
-        Object.entries(LEGAL).map(([key, m]) => h("li", {},
-          h("button", { type: "button", class: "link link--action", "data-legal": key, onclick: () => openModal(m) }, m.title))),
-        h("li", {}, aboutDemoButton("このデモについて")))));
+        LEGAL_LINKS.map((l) => h("li", {}, h("a", { class: "link link--action", href: l.href }, l.label))),
+        h("li", {}, aboutDemoButton("このデモについて"))),
+      h("p", { class: "foot__copy" }, `© ${CONFIG.shopName}`)));
   }
 
-  mountDemoBand();
+  // 画面の下：スマホだけの予約ボタンとデモ注記帯を1つの固定の段にまとめる（本文の最後は段の上で終わる）
+  if (!document.querySelector(".dock")) {
+    const dock = h("div", { class: "dock" },
+      h("div", { class: "dock__book", "data-sticky-book": "" }, bookLink("dock__btn", "予約する")));
+    document.body.append(dock);
+    mountDemoBand(dock);
+  }
+  wireBookingButtons(header || document.body);
+  wireBookingButtons(document.querySelector(".dock"));
 }

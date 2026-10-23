@@ -1,4 +1,4 @@
-// サイト7ページの e2e（docs/spec-site.md が根拠。Playwright を node:test から直接使う）。
+// サイトの全ページの e2e（docs/spec-site.md が根拠。Playwright を node:test から直接使う）。
 // 実行：tests で `npm run e2e`。試験の中で `python -m http.server`（8810 番台の空きポート）を demos/kaji-yoyaku で起こし、終わったら止める。
 // BASE_URL を付けると配信は起こさず、そこを見る。PW_CHROMIUM で chrome.exe を指定できる。
 import { test, before, after } from "node:test";
@@ -15,15 +15,17 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..")
 // 仕様の NAV（js/content.js）。href と表示名
 const NAV = [
   { href: "index.html", label: "トップ" },
-  { href: "service.html", label: "サービスと料金" },
+  { href: "service.html", label: "サービス内容" },
+  { href: "price.html", label: "料金" },
   { href: "flow.html", label: "ご利用の流れ" },
   { href: "staff.html", label: "スタッフ紹介" },
   { href: "area.html", label: "対応エリア" },
   { href: "faq.html", label: "よくある質問" },
   { href: "contact.html", label: "お問い合わせ" },
 ];
-const NAV_PAGES = NAV.map((n) => n.href); // メニューに入る7ページ
-const PAGES = [...NAV_PAGES, "payment.html"]; // 共通の検査は payment.html（メニュー外）も対象
+const NAV_PAGES = NAV.map((n) => n.href); // メニューに入る8ページ
+const NEW_PAGES = ["company.html", "law.html", "privacy.html", "404.html"]; // 新しい頁（price.html は NAV 側）。会社概要などはフッターから
+const PAGES = [...NAV_PAGES, "payment.html", ...NEW_PAGES]; // 共通の検査は payment.html と新しい頁（メニュー外）も対象
 const STAFF_IDS = ["s1", "s2", "s3"];
 
 /* ---- 配信とブラウザ ---- */
@@ -93,7 +95,7 @@ async function open(t, file, { width = 390, height = 844 } = {}) {
   return { page, ctx, errors };
 }
 
-/* ---- 7ページ共通 ---- */
+/* ---- 全ページ共通 ---- */
 for (const file of PAGES) {
   test(`${file}：コンソールのエラーと読み込みの失敗が0件`, async (t) => {
     const { page, errors } = await open(t, file);
@@ -133,15 +135,18 @@ for (const file of PAGES) {
 }
 
 /* ---- メニュー ---- */
-// payment.html はメニューに入れないので、「今のページ」の検査は NAV の7ページだけ
+// payment.html などはメニューに入れないので、「今のページ」の検査は NAV の8ページだけ
 for (const file of NAV_PAGES) {
-  test(`${file}：メニューに NAV の7つのリンクがあり、今のページに [data-nav-current]`, async (t) => {
+  test(`${file}：メニューに NAV の8つのリンクが仕様の順にあり、今のページに [data-nav-current]`, async (t) => {
     const { page } = await open(t, file);
     // 表示の有無ではなく DOM の存在を見る（スマホのメニューは閉じていてよい）
     const links = await page.$$eval("header[data-chrome] nav a", (as) => as.map((a) => ({ href: a.getAttribute("href"), text: a.textContent.trim() })));
     for (const n of NAV) {
       assert.ok(links.some((l) => l.href === n.href && l.text.includes(n.label)), `メニューに「${n.label}」(${n.href})`);
     }
+    const order = links.map((l) => l.href).filter((h) => NAV_PAGES.includes(h)).filter((h, i, a) => a.indexOf(h) === i);
+    assert.deepEqual(order, NAV_PAGES, "メニューの並び");
+    assert.ok(!links.some((l) => l.href === "company.html"), "会社概要はフッター（メニューに入れない）");
     const cur = await page.$$eval("nav [data-nav-current]", (els) => els.map((e) => e.getAttribute("href") ?? e.querySelector("a")?.getAttribute("href")));
     assert.ok(cur.length >= 1, "[data-nav-current] がない");
     assert.ok(cur.every((h) => h === file), `今のページ以外に付いている: ${cur}`);
@@ -176,15 +181,15 @@ test("スタッフ紹介に [data-book=s1]〜s3", async (t) => {
 // モーダルの作りは仕様に無いので、dialog[open] か role=dialog のどちらかが見えればよい
 const MODAL = 'dialog[open], [role="dialog"]';
 
+// config の booking.shop に Square の URL が入り、booking.staff（s1〜s3）は空。担当別は店全体の URL へ行く。
+const SHOP_URL = "https://book.squareup.com/appointments/yty8z30rub8b6y/location/L54G6PFCMRTWP";
 for (const [file, ids] of [["index.html", ["any", ...STAFF_IDS]], ["staff.html", STAFF_IDS]]) {
   for (const id of ids) {
-    test(`${file}：URL が空の時 [data-book=${id}] を押すとモーダルが開き、ページは移動しない`, async (t) => {
+    test(`${file}：[data-book=${id}] の href が config の booking.shop（Square 予約の URL）`, async (t) => {
       const { page } = await open(t, file);
-      const before = page.url();
-      await page.locator(`[data-book="${id}"]`).first().click();
-      await page.locator(MODAL).first().waitFor({ state: "visible", timeout: 3000 });
-      assert.match(await page.locator(MODAL).first().innerText(), /予約システム（Square 予約）を準備中です/);
-      assert.equal(page.url(), before, "URL が変わった");
+      const hrefs = await page.locator(`[data-book="${id}"]`).evaluateAll((els) => els.map((e) => e.getAttribute("href")));
+      assert.ok(hrefs.length >= 1, `data-book=${id}`);
+      for (const h of hrefs) assert.equal(h, SHOP_URL);
     });
   }
 }
@@ -204,6 +209,125 @@ for (const file of ["index.html", "staff.html"]) {
     }
   });
 }
+
+/* ---- ヘッダーの予約ボタンとスマホの下の固定ボタン ---- */
+for (const file of PAGES) {
+  test(`${file}：header [data-book=any] が常に見える（390 と 1440）`, async (t) => {
+    for (const v of [{ width: 390, height: 844 }, { width: 1440, height: 900 }]) {
+      const { page } = await open(t, file, v);
+      const btn = page.locator('header [data-book="any"]').first();
+      assert.ok((await btn.count()) >= 1, "header [data-book=any]");
+      assert.ok(await btn.isVisible(), `見えない ${v.width}px`);
+    }
+  });
+
+  test(`${file}：[data-sticky-book] が 390px で見え、画面の下の側にある`, async (t) => {
+    const { page } = await open(t, file, { width: 390, height: 844 });
+    const el = page.locator("[data-sticky-book]").first();
+    assert.ok((await el.count()) >= 1, "[data-sticky-book]");
+    assert.ok(await el.isVisible(), "見えない");
+    const b = await el.boundingBox();
+    assert.ok(b.y + b.height <= 844 + 1 && b.y >= 844 / 2, `画面の下にない: y ${b.y} h ${b.height}`);
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    const b2 = await el.boundingBox();
+    assert.ok(b2 && b2.y + b2.height <= 844 + 1 && b2.y >= 844 / 2, "スクロールの後も画面の下に出ている");
+  });
+}
+
+/* ---- トップの中身（data 属性の節） ---- */
+test("トップ [data-hero]：h1 に「家事代行」「八王子」、「3,500円」「2時間から」、写真 img", async (t) => {
+  const { page } = await open(t, "index.html");
+  const hero = page.locator("[data-hero]");
+  assert.equal(await hero.count(), 1, "[data-hero]");
+  const h1 = await hero.locator("h1").innerText();
+  assert.ok(h1.includes("家事代行") && h1.includes("八王子"), `h1: ${h1}`);
+  const text = await hero.innerText();
+  assert.ok(text.includes("3,500円"), "3,500円");
+  assert.ok(text.includes("2時間から"), "2時間から");
+  assert.ok((await hero.locator("img").count()) >= 1, "写真 img");
+});
+
+test("トップ：旧い見出しと旧いメニューの名が残っていない", async (t) => {
+  const { page } = await open(t, "index.html");
+  const text = await page.evaluate(() => document.body.innerText);
+  assert.ok(!text.includes("掃除機がけと台所の片づけ。"), "旧見出し");
+  assert.ok(!text.includes("サービスと料金"), "旧メニュー名");
+});
+
+test("トップ [data-service-item] が4つ、各 img と作業名があり、写真が読み込まれる", async (t) => {
+  const { page } = await open(t, "index.html");
+  const items = page.locator("[data-service-item]");
+  assert.equal(await items.count(), 4);
+  for (let i = 0; i < 4; i++) {
+    const it = items.nth(i);
+    const img = it.locator("img").first();
+    assert.equal(await it.locator("img").count() >= 1, true, `${i + 1} 番目の img`);
+    assert.ok((await it.innerText()).trim().length > 0, `${i + 1} 番目の作業名`);
+    await img.evaluate((el) => (el.loading = "eager"));
+    await page.waitForFunction((el) => el.complete, await img.elementHandle(), { timeout: 5000 });
+    assert.ok(await img.evaluate((el) => el.naturalWidth) > 0, `${i + 1} 番目の写真の naturalWidth`);
+  }
+});
+
+for (const [sel, n] of [["[data-flow-step]", 3], ["[data-faq-item]", 3], ["[data-news-item]", 2]]) {
+  test(`トップ ${sel} がちょうど ${n} つで、中身がある`, async (t) => {
+    const { page } = await open(t, "index.html");
+    const els = page.locator(sel);
+    assert.equal(await els.count(), n);
+    for (let i = 0; i < n; i++) assert.ok(((await els.nth(i).textContent()) || "").trim().length > 0, `${i + 1} 番目が空`);
+  });
+}
+
+for (const sel of ["[data-assurance]", "[data-price]", "[data-area]"]) {
+  test(`トップ ${sel} がある（1つ以上で、中身がある）`, async (t) => {
+    const { page } = await open(t, "index.html");
+    const els = page.locator(sel);
+    assert.ok((await els.count()) >= 1, sel);
+    assert.ok(((await els.first().textContent()) || "").trim().length > 0, `${sel} が空`);
+  });
+}
+
+test("トップ [data-price] に「3,500円」がある", async (t) => {
+  const { page } = await open(t, "index.html");
+  assert.ok((await page.locator("[data-price]").first().innerText()).includes("3,500円"));
+});
+
+/* ---- スタッフの写真の大きさ（3枚で揃う） ---- */
+for (const file of ["index.html", "staff.html"]) {
+  for (const v of [{ width: 390, height: 844 }, { width: 1440, height: 900 }]) {
+    test(`${file}：[data-staff-card] img の表示の幅と高さが3枚で揃う（差 1px 以内） ${v.width}px`, async (t) => {
+      const { page } = await open(t, file, v);
+      const imgs = page.locator("[data-staff-card] img");
+      assert.equal(await imgs.count(), 3, "写真は3枚");
+      const sizes = await imgs.evaluateAll((els) => els.map((e) => { const r = e.getBoundingClientRect(); return { w: r.width, h: r.height }; }));
+      for (const s of sizes) assert.ok(s.w > 0 && s.h > 0, `大きさが0: ${JSON.stringify(sizes)}`);
+      const spread = (k) => Math.max(...sizes.map((s) => s[k])) - Math.min(...sizes.map((s) => s[k]));
+      assert.ok(spread("w") <= 1, `幅の差 ${spread("w")}px ${JSON.stringify(sizes)}`);
+      assert.ok(spread("h") <= 1, `高さの差 ${spread("h")}px ${JSON.stringify(sizes)}`);
+    });
+  }
+}
+
+/* ---- フッターの3リンクと新しい頁 ---- */
+for (const file of PAGES) {
+  test(`${file}：フッターに company.html・law.html・privacy.html へのリンク`, async (t) => {
+    const { page } = await open(t, file);
+    for (const h of ["company.html", "law.html", "privacy.html"]) {
+      assert.ok((await page.locator(`footer[data-chrome] a[href="${h}"]`).count()) >= 1, `フッターに ${h}`);
+    }
+  });
+}
+
+test("フッターの3リンク先と新しい頁が 200 で開く", async (t) => {
+  const { ctx } = await open(t, null);
+  for (const f of ["price.html", ...NEW_PAGES]) assert.equal((await ctx.request.get(BASE + f)).status(), 200, f);
+});
+
+test("404.html：トップへのリンクがある（ヘッダーとフッターの外）", async (t) => {
+  const { page } = await open(t, "404.html");
+  const n = await page.locator('a[href="index.html"]').evaluateAll((as) => as.filter((a) => !a.closest("header[data-chrome], footer[data-chrome]")).length);
+  assert.ok(n >= 1, "トップへのリンク");
+});
 
 /* ---- 文字サイズ ---- */
 test("「大きく」で html[data-font-scale=large]、再読み込みと別ページの後も残る", async (t) => {
@@ -327,9 +451,12 @@ test("お問い合わせ：送信するとモーダルが開き、ページは�
 });
 
 /* ---- カード払いのお試し（payment.html） ---- */
-test("トップに a[href=payment.html] があり、200 で開く", async (t) => {
+// config.payment.testLink が空の間は、payment.html への導線（「カード払いを試す（テスト）」）を出さない。payment.html 自体は残る。
+test("testLink が空：トップと flow.html に a[href=payment.html] が無い。payment.html 自体は 200 で開く", async (t) => {
   const { page, ctx } = await open(t, "index.html");
-  assert.ok((await page.locator('a[href="payment.html"]').count()) >= 1);
+  assert.equal(await page.locator('a[href="payment.html"]').count(), 0, "トップに導線がある");
+  await page.goto(BASE + "flow.html");
+  assert.equal(await page.locator('a[href="payment.html"]').count(), 0, "flow.html に導線がある");
   assert.equal((await ctx.request.get(BASE + "payment.html")).status(), 200);
 });
 

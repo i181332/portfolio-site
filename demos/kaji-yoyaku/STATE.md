@@ -12,13 +12,13 @@
   - オーナーはオンライン予約を off
 
 ## 停止点（次にやること）
-1. Square の残り（済み：サービス例のオンライン予約 off、店舗の営業時間 月〜日 9–17、店舗の住所＝JR高尾駅 八王子市高尾町1201-2、店舗メール＝demo@example.com、店舗名カナ・ローマ字）：スタッフ写真3枚は利用者が手で上げる（`notes/square-photos/staff-s*.jpg`）／事業の詳細・ブランド（色 #1E4A3A・ロゴ）を確認／実名が公開側に出る所が他にないか確認（出る所は example.com・公共住所に置換してよい）／「オンライン予約を有効にする」＝公開は**クライアント確認の時だけ一瞬公開してすぐ消す**（押す前に承認）→ URL 取得／高度なウィジェットで担当ごとの入口
-- Chrome は "demo" プロフィール（拡張機能の Browser 1）。「My Business」の方は別アカウントなので触らない
-2. URL を `js/config.js` の `booking.shop`・`booking.staff` に入れる
-3. テスト予約1件で、メールや予約サイトに実名が出ないか確認（**オーナーのログイン用メールは実名入りの Gmail**。公開側に出ないか特に確認）
-4. 批評ループ2回 → 独立レビュー2本（高齢者・家族。サイト→Square で予約し終えるまで）→ README → 送る文面（税込33,000円への訂正を含む）
-5. Stripe のテスト用 Payment Link（利用者の操作。公開 URL が決まってから）→ `CONFIG.payment.testLink`
-- 戻し方：作業前 `366199c`、立て直し前 `78b0858`
+1. 作り直し：仕様 `docs/spec-site.md`「ホームページに要る物の一覧」（済）→ 写真の取得（子、assets/work-*.webp）と e2e の書き直し（子、tests/e2e）を並列中 → 実装（implementer）→ 文章と見た目の審査（reviewer）→ 親がスマホ幅で確認
+2. Square：予約サイト公開済み `https://book.squareup.com/appointments/yty8z30rub8b6y/location/L54G6PFCMRTWP`（config.js に反映済み）。テスト予約1件で実名が出ないか確認（未）。スタッフ写真・ロゴは利用者が手で上げる
+3. Cloudflare Pages：利用者の `npx wrangler@3 login` 待ち → `sh scripts/build-dist.sh` → `npx wrangler@3 pages deploy dist --project-name kaji-yoyaku-demo`
+4. 送る文面 `notes/message-draft.md` に URL と費用の内訳を入れる
+- 試作3案 `proposals/a〜c`（不採用、参考）。手元のサーバー：127.0.0.1:8765（dist）、:8766（作業場所）、0.0.0.0:8770（スマホ確認用 scratchpad/preview）
+- 利用者の Windows はアニメーション効果がオフ（遷移は動画で見せる：tests/record-transitions.mjs）
+- 戻し方：作業前 `366199c`、試作 `d981eaf`
 
 ## 触らない物
 - ポートフォリオ本体：ルートの `index.html`・`src/`・`vite.config.ts`・ルートの `package.json`・`tsconfig*`

@@ -1,17 +1,10 @@
 /*
- * site.css — トップ以外のページ（service・flow・staff・area・faq・contact・payment）の組み。pages.css の後に読む。
+ * site.css — トップ以外のページ（service・price・flow・staff・area・faq・contact・company・law・privacy・404・payment）の組み。pages.css の後に読む。
  * ページの先頭（.page-head）は pages.css。ここにはページごとの節を足す。
  */
 
-/* ---------- 締めの帯（ページ末の予約の案内） ---------- */
-.page-closing { padding-block: var(--space-7); padding-inline: 0; }
-.page-closing__inner { display: grid; justify-items: start; gap: var(--space-3); }
-.page-closing__title { font-size: clamp(calc(var(--fs-body) * 1.2222), 1rem + 1.5vw, var(--fs-step)); }
-.page-closing__btn { padding-inline: var(--space-7); }
-@media (max-width: 639px) { .page-closing__btn { width: 100%; } }
-
 /* ==========================================================
- * スタッフ紹介（staff.html）：大きめの写真と、名前・ひとこと・得意なこと・曜日と時間
+ * スタッフ紹介（staff.html）：写真（3人とも同じ大きさの正方形）と、名前、得意なこと、曜日と時間
  * ========================================================== */
 .members { padding-block-end: var(--space-7); }
 .member {
@@ -24,7 +17,8 @@
 .member:first-child { border-top: 0; padding-block-start: var(--space-2); }
 .member__photo {
   width: 100%;
-  aspect-ratio: 4 / 3;
+  max-width: 22rem;
+  aspect-ratio: 1;
   object-fit: cover;
   object-position: center 30%;
   border-radius: var(--radius-surface);
@@ -32,7 +26,6 @@
 }
 .member__body { display: grid; gap: var(--space-3); min-width: 0; }
 .member__name { font-size: var(--fs-name); line-height: 1.25; letter-spacing: 0.04em; }
-.member__intro { font-size: var(--fs-lead); line-height: 1.75; word-break: auto-phrase; }
 .member__facts { border-top: 1px solid var(--line); }
 .member__facts > div { display: grid; grid-template-columns: minmax(0, 1fr); padding-block: var(--space-3); border-bottom: 1px solid var(--line); }
 .member__facts dt { font-size: var(--fs-small); font-weight: 700; color: var(--mute); line-height: 1.6; }
@@ -41,7 +34,6 @@
 
 @media (min-width: 760px) {
   .member { grid-template-columns: minmax(14rem, 22rem) minmax(0, 1fr); column-gap: var(--space-7); align-items: start; padding-block: var(--space-7); }
-  .member__photo { aspect-ratio: 1; }
   .member__facts > div { grid-template-columns: 9em minmax(0, 1fr); column-gap: var(--space-4); align-items: baseline; }
   .member__btn { width: auto; justify-self: start; padding-inline: var(--space-7); }
 }
@@ -85,9 +77,11 @@
 .s-sect { display: grid; gap: var(--space-4); padding-block: var(--space-6); justify-items: start; }
 .s-band { padding-inline: 0; }
 .s-band--mist { background: var(--mist); }
+/* ページ最後の予約の帯：全ページ白地に上の罫線（前の節が何色でも、同じ色の帯が続いて1つに見えない） */
+.s-band--close { border-top: 1px solid var(--line); }
 .s-band > .s-sect, .s-band > .s-closing { padding-block: var(--space-6); }
 .s-title { font-size: var(--fs-step); }
-.s-sub { margin-block-start: var(--space-3); }
+.s-sub { margin-block-start: var(--space-3); font-size: var(--fs-lead); }
 .s-lead { font-size: var(--fs-lead); line-height: 1.8; word-break: auto-phrase; }
 .s-tbd { margin-inline: 0.25em; padding: 0 var(--space-2); border: 1px solid var(--line-strong); border-radius: var(--radius-control); background: var(--paper); color: var(--mute); font-size: var(--fs-small); white-space: nowrap; }
 .s-notes, .s-list { display: grid; gap: var(--space-2); }
@@ -96,32 +90,50 @@
 .s-closing__btn { padding-inline: var(--space-7); }
 @media (max-width: 639px) { .s-closing__btn { width: 100%; } }
 
+/* PC：見出しを左の列、中身を右の列に置き、画面の右半分が空かないようにする（見出しのある節だけ。文書の privacy は除く） */
+@media (min-width: 960px) {
+  .s-sect:has(> .s-title):not(.s-doc) { grid-template-columns: 17rem minmax(0, 1fr); column-gap: var(--space-7); align-items: start; }
+  .s-sect:has(> .s-title):not(.s-doc) > * { grid-column: 2; }
+  .s-sect:has(> .s-title):not(.s-doc) > .s-title { grid-column: 1; grid-row: 1; word-break: auto-phrase; }
+}
+
+/* 2つの列（price・area・contact）。スマホは縦に並べ、PC で左右に置く */
+.s-split { display: grid; gap: var(--space-6); padding-block: var(--space-4) var(--space-7); }
+.s-split__col { display: grid; gap: var(--space-4); justify-items: start; align-content: start; min-width: 0; }
+.s-split__col > .s-sub { margin-block-start: var(--space-2); }
+.s-split__col--mist { align-self: start; padding: var(--space-5); border-radius: var(--radius-surface); background: var(--mist); }
+.s-split__col--mist .s-info { border-top-color: var(--line-strong); }
+.s-split .table-wrap, .s-split .s-price { width: 100%; max-width: none; }
+.s-names { word-break: keep-all; }   /* 町名と駅名を途中で折らない（読点で折る） */
+@media (min-width: 960px) {
+  .s-split { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--space-7); }
+}
+
 /* できること（service） */
 .s-tasks { display: grid; gap: var(--space-6); width: 100%; }
 .s-task { display: grid; gap: var(--space-3); max-width: none; }
 .s-task__img { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; border-radius: var(--radius-surface); background: var(--mist); }
-.s-task h3 { margin-block-end: var(--space-1); }
+.s-task h3 { margin-block-end: var(--space-2); }
+.s-task__examples { display: grid; gap: var(--space-1); }
+.s-task__examples li { padding-inline-start: var(--space-3); border-inline-start: 3px solid var(--line); line-height: 1.7; }
 .s-price { max-width: 28rem; background: var(--paper); }
 .s-price tbody th { font-weight: 700; }
 .s-price td { font-weight: 700; color: var(--ochre-text); font-variant-numeric: tabular-nums; }
 @media (min-width: 760px) {
-  .s-tasks { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .s-tasks { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
-/* 流れ（flow） */
+/* 流れ（flow）。PC は2列に並べる */
 .s-steps { display: grid; gap: var(--space-5); width: 100%; }
+@media (min-width: 960px) { .s-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--space-7); } }
 .s-step { display: grid; grid-template-columns: 3rem minmax(0, 1fr); gap: var(--space-4); max-width: none; align-items: start; }
 .s-step > div { display: grid; gap: var(--space-2); justify-items: start; }
 .s-step__num { display: grid; place-items: center; width: 3rem; height: 3rem; border-radius: 50%; background: var(--sugi); color: var(--paper); font-weight: 700; font-size: var(--fs-lead); }
 
-/* 地区（area） */
-.s-chips { display: flex; flex-wrap: wrap; gap: var(--space-2); }
-.s-chips li { padding: var(--space-2) var(--space-4); border: 1px solid var(--line-strong); border-radius: var(--radius-control); background: var(--mist); }
-
-/* よくある質問（faq） */
-.s-qa { width: 100%; max-width: 46rem; border-top: 1px solid var(--line); }
+/* よくある質問（faq）。開け閉めの印は pages.css の共通の規則 */
+.s-qa { width: 100%; border-top: 1px solid var(--line); }
 .s-qa__item { border-bottom: 1px solid var(--line); }
-.s-qa__item summary { display: flex; align-items: center; min-height: 3.5rem; padding-block: var(--space-3); font-weight: 700; line-height: 1.6; cursor: pointer; word-break: auto-phrase; }
+.s-qa__item summary { word-break: auto-phrase; }
 .s-qa__item p { padding-block-end: var(--space-4); line-height: 1.8; }
 
 /* お問い合わせ（contact） */
@@ -132,3 +144,31 @@
 .s-info { width: 100%; max-width: 36rem; border-top: 1px solid var(--line); }
 .s-info > div { display: grid; padding-block: var(--space-3); border-bottom: 1px solid var(--line); }
 .s-info dt { font-size: var(--fs-small); font-weight: 700; color: var(--mute); }
+.s-info dd { line-height: 1.75; word-break: auto-phrase; }
+.s-info--wide { max-width: 56rem; }
+@media (min-width: 640px) {
+  .s-info--wide > div { grid-template-columns: 13em minmax(0, 1fr); column-gap: var(--space-4); align-items: baseline; }
+}
+
+/* 文書（privacy） */
+.s-doc > * { max-width: 46rem; }
+.s-doc .s-title { margin-block-start: var(--space-4); font-size: var(--fs-lead); }
+
+/* 画面遷移：スタッフの写真だけが動く（トップの top.css と同じ宣言。staff.html の受け側） */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition { navigation: auto; }
+}
+::view-transition-old(root),
+::view-transition-new(root) { animation: none; }
+::view-transition-group(photo-s1),
+::view-transition-group(photo-s2),
+::view-transition-group(photo-s3) {
+  animation-duration: 0.45s;
+  animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
+}
+::view-transition-old(photo-s1), ::view-transition-new(photo-s1),
+::view-transition-old(photo-s2), ::view-transition-new(photo-s2),
+::view-transition-old(photo-s3), ::view-transition-new(photo-s3) {
+  height: 100%;
+  object-fit: cover;
+}

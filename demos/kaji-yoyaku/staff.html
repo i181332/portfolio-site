@@ -5,7 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>スタッフ紹介｜高尾の家事手伝い みどり（デモ）</title>
-<meta name="description" content="八王子市の高尾周辺のご自宅へお伺いする家事代行のスタッフ3名の紹介です。得意なことと、お伺いできる曜日と時間を載せています。">
+<meta name="description" content="八王子市の高尾周辺のご自宅へお伺いする家事代行のスタッフ3名です。得意なこと、お伺いできる曜日と時間、担当を選んでの予約。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="スタッフ紹介｜高尾の家事手伝い みどり（デモ）">
+<meta property="og:description" content="八王子市の高尾周辺のご自宅へお伺いする家事代行のスタッフ3名です。得意なこと、お伺いできる曜日と時間、担当を選んでの予約。">
+<meta property="og:image" content="assets/work-hero.webp">
 <script>
   /* 「大きく」を選んだ方に、標準→大きくの瞬きを見せないため、モジュールより先に読む */
   try {
@@ -13,7 +17,33 @@
     if (p && p.fontScale === "large") document.documentElement.dataset.fontScale = "large";
   } catch (e) {}
 </script>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%226%22 fill=%22%231E4A3A%22/%3E%3Ccircle cx=%2216%22 cy=%2216%22 r=%228%22 fill=%22none%22 stroke=%22%23fff%22 stroke-width=%223%22/%3E%3C/svg%3E">
+<link rel="expect" href="#s3" blocking="render">
+<script>
+  /* 画面遷移（トップのスタッフ写真 ⇄ この頁の同じ人の写真）。pagereveal を取り逃さないよう、モジュールより先に読む */
+  (function () {
+    var KEY = "kajiDemo.person";
+    var mark = function (id, vt) {
+      var img = id && document.querySelector('[data-staff-card="' + id + '"] img');
+      if (!img || !vt) return;
+      img.style.viewTransitionName = "photo-" + id;
+      vt.finished.finally(function () { img.style.viewTransitionName = ""; });
+    };
+    window.addEventListener("pagereveal", function (e) {
+      var m = /^#(s\d)$/.exec(location.hash);
+      if (e.viewTransition && m) mark(m[1], e.viewTransition);
+    });
+    window.addEventListener("pageswap", function (e) {
+      if (!e.viewTransition || !e.activation) return;
+      var to = e.activation.entry && e.activation.entry.url;
+      var path = to ? new URL(to, location.href).pathname : "";
+      if (!/(\/|index\.html)$/.test(path)) return;   // 行き先がトップの時だけ
+      var id = null;
+      try { id = sessionStorage.getItem(KEY); } catch (err) {}
+      mark(id, e.viewTransition);
+    });
+  })();
+</script>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%226%22 fill=%22%2323412F%22/%3E%3Ccircle cx=%2216%22 cy=%2216%22 r=%228%22 fill=%22none%22 stroke=%22%23fff%22 stroke-width=%223%22/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap">
@@ -30,7 +60,7 @@
 <main>
   <div class="page-head container">
     <h1>スタッフ紹介</h1>
-    <p class="lead page-head__lead">お伺いするのは、この3人です。予約の時に担当を選べます。2回目からも、同じ担当を選んで予約できます。</p>
+    <p class="lead page-head__lead">担当は予約の画面で選べます。</p>
     <p class="note">写真は素材です（本番はご本人）。</p>
   </div>
 
@@ -38,11 +68,10 @@
     <ul class="members" role="list" id="staff-list"></ul>
   </section>
 
-  <section class="band band--mist page-closing" aria-labelledby="h-any">
-    <div class="container page-closing__inner">
-      <h2 class="page-closing__title" id="h-any">担当を決めずに予約する</h2>
-      <p>空いている担当から選べます。どの担当も、同じ作業をお受けします。</p>
-      <a class="btn btn--secondary page-closing__btn" data-book="any">空き状況を見て予約する</a>
+  <section class="s-band s-band--close" aria-labelledby="h-close">
+    <div class="container s-closing">
+      <h2 class="s-title" id="h-close">ご予約</h2>
+      <a class="btn btn--primary s-closing__btn" data-book="any">予約する</a>
       <span data-booking-note-slot></span>
     </div>
   </section>

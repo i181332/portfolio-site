@@ -1,209 +1,190 @@
 /*
  * top.css — トップページ（index.html）固有のレイアウト。tokens.css・base.css・pages.css の後に読む。
- * 主役は担当3名の顔と「この人で予約する」。ほかの節は短く「左に見出し、右に文」の行を積み、区切りは余白と罫1本。
- * 見出し・名前はゴシック太字、字間 0。
+ * 白地と薄い緑の帯を交互に置き、写真は大きめ、余白は広め。区切りは余白と罫1本（影・カードの枠は使わない）。
  */
+
+/* ---------- 画面遷移：スタッフの写真だけが動く（受け側の staff.html にも同じ宣言が要る） ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition { navigation: auto; }
+}
+::view-transition-old(root),
+::view-transition-new(root) { animation: none; }
+::view-transition-group(photo-s1),
+::view-transition-group(photo-s2),
+::view-transition-group(photo-s3) {
+  animation-duration: 0.45s;
+  animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
+}
+::view-transition-old(photo-s1), ::view-transition-new(photo-s1),
+::view-transition-old(photo-s2), ::view-transition-new(photo-s2),
+::view-transition-old(photo-s3), ::view-transition-new(photo-s3) {
+  height: 100%;
+  object-fit: cover;
+}
 
 /* ---------- 節の共通 ---------- */
 .page-top .band { padding-inline: 0; }           /* .container が左右の余白を持つ */
 .sect { padding-block: clamp(var(--space-7), 2rem + 3vw, var(--space-8)); }   /* スマホ 48px・PC 72px */
-/* 節見出し：スマホは本文の 1.22 倍（22px、大きくで 26px）、PC は --fs-step。h1 との差を保つ */
-.sect__title { margin-block-end: var(--space-5); font-size: clamp(calc(var(--fs-body) * 1.2222), 1rem + 1.5vw, var(--fs-step)); line-height: var(--lh-heading); letter-spacing: 0; word-break: auto-phrase; }
-/* 本文は文節で折る（語の途中で1〜2字だけ落ちないように） */
-.sect__body :is(p, dd, li, summary) { word-break: auto-phrase; }
-.sect__more { margin-block-start: var(--space-3); }
-@media (min-width: 960px) {
-  .sect__grid {
-    display: grid;
-    grid-template-columns: 17rem minmax(0, 1fr);
-    column-gap: var(--space-7);
-    align-items: start;
-  }
-  .sect__grid > .sect__title { position: sticky; top: var(--space-5); }
-}
-
-/* ==========================================================
- * 1. 最初の画面：見出し → 写真（低く） → 予約ボタン
- * ========================================================== */
-.hero { display: grid; gap: var(--space-4); padding-block: var(--space-4) var(--space-6); }
-.hero__text { container-type: inline-size; min-width: 0; }
-/* 見出し：1文を1つの塊（block）にし、その中は文節（inline-block）で折る。
- * スマホは --fs-display（32px）で「掃除機がけと／台所の片づけ。／2時間から／お伺いします。」の4行。 */
-.hero__title {
-  font-size: var(--fs-display);
-  line-height: 1.3;
-  letter-spacing: 0.02em;
+.sect__title {
+  margin-block-end: var(--space-5);
+  font-size: clamp(calc(var(--fs-body) * 1.3333), 1rem + 1.5vw, var(--fs-step));
+  line-height: var(--lh-heading);
+  letter-spacing: 0;
   color: var(--sugi);
 }
-.hero__title > span { display: block; }
-.hero__title > span > span, .hero__lead > span { display: inline-block; }
-.hero__lead { margin-block: var(--space-2) 0; max-width: none; font-size: var(--fs-body); line-height: 1.6; letter-spacing: 0; font-feature-settings: "palt" 1; }
-/* 家族向けの1行。押せる高さは余白で 44px 取り、組みの高さは増やさない */
-.hero__family { margin-block-start: var(--space-2); font-size: var(--fs-small); line-height: 1.5; }
-.hero__family a { display: inline-block; padding-block: 0.625rem; margin-block: -0.625rem; word-break: auto-phrase; }
+.page-top main :is(p, dd, li, summary) { word-break: auto-phrase; }
+.sect__more { margin-block-start: var(--space-4); }
 
-/* 写真：スマホは見出しの下に横長で低く、PC は右に縦長 */
-.hero__photo {
-  height: clamp(6rem, 15vh, 9rem);
-  border-radius: var(--radius-surface);
-  background: var(--mist) url("../assets/tatami-light.webp") center 55% / cover no-repeat;
+/* ==========================================================
+ * 1. 最初の画面：スマホは 文字 → ボタン → 写真。PC は左に文字とボタン、右に写真
+ * ========================================================== */
+.hero { display: grid; gap: var(--space-5); padding-block: var(--space-5) var(--space-7); }
+.hero__text { min-width: 0; }
+.hero__title { font-family: var(--font-heading); font-weight: 700; letter-spacing: 0; }
+.hero__kind { display: block; font-size: var(--fs-display); line-height: 1.3; color: var(--sugi); }
+.hero__tasks { display: block; margin-block-start: var(--space-2); font-size: var(--fs-lead); line-height: 1.5; color: var(--ink); }
+.hero__price { margin-block-start: var(--space-4); font-size: var(--fs-body); line-height: 1.5; }
+.hero__yen { margin-inline: 0.15em; font-size: var(--fs-figure); color: var(--ochre-text); font-variant-numeric: tabular-nums; }
+.hero__who { margin-block-start: var(--space-2); font-size: var(--fs-body); line-height: 1.7; }
+
+.hero__actions { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--space-3); }
+.hero__btn { padding-inline: var(--space-4); }
+
+.hero__img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+  border-radius: var(--radius-control);
+  background: var(--mist);
 }
 
-.hero__actions { display: grid; justify-items: center; gap: var(--space-2); max-width: 34rem; }
-.hero__actions .booking-note { text-align: center; }
-.hero__pay { min-height: 2.75rem; font-size: var(--fs-small); }
-
-/* 背の低いスマホ（375×667 など）：見出しを1文1行に戻し、写真を低くして、主ボタンを最初の画面に入れる */
+/* 背の低いスマホ（375×667 など）：上の余白と行間を詰めて、主ボタンを最初の画面に入れる */
 @media (max-width: 959px) and (max-height: 720px) {
-  .hero { gap: var(--space-3); padding-block-start: var(--space-3); }
-  .hero__title { font-size: min(var(--fs-display), 100cqi / 13.2); letter-spacing: 0; }
-  .hero__photo { height: 5.5rem; }
+  .hero { gap: var(--space-4); padding-block-start: var(--space-4); }
+  .hero__tasks { margin-block-start: var(--space-1); }
+  .hero__price { margin-block-start: var(--space-3); }
 }
 
 @media (min-width: 960px) {
   .hero {
-    grid-template-columns: minmax(0, 1fr) minmax(18rem, 30rem);
-    grid-template-areas: "text photo" "actions photo";
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    grid-template-areas: "text img" "actions img";
     grid-template-rows: auto 1fr;
-    column-gap: var(--space-8);
+    column-gap: var(--space-7);
     row-gap: var(--space-6);
-    padding-block: var(--space-7);
+    align-items: center;
+    padding-block: var(--space-7) var(--space-8);
   }
-  .hero__text { grid-area: text; }
-  .hero__photo { grid-area: photo; align-self: stretch; height: auto; min-height: 20rem; background-position: center 40%; }
-  .hero__actions { grid-area: actions; align-content: start; justify-items: start; max-width: none; }
-  .hero__actions .booking-note { text-align: start; }
-  .hero__btn { width: auto; padding-inline: var(--space-7); white-space: nowrap; }
-  /* PC：1文（13字）が1行に収まる大きさを上限にし、2文を2行で置く */
-  .hero__title { font-size: min(var(--fs-display), 100cqi / 13.7); line-height: 1.42; letter-spacing: 0.04em; }
-  .hero__lead { margin-block-start: var(--space-3); font-size: var(--fs-lead); line-height: 1.8; }
-  .hero__family { margin-block-start: var(--space-3); }
+  .hero__text { grid-area: text; align-self: end; }
+  .hero__actions { grid-area: actions; align-self: start; grid-template-columns: auto auto; justify-content: start; }
+  .hero__btn { padding-inline: var(--space-7); }
+  .hero__img { grid-area: img; aspect-ratio: 4 / 3; }
+  .hero__tasks { margin-block-start: var(--space-3); }
+  .hero__price { margin-block-start: var(--space-5); }
 }
 
 /* ==========================================================
- * 2. 担当の顔（ページで一番目立つ所）
+ * 2. できること：写真の下に作業名と具体例。スマホも2列にして、写真を低く（縦に長くしない）
  * ========================================================== */
-.faces-band { padding-block: var(--space-6) var(--space-7); }
-.faces__title { margin-block-end: var(--space-2); }
-.faces__lead { font-size: var(--fs-body); line-height: 1.7; word-break: auto-phrase; }
-.faces { display: grid; margin-block-start: var(--space-5); }
-.face {
-  display: grid;
-  grid-template-columns: 6rem minmax(0, 1fr);
-  grid-template-areas: "photo body" "btn btn";
-  column-gap: var(--space-4);
-  row-gap: var(--space-4);
-  align-items: center;
-  padding-block: var(--space-5);
-  max-width: none;
-  border-top: 1px solid var(--line);
-}
-.face:first-child { border-top: 0; padding-block-start: 0; }
-.face__photo {
-  grid-area: photo;
+.services { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-5) var(--space-3); }
+.services__img {
   width: 100%;
-  aspect-ratio: 1;
+  height: auto;
+  aspect-ratio: 3 / 2;
   object-fit: cover;
-  border-radius: 50%;
-  border: 4px solid var(--paper);
-  background: var(--sugi);
+  border-radius: var(--radius-control);
+  background: var(--paper);
 }
-.face__body { grid-area: body; min-width: 0; }
-.face__name { font-size: var(--fs-name); line-height: 1.2; letter-spacing: 0.04em; color: var(--sugi); }
-.face__san { margin-inline-start: 0.1em; font-size: max(0.55em, var(--fs-small)); letter-spacing: 0; }
-.face__intro { margin-block-start: var(--space-1); font-size: var(--fs-body); line-height: 1.7; word-break: auto-phrase; }
-.face__btn { grid-area: btn; width: 100%; }
-.faces__foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0 var(--space-5); margin-block-start: var(--space-3); }
-
-@media (min-width: 760px) {
-  .faces-band { padding-block: var(--space-7) var(--space-8); }
-  .faces__head { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: baseline; column-gap: var(--space-6); }
-  .faces__title { margin: 0; }
-  .faces { grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: var(--space-6); margin-block-start: var(--space-7); }
-  .face {
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-areas: "photo" "body" "btn";
-    grid-template-rows: auto 1fr auto;
-    align-items: start;
-    justify-items: center;
-    padding: 0;
-    border: 0;
-    text-align: center;
-  }
-  .face__photo { width: min(100%, 12.5rem); border-width: 6px; }
-  .face__intro { max-width: 17em; margin-inline: auto; }
-  .faces__foot { margin-block-start: var(--space-6); }
+.services__name { margin-block: var(--space-2) var(--space-1); font-size: var(--fs-body); line-height: var(--lh-heading); letter-spacing: 0; }
+.services__ex { font-size: var(--fs-small); line-height: 1.6; }
+@media (min-width: 600px) {
+  .services { column-gap: var(--space-5); row-gap: var(--space-6); }
+  .services__img { aspect-ratio: 4 / 3; }
+  .services__name { margin-block-start: var(--space-3); font-size: var(--fs-lead); }
+  .services__ex { font-size: var(--fs-body); line-height: 1.7; }
+}
+@media (min-width: 1040px) {
+  .services { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
 
 /* ==========================================================
- * 3. できること / 5. ご利用の流れ / 6. ご家族の方に（行を積む）
+ * 3. お約束 / 6. ご利用の流れ（罫で区切った行を積む）
  * ========================================================== */
-.tasks__row, .steps__row, .family__row { border-top: 1px solid var(--line); }
-.tasks__row:first-child, .steps__row:first-child, .family__row:first-child { border-top: 0; padding-block-start: 0; }
-
-.tasks__row {
-  display: grid;
-  grid-template-columns: 5.5rem minmax(0, 1fr);
-  gap: var(--space-4);
-  align-items: start;
-  padding-block: var(--space-5);
-}
-.tasks__img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: var(--radius-surface); background: var(--paper); }
-.tasks__name, .steps__name { margin-block-end: var(--space-1); font-size: var(--fs-lead); line-height: var(--lh-heading); letter-spacing: 0; }
-
-@media (min-width: 640px) {
-  .tasks__row { grid-template-columns: 9rem minmax(0, 1fr); gap: var(--space-6); }
+.promise__row, .steps__row { padding-block: var(--space-4); border-top: 1px solid var(--line); }
+.promise__row:first-child, .steps__row:first-child { border-top: 0; padding-block-start: 0; }
+.promise__name, .steps__name { margin-block-end: var(--space-1); font-size: var(--fs-lead); font-weight: 700; line-height: var(--lh-heading); letter-spacing: 0; color: var(--sugi); }
+@media (min-width: 760px) {
+  .promise { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: var(--space-6); }
+  .promise__row { padding-block: 0; border-top: 0; }
+  .steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: var(--space-6); }
+  .steps__row { padding-block: 0; border-top: 0; }
 }
 
-.steps__row {
-  display: grid;
-  grid-template-columns: 2.75rem minmax(0, 1fr);
-  gap: var(--space-4);
-  padding-block: var(--space-5);
-}
-.steps__num {
-  display: grid;
-  place-items: center;
-  width: 2.75rem;
-  height: 2.75rem;
-  border-radius: 50%;
-  background: var(--sugi);
-  color: var(--paper);
-  font-size: 1.25rem;
-  font-weight: 700;
-  line-height: 1;
-}
-/* スマホ：行の左の列（写真・番号）は 4rem に揃え、本文の左端を節の間で1本にする */
-@media (max-width: 639px) {
-  .tasks__row, .steps__row { grid-template-columns: 4rem minmax(0, 1fr); }
-}
-
-.family__row { padding-block: var(--space-4); }
-.family dt { margin-block-end: var(--space-1); font-size: var(--fs-lead); font-weight: 700; line-height: var(--lh-heading); color: var(--sugi); }
-@media (min-width: 640px) {
-  .family__row { display: grid; grid-template-columns: 13em minmax(0, 1fr); gap: var(--space-5); }
-  .family dt { font-size: var(--fs-ui); }
+/* PC：流れは左に手順を積み、右に写真（文字だけの帯を続けない） */
+.flow__img { display: none; }
+@media (min-width: 960px) {
+  .flow { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); column-gap: var(--space-7); align-items: stretch; }
+  .flow .steps { display: block; }
+  .flow .steps__row { padding-block: var(--space-4); border-top: 1px solid var(--line); }
+  .flow .steps__row:first-child { border-top: 0; padding-block-start: 0; }
+  .flow__img { display: block; width: 100%; height: 100%; min-height: 18rem; object-fit: cover; border-radius: var(--radius-control); background: var(--paper); }
 }
 
 /* ==========================================================
  * 4. 料金
  * ========================================================== */
-.price { max-width: 30rem; }
-.price tbody th { font-size: var(--fs-ui); }
-.price__hours { font-size: 1.5rem; color: var(--ink); }
-.price__yen { font-size: 2.25rem; }
-.price .unit { font-size: max(var(--unit-scale), var(--fs-small)); }   /* 「時間」「円」も 16px より小さくしない */
-.price caption { font-size: var(--fs-small); line-height: 1.75; word-break: auto-phrase; }
-.price__tax { display: block; margin-block-start: var(--space-1); }
-@media (max-width: 639px) {
-  .price { max-width: 20rem; }
-  .price__yen { font-size: var(--fs-figure); }   /* 28px：見出し（32px）より大きくしない */
+.price { width: 100%; max-width: 28rem; border-collapse: collapse; }
+.price th, .price td { padding-block: var(--space-3); border-top: 1px solid var(--line); font-size: var(--fs-ui); text-align: start; }
+.price tr:last-child :is(th, td) { border-bottom: 1px solid var(--line); }
+.price th { font-weight: 500; }
+.price td { text-align: end; }
+.price__yen { font-size: var(--fs-figure); font-weight: 700; line-height: 1.2; color: var(--ochre-text); font-variant-numeric: tabular-nums; }
+.price__facts { margin-block-start: var(--space-5); font-size: var(--fs-body); line-height: 1.7; }
+.price__facts > div + div { margin-block-start: var(--space-3); }
+.price__facts dt { font-weight: 700; color: var(--sugi); }
+/* PC：左に表、右にお支払いの要点（右半分を空けない） */
+@media (min-width: 960px) {
+  .price-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: var(--space-8); align-items: start; }
+  .price { max-width: none; }
+  .price__facts { margin-block-start: 0; }
+}
+
+/* ==========================================================
+ * 5. スタッフ：写真は3人とも同じ枠（正方形）
+ * スマホは写真を左の固定幅に、PC は等幅の3列に。文の長さで写真の大きさが変わらないようにする
+ * ========================================================== */
+.staff { display: grid; gap: var(--space-6); }
+.staff__item {
+  display: grid;
+  grid-template-columns: 7.5rem minmax(0, 1fr);
+  column-gap: var(--space-4);
+  align-items: start;
+}
+.staff__photo { display: block; border-radius: var(--radius-control); overflow: hidden; }
+.staff__photo img { display: block; width: 100%; height: auto; aspect-ratio: 1; object-fit: cover; background: var(--mist); }
+.staff__body { display: flex; flex-direction: column; min-width: 0; height: 100%; }
+.staff__name { font-size: var(--fs-lead); line-height: var(--lh-heading); letter-spacing: 0.02em; color: var(--sugi); }
+.staff__san { margin-inline-start: 0.1em; font-size: var(--fs-small); }
+.staff__facts { margin-block-start: var(--space-2); font-size: var(--fs-small); line-height: 1.6; }
+.staff__facts dt { font-weight: 700; color: var(--mute); }
+.staff__facts dd + dt { margin-block-start: var(--space-1); }
+.staff__btn { width: 100%; margin-block-start: auto; font-size: var(--fs-ui); }
+.staff__facts { margin-block-end: var(--space-3); }
+.staff__days, .staff__hours { display: block; }   /* 曜日と時間は別の行（時間の途中で折り返さない） */
+.staff__hours { white-space: nowrap; }
+.staff__choose { margin-block-start: var(--space-5); font-size: var(--fs-body); font-weight: 700; }
+.staff__note { margin-block-start: var(--space-2); }
+@media (min-width: 760px) {
+  .staff { grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: var(--space-5); }
+  .staff__item { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr; row-gap: var(--space-4); }
+  .staff__facts { font-size: var(--fs-body); }
 }
 
 /* ==========================================================
  * 7. よくある質問（抜粋。開閉）
  * ========================================================== */
-.qa { border-top: 1px solid var(--line); }
+.qa { max-width: 48rem; border-top: 1px solid var(--line); }
 .qa__item { border-bottom: 1px solid var(--line); }
 .qa__item summary {
   display: flex;
@@ -235,10 +216,42 @@
 .qa__item p { padding-block-end: var(--space-4); }
 
 /* ==========================================================
- * 9. 締め：予約とお問い合わせ
+ * 7. よくある質問 / 対応エリア / お知らせ：PC は左に質問、右にエリアとお知らせ
  * ========================================================== */
-.closing { display: grid; justify-items: start; gap: var(--space-3); padding-block: var(--space-8); }
-.closing__title { margin-block-end: var(--space-2); }
-.closing__btn { padding-inline: var(--space-7); }
-.closing__contact { margin-block-start: var(--space-4); }
-@media (max-width: 639px) { .closing__btn { width: 100%; } }
+.info__side { display: grid; gap: clamp(var(--space-7), 2rem + 3vw, var(--space-8)); margin-block-start: clamp(var(--space-7), 2rem + 3vw, var(--space-8)); }
+@media (min-width: 960px) {
+  .info { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); column-gap: var(--space-8); align-items: start; }
+  .info__side { gap: var(--space-7); margin-block-start: 0; }
+}
+.area__text { max-width: var(--measure); font-size: var(--fs-body); line-height: 1.8; }
+/* 罫は上下とも .news__item が持つ（一番上の線と各行の線の長さを揃える） */
+.news { max-width: 48rem; }
+.news__item { display: grid; gap: var(--space-1); padding-block: var(--space-4); border-bottom: 1px solid var(--line); font-size: var(--fs-body); line-height: 1.6; }
+.news__item:first-child { border-top: 1px solid var(--line); }
+.news__item time { font-size: var(--fs-small); color: var(--mute); font-variant-numeric: tabular-nums; }
+
+/* ==========================================================
+ * 8. 締め：予約と電話。PC は中央に寄せる
+ * ========================================================== */
+.closing { padding-block: var(--space-8); }
+.closing__inner { display: grid; justify-items: start; gap: var(--space-3); }
+.closing .sect__title { margin-block-end: 0; }
+.closing__btn { padding-inline: var(--space-8); }
+/* 電話番号の置き場所：番号が入る枠を点線で見せる（架空の番号は出さない） */
+.closing__tel {
+  margin-block-start: var(--space-3);
+  padding: var(--space-3) var(--space-5);
+  border: var(--border) dashed var(--line-strong);
+  border-radius: var(--radius-control);
+  background: var(--paper);
+  font-size: var(--fs-lead);
+  font-weight: 700;
+  line-height: var(--lh-heading);
+  color: var(--ink);
+}
+.closing__links { display: flex; flex-wrap: wrap; gap: 0 var(--space-6); }
+@media (max-width: 639px) { .closing__btn, .closing__tel { width: 100%; } }
+@media (min-width: 640px) {
+  .closing__inner { justify-items: center; text-align: center; }
+  .closing__links { justify-content: center; }
+}
