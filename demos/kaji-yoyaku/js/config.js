@@ -4,12 +4,16 @@ export const CONFIG = {
   area: "東京都八王子市の高尾周辺", // 画面に出すので中黒は使わない
   hourlyRate: 3500,
   hoursOptions: [2, 3, 4],
-  booking: {            // Square 予約の URL。空なら「準備中」のモーダル
-    shop: "https://book.squareup.com/appointments/yty8z30rub8b6y/location/L54G6PFCMRTWP", // 店全体（担当を選ぶ所から）
-    staff: { s1: "", s2: "", s3: "" }, // 担当を指定した入口。空なら店全体へ
+  booking: {
+    page: "book.html",  // サイトの「予約する」の行き先（サイト内の予約ページ）
+    square: "https://book.squareup.com/appointments/yty8z30rub8b6y/location/L54G6PFCMRTWP", // 本物の Square 予約（架空の店）。予約ページの下に小さなリンクで残す
   },
-  payment: {            // Stripe のテスト用 Payment Link（2時間 7,000円）。空なら「準備中」のモーダル
-    testLink: "https://buy.stripe.com/test_9B67sK0u2cEA5HV3Yd2go00",
+  payment: {            // Stripe のテスト用 Payment Link（コースの時間ごと）。空なら「準備中」のモーダル
+    links: {
+      2: "https://buy.stripe.com/test_9B67sK0u2cEA5HV3Yd2go00",
+      3: "https://buy.stripe.com/test_aFa00igt0cEAdan8et2go01",
+      4: "https://buy.stripe.com/test_4gM8wOfoW1ZW7Q3fGV2go02",
+    },
   },
   storagePrefix: "kajiDemo.",
 };

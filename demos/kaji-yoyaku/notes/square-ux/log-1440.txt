@@ -1,0 +1,23 @@
+OK open
+OK 01 services
+OK 02 service detail
+OK 03 pick 指名なし
+OK 05 availability
+OK 06 month view
+OK 07 next month + weekday
+OK 09 pick time -> checkout
+
+hosts:
+book.squareup.com
+booking-flow-production-c.squarecdn.com
+square-fonts-production-f.squarecdn.com
+cdn.cookielaw.org
+geolocation.onetrust.com
+app.squareup.com
+o160250.ingest.sentry.io
+api.squareup.com
+web.squarecdn.com
+pci-connect.squareup.com
+pay.google.com
+www.gstatic.com
+play.google.com

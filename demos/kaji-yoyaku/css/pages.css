@@ -152,7 +152,6 @@ html[data-font-scale="large"] .page-head h1 { font-size: clamp(2rem, 1.4rem + 2v
 /* ==========================================================
  * 予約ボタンの注記・未確認の印
  * ========================================================== */
-.booking-note { font-size: var(--fs-small); line-height: 1.6; color: var(--mute); word-break: auto-phrase; }
 
 /* 未確認の事実は断定しない：黄土の枠で「本制作時に確認」と分かるように */
 .tbd {

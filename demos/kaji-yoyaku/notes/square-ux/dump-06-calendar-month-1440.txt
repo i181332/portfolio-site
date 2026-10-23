@@ -1,0 +1,24 @@
+https://book.squareup.com/appointments/yty8z30rub8b6y/location/L54G6PFCMRTWP/availability
+scrollHeight=900
+
+--- text
+高尾の家事手伝い みどり
+時刻はJSTで表示されます。
+今日、2026年10月23日金曜日
+次に予約可能な日は10月24日土曜日です。
+利用可能な予約日時へ
+予約のサマリー
+家事代行 2時間
+担当：すべてのスタッフ
+￥7,000
+Square 提供
+クッキーの詳細設定
+
+--- controls
+A||||高尾の家事手伝い みどり
+MARKET-LINK|||メニュー|
+MARKET-BUTTON||button|折りたたんで週表示を表示|
+MARKET-LINK||||JST
+MARKET-BUTTON||button||利用可能な予約日時へ
+MARKET-LINK|edit-service||選択したサービスを編集：家事代行 2時間|
+MARKET-LINK||||クッキーの詳細設定

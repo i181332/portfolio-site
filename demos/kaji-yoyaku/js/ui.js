@@ -1,5 +1,5 @@
 // 全ページの共通部品。各ページはこれを呼ぶだけ。
-// ヘッダーとフッター（mountChrome）、文字サイズ切替、デモ注記帯、予約ボタン（Square 予約へ）、モーダル、DOM を組む小さな道具。
+// ヘッダーとフッター（mountChrome）、文字サイズ切替、デモ注記帯、予約ボタン（予約ページへ）、モーダル、DOM を組む小さな道具。
 import { CONFIG } from "./config.js";
 import { NAV, LEGAL_LINKS, HOURS } from "./content.js";
 
@@ -90,8 +90,8 @@ export function openModal({ title, body, actions = [{ label: "閉じる", value:
 export const DEMO_BAND_TEXT = "ご提案用のデモです。実際の請求はありません";
 export const ABOUT_DEMO = [
   "このサイトは、ご提案のために作ったデモです。店名、スタッフ、料金の条件は、すべて架空です。",
-  "予約は、予約システム（Square 予約）の実際の画面で行います。本番も同じ画面です。架空の店のため、予約してもお伺いはしません。",
-  "カード払いは、テスト用の支払い画面で試せます。実際の請求はありません。",
+  "予約の画面は、本番で使う予約システム（Square 予約）に似せて作っています。空いている時間は見本です。架空の店のため、予約してもお伺いはしません。",
+  "カード払いは、テスト用の支払い画面（Stripe）で試せます。実際の請求はありません。",
 ];
 
 export function mountDemoBand(parent = document.body) {
@@ -107,52 +107,18 @@ export function aboutDemoButton(label = "このデモについて（店名とス
   }, label);
 }
 
-/* ---------- 予約（Square 予約へ） ---------- */
-// 担当の入口が空なら店全体、店全体も空なら null
+/* ---------- 予約（サイト内の予約ページへ） ---------- */
+// 担当の入口は ?staff=。無ければ店全体（担当は予約ページで選ぶ）
 export function bookingHref(staffId) {
-  const { shop, staff } = CONFIG.booking;
-  return (staffId && staff[staffId]) || shop || null;
+  const { page } = CONFIG.booking;
+  return staffId ? `${page}?staff=${encodeURIComponent(staffId)}` : page;
 }
 
-const BOOKING_PENDING = {
-  title: "予約システム（Square 予約）を準備中です",
-  body: [
-    "このボタンから、予約システム（Square 予約）の画面へ進みます。担当と日時を選ぶと予約が決まります。",
-    "デモの準備が整うまで、もうしばらくお待ちください。",
-  ],
-};
-
-// [data-book="any|s1|s2|s3"] のリンクとボタンに予約の URL を付ける。URL が無い間は、押すと準備中のモーダル
+// [data-book="any|s1|s2|s3"] のリンクに予約ページの URL を付ける
 export function wireBookingButtons(root = document) {
   for (const el of root.querySelectorAll("[data-book]")) {
-    if (el.hasAttribute("data-book-wired")) continue; // 2度呼ばれても、押した時の処理を重ねない
-    el.setAttribute("data-book-wired", "");
     const id = el.dataset.book;
-    const url = bookingHref(id === "any" ? null : id);
-    if (url && el.tagName === "A") { el.href = url; continue; }
-    if (el.tagName === "A") { el.setAttribute("href", "#"); el.setAttribute("aria-haspopup", "dialog"); }
-    el.addEventListener("click", (e) => {
-      e.preventDefault();
-      if (url) location.href = url;
-      else openModal(BOOKING_PENDING);
-    });
-  }
-}
-
-// ページ最後の予約ボタンの下に1回だけ置く、小さな注記（「本番も同じ画面」は ABOUT_DEMO に置く）
-export function bookingNote() {
-  return h("p", { class: "booking-note", "data-booking-note": "" }, "予約は Square 予約の画面で行います");
-}
-
-/* ---------- カード払いのお試し（payment.html）への導線 ---------- */
-// テスト用の支払いリンク（config の payment.testLink）が入っている時だけ、導線を出す。payment.html 自体は残す
-export const hasPaymentTest = () => Boolean(CONFIG.payment.testLink);
-
-// [data-pay-link]（HTML では hidden で置く）を、リンクがあれば見せ、無ければ DOM から外す
-export function wirePaymentLinks(root = document) {
-  for (const el of root.querySelectorAll("[data-pay-link]")) {
-    if (hasPaymentTest()) el.hidden = false;
-    else el.remove();
+    el.setAttribute("href", bookingHref(id === "any" ? null : id));
   }
 }
 

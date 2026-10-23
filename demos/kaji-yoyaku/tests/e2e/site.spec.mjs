@@ -25,7 +25,9 @@ const NAV = [
 ];
 const NAV_PAGES = NAV.map((n) => n.href); // メニューに入る8ページ
 const NEW_PAGES = ["company.html", "law.html", "privacy.html", "404.html"]; // 新しい頁（price.html は NAV 側）。会社概要などはフッターから
-const PAGES = [...NAV_PAGES, "payment.html", ...NEW_PAGES]; // 共通の検査は payment.html と新しい頁（メニュー外）も対象
+const PAGES = [...NAV_PAGES, ...NEW_PAGES]; // header/footer/メニューを持つ頁。共通の検査は新しい頁（メニュー外）も対象
+const BOOK = "book.html"; // 予約ページ。ヘッダーは店名だけで、header[data-chrome]・footer[data-chrome]・メニューを持たない（docs/spec-booking.md の見た目）
+const COMMON_PAGES = [...PAGES, BOOK]; // header/footer/メニューを除く共通の検査の対象
 const STAFF_IDS = ["s1", "s2", "s3"];
 
 /* ---- 配信とブラウザ ---- */
@@ -96,17 +98,19 @@ async function open(t, file, { width = 390, height = 844 } = {}) {
 }
 
 /* ---- 全ページ共通 ---- */
-for (const file of PAGES) {
+for (const file of COMMON_PAGES) {
   test(`${file}：コンソールのエラーと読み込みの失敗が0件`, async (t) => {
     const { page, errors } = await open(t, file);
     await page.waitForLoadState("load");
     assert.deepEqual(errors, []);
   });
 
-  test(`${file}：header[data-chrome]・footer[data-chrome]・[data-demo-band] がある`, async (t) => {
+  test(`${file}：${file === BOOK ? "" : "header[data-chrome]・footer[data-chrome]・"}[data-demo-band] がある`, async (t) => {
     const { page } = await open(t, file);
-    assert.equal(await page.locator("header[data-chrome]").count(), 1, "header[data-chrome]");
-    assert.equal(await page.locator("footer[data-chrome]").count(), 1, "footer[data-chrome]");
+    if (file !== BOOK) {
+      assert.equal(await page.locator("header[data-chrome]").count(), 1, "header[data-chrome]");
+      assert.equal(await page.locator("footer[data-chrome]").count(), 1, "footer[data-chrome]");
+    }
     assert.ok((await page.locator("[data-demo-band]").count()) >= 1, "[data-demo-band]");
   });
 
@@ -124,7 +128,7 @@ for (const file of PAGES) {
   test(`${file}：title に「（デモ）」`, async (t) => {
     const { page } = await open(t, file);
     assert.ok((await page.title()).includes("（デモ）"), await page.title());
-    assert.ok((await page.title()).includes("高尾の家事手伝い みどり"), "屋号も入る");
+    if (file !== BOOK) assert.ok((await page.title()).includes("高尾の家事手伝い みどり"), "屋号も入る");
   });
 
   test(`${file}：meta description がある`, async (t) => {
@@ -135,7 +139,7 @@ for (const file of PAGES) {
 }
 
 /* ---- メニュー ---- */
-// payment.html などはメニューに入れないので、「今のページ」の検査は NAV の8ページだけ
+// 新しい頁などはメニューに入れないので、「今のページ」の検査は NAV の8ページだけ
 for (const file of NAV_PAGES) {
   test(`${file}：メニューに NAV の8つのリンクが仕様の順にあり、今のページに [data-nav-current]`, async (t) => {
     const { page } = await open(t, file);
@@ -167,10 +171,9 @@ test("メニューのリンク先がすべて 200 で開く（リンク切れな
 });
 
 /* ---- 予約のボタン ---- */
-test("トップに [data-book=any] と s1〜s3、[data-booking-note] が1つ以上", async (t) => {
+test("トップに [data-book=any] と s1〜s3が1つ以上", async (t) => {
   const { page } = await open(t, "index.html");
   for (const id of ["any", ...STAFF_IDS]) assert.ok((await page.locator(`[data-book="${id}"]`).count()) >= 1, `data-book=${id}`);
-  assert.ok((await page.locator("[data-booking-note]").count()) >= 1, "[data-booking-note]");
 });
 
 test("スタッフ紹介に [data-book=s1]〜s3", async (t) => {
@@ -178,18 +181,18 @@ test("スタッフ紹介に [data-book=s1]〜s3", async (t) => {
   for (const id of STAFF_IDS) assert.ok((await page.locator(`[data-book="${id}"]`).count()) >= 1, `data-book=${id}`);
 });
 
-// モーダルの作りは仕様に無いので、dialog[open] か role=dialog のどちらかが見えればよい
+// モーダルの作りは仕様に無いので、dialog[open] か role=dialog のどちらかが見えればよい（お問い合わせの試験で使う）
 const MODAL = 'dialog[open], [role="dialog"]';
 
-// config の booking.shop に Square の URL が入り、booking.staff（s1〜s3）は空。担当別は店全体の URL へ行く。
-const SHOP_URL = "https://book.squareup.com/appointments/yty8z30rub8b6y/location/L54G6PFCMRTWP";
+// 予約のボタンの行き先はサイト内の book.html（docs/spec-booking.md の「サイト側の変更」）。担当別は ?staff=
 for (const [file, ids] of [["index.html", ["any", ...STAFF_IDS]], ["staff.html", STAFF_IDS]]) {
   for (const id of ids) {
-    test(`${file}：[data-book=${id}] の href が config の booking.shop（Square 予約の URL）`, async (t) => {
+    const want = id === "any" ? "book.html" : `book.html?staff=${id}`;
+    test(`${file}：[data-book=${id}] の href が ${want}`, async (t) => {
       const { page } = await open(t, file);
       const hrefs = await page.locator(`[data-book="${id}"]`).evaluateAll((els) => els.map((e) => e.getAttribute("href")));
       assert.ok(hrefs.length >= 1, `data-book=${id}`);
-      for (const h of hrefs) assert.equal(h, SHOP_URL);
+      for (const h of hrefs) assert.equal(h, want);
     });
   }
 }
@@ -343,7 +346,7 @@ test("「大きく」で html[data-font-scale=large]、再読み込みと別ペ�
 /* ---- 画面の大きさ ---- */
 const VIEWS = [{ width: 390, height: 844 }, { width: 375, height: 667 }, { width: 1440, height: 900 }];
 for (const v of VIEWS) {
-  for (const file of PAGES) {
+  for (const file of COMMON_PAGES) {
     test(`横スクロールなし ${file} ${v.width}x${v.height}`, async (t) => {
       const { page } = await open(t, file, v);
       await page.waitForLoadState("load");
@@ -448,35 +451,4 @@ test("お問い合わせ：送信するとモーダルが開き、ページは�
   await page.locator(MODAL).first().waitFor({ state: "visible", timeout: 3000 });
   assert.match(await page.locator(MODAL).first().innerText(), /デモのため送信しません/);
   assert.equal(page.url(), before, "URL が変わった");
-});
-
-/* ---- カード払いのお試し（payment.html） ---- */
-// config.payment.testLink に Stripe のテスト用リンクが入っている前提。導線（「カード払いを試す（テスト）」）を出す。
-const PAY_URL = "https://buy.stripe.com/test_9B67sK0u2cEA5HV3Yd2go00";
-test("トップと flow.html に a[href=payment.html] があり、payment.html は 200 で開く", async (t) => {
-  const { page, ctx } = await open(t, "index.html");
-  assert.ok((await page.locator('a[href="payment.html"]').count()) >= 1, "トップに導線がない");
-  await page.goto(BASE + "flow.html");
-  assert.ok((await page.locator('a[href="payment.html"]').count()) >= 1, "flow.html に導線がない");
-  assert.equal((await ctx.request.get(BASE + "payment.html")).status(), 200);
-});
-
-test("payment.html：[data-pay-test] の href が testLink（Stripe のテスト用リンク）と一致する", async (t) => {
-  const { page } = await open(t, "payment.html");
-  const hrefs = await page.locator("[data-pay-test]").evaluateAll((els) => els.map((e) => e.getAttribute("href")));
-  assert.ok(hrefs.length >= 1, "[data-pay-test]");
-  for (const h of hrefs) assert.equal(h, PAY_URL);
-});
-
-test("payment.html?paid=1：[data-pay-done] が見え、URL からクエリが消える", async (t) => {
-  const { page } = await open(t, "payment.html?paid=1");
-  await page.locator("[data-pay-done]").first().waitFor({ state: "visible", timeout: 3000 });
-  assert.match(await page.locator("[data-pay-done]").first().innerText(), /テストのお支払いが完了しました/);
-  assert.ok(!page.url().includes("?"), "クエリが残っている: " + page.url());
-  assert.ok(page.url().endsWith("payment.html"));
-});
-
-test("payment.html（?paid=1 なし）では [data-pay-done] が見えない", async (t) => {
-  const { page } = await open(t, "payment.html");
-  assert.equal(await page.locator("[data-pay-done]:visible").count(), 0);
 });

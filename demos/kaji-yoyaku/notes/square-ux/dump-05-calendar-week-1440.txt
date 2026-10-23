@@ -1,0 +1,90 @@
+https://book.squareup.com/appointments/yty8z30rub8b6y/location/L54G6PFCMRTWP/availability
+scrollHeight=900
+
+--- text
+高尾の家事手伝い みどり
+2026年10月
+日
+ 11 
+月
+ 12 
+火
+ 13 
+水
+ 14 
+木
+ 15 
+金
+ 16 
+土
+ 17 
+日
+ 18 
+月
+ 19 
+火
+ 20 
+水
+ 21 
+木
+ 22 
+金
+ 23 
+土
+ 24 
+日
+ 25 
+月
+ 26 
+火
+ 27 
+水
+ 28 
+木
+ 29 
+金
+ 30 
+土
+ 31 
+時刻はJSTで表示されます。
+今日、2026年10月23日金曜日
+次に予約可能な日は10月24日土曜日です。
+利用可能な予約日時へ
+予約のサマリー
+家事代行 2時間
+担当：すべてのスタッフ
+￥7,000
+Square 提供
+クッキーの詳細設定
+
+--- controls
+A||||高尾の家事手伝い みどり
+MARKET-LINK|||メニュー|
+MARKET-BUTTON|prior-week-button|button|先週|
+MARKET-BUTTON|next-week-button|button|来週|
+MARKET-BUTTON|date-11|button||日 /  11
+MARKET-BUTTON|date-12|button||月 /  12
+MARKET-BUTTON|date-13|button||火 /  13
+MARKET-BUTTON|date-14|button||水 /  14
+MARKET-BUTTON|date-15|button||木 /  15
+MARKET-BUTTON|date-16|button||金 /  16
+MARKET-BUTTON|date-17|button||土 /  17
+MARKET-BUTTON|date-18|button||日 /  18
+MARKET-BUTTON|date-19|button||月 /  19
+MARKET-BUTTON|date-20|button||火 /  20
+MARKET-BUTTON|date-21|button||水 /  21
+MARKET-BUTTON|date-22|button||木 /  22
+MARKET-BUTTON|date-23-selected|button||金 /  23
+MARKET-BUTTON|date-24|button||土 /  24
+MARKET-BUTTON|date-25|button||日 /  25
+MARKET-BUTTON|date-26|button||月 /  26
+MARKET-BUTTON|date-27|button||火 /  27
+MARKET-BUTTON|date-28|button||水 /  28
+MARKET-BUTTON|date-29|button||木 /  29
+MARKET-BUTTON|date-30|button||金 /  30
+MARKET-BUTTON|date-31|button||土 /  31
+MARKET-BUTTON||button|展開して月表示を表示|
+MARKET-LINK||||JST
+MARKET-BUTTON||button||利用可能な予約日時へ
+MARKET-LINK|edit-service||選択したサービスを編集：家事代行 2時間|
+MARKET-LINK||||クッキーの詳細設定

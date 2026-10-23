@@ -1,12 +1,11 @@
 // トップ以外のページの起動。ヘッダーとフッター、予約ボタン、ページごとの小さな処理（要素がある時だけ動く）。
-import { CONFIG } from "./config.js";
 import { STAFF, SERVICES, HOURS } from "./content.js";
-import { h, mountChrome, wireBookingButtons, bookingNote, openModal, wirePaymentLinks, currentPage } from "./ui.js";
+import { h, mountChrome, wireBookingButtons, openModal, currentPage } from "./ui.js";
 
 const $ = (sel, root = document) => root.querySelector(sel);
 
 /* ---------- スタッフ紹介（staff.html の #staff-list） ---------- */
-// 担当を指定した入口は無いので、ボタンは全員「予約する」（担当は予約の画面で選ぶ。ページに1回書く）
+// ボタンは全員「予約する」。押すと、その人を選んだ状態で予約ページが開く
 function renderStaffList(list) {
   list.replaceChildren(...STAFF.map((s) => h("li", { class: "member", id: s.id, "data-staff-card": s.id },
     h("img", { class: "member__photo", src: s.photo, alt: `${s.name}さんの写真（素材）`, width: 480, height: 480, decoding: "async" }),
@@ -28,28 +27,6 @@ function renderServiceList(list) {
       h("ul", { class: "s-task__examples", role: "list" }, s.examples.map((e) => h("li", {}, e)))))));
 }
 
-/* ---------- カード払いのお試し（payment.html） ---------- */
-function mountPayment() {
-  const done = $("[data-pay-done]");
-  if (done && new URLSearchParams(location.search).get("paid") === "1") {
-    done.hidden = false;
-    history.replaceState(null, "", location.pathname); // 再読み込みで完了の表示を繰り返さない
-  }
-  const btn = $("[data-pay-test]");
-  if (!btn) return;
-  const url = CONFIG.payment.testLink;
-  if (url) { btn.href = url; return; }
-  btn.setAttribute("href", "#");
-  btn.setAttribute("aria-haspopup", "dialog");
-  btn.addEventListener("click", (e) => {
-    e.preventDefault();
-    openModal({
-      title: "テスト用の支払い画面を準備中です",
-      body: ["このボタンから、テスト用の支払い画面（Stripe）を開きます。実際の請求はありません。", "デモの準備が整うまで、もうしばらくお待ちください。"],
-    });
-  });
-}
-
 /* ---------- お問い合わせ（contact.html）：送信せず、見本のモーダルを出す ---------- */
 function mountContact() {
   const form = $("main form");
@@ -66,9 +43,6 @@ const staffList = $("#staff-list");
 if (staffList) renderStaffList(staffList);
 const serviceList = $("#service-list");
 if (serviceList) renderServiceList(serviceList);
-document.querySelectorAll("[data-booking-note-slot]").forEach((n) => n.replaceWith(bookingNote()));
 document.querySelectorAll("[data-hours]").forEach((n) => (n.textContent = HOURS)); // 営業時間は content.js の1か所から
-wirePaymentLinks(document); // テスト用のリンクがある時だけ導線を出す
 wireBookingButtons(document);
-mountPayment();
 mountContact();

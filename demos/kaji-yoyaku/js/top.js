@@ -3,7 +3,7 @@
 import { CONFIG } from "./config.js";
 import { SERVICES, STAFF } from "./content.js";
 import { yenParts } from "./format.js";
-import { h, mountChrome, wireBookingButtons, bookingNote } from "./ui.js";
+import { h, mountChrome, wireBookingButtons } from "./ui.js";
 
 const $ = (sel, root = document) => root.querySelector(sel);
 
@@ -40,16 +40,9 @@ function renderStaff() {
         h("dl", { class: "staff__facts" },
           h("dt", {}, "得意なこと"), h("dd", {}, s.skills.join("、")),
           h("dt", {}, "お伺いする日"), h("dd", {}, h("span", { class: "staff__days" }, s.days), h("span", { class: "staff__hours" }, s.hours))),
-        // 担当を指定した入口は無いので、呼び名はほかの予約ボタンと同じ（担当は予約の画面で選ぶ）
+        // 予約ボタンは data-book に各人の id を持ち、wireBookingButtons が ?staff= 付きの予約ページの URL にする
         h("a", { class: "btn btn--secondary staff__btn", "data-book": s.id }, "予約する")));
   }));
-}
-
-/* ================= カード払いのお試し ================= */
-// テスト用の支払いリンク（config の payment.testLink）が空の間は、行き止まりになるので出さない
-function hidePayTestWhileEmpty() {
-  if (CONFIG.payment.testLink) return;
-  document.querySelectorAll("[data-pay-test-link]").forEach((n) => n.remove());
 }
 
 /* ================= 画面遷移：スタッフの写真がスタッフ紹介の同じ人の写真へ ================= */
@@ -90,6 +83,4 @@ mountChrome({ current: "index.html" });
 renderServices();
 renderPrice();
 renderStaff();
-hidePayTestWhileEmpty();
-document.querySelectorAll("[data-booking-note-slot]").forEach((n) => n.replaceWith(bookingNote()));
 wireBookingButtons(document);
