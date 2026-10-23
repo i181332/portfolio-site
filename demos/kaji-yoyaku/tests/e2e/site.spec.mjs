@@ -451,22 +451,21 @@ test("お問い合わせ：送信するとモーダルが開き、ページは�
 });
 
 /* ---- カード払いのお試し（payment.html） ---- */
-// config.payment.testLink が空の間は、payment.html への導線（「カード払いを試す（テスト）」）を出さない。payment.html 自体は残る。
-test("testLink が空：トップと flow.html に a[href=payment.html] が無い。payment.html 自体は 200 で開く", async (t) => {
+// config.payment.testLink に Stripe のテスト用リンクが入っている前提。導線（「カード払いを試す（テスト）」）を出す。
+const PAY_URL = "https://buy.stripe.com/test_9B67sK0u2cEA5HV3Yd2go00";
+test("トップと flow.html に a[href=payment.html] があり、payment.html は 200 で開く", async (t) => {
   const { page, ctx } = await open(t, "index.html");
-  assert.equal(await page.locator('a[href="payment.html"]').count(), 0, "トップに導線がある");
+  assert.ok((await page.locator('a[href="payment.html"]').count()) >= 1, "トップに導線がない");
   await page.goto(BASE + "flow.html");
-  assert.equal(await page.locator('a[href="payment.html"]').count(), 0, "flow.html に導線がある");
+  assert.ok((await page.locator('a[href="payment.html"]').count()) >= 1, "flow.html に導線がない");
   assert.equal((await ctx.request.get(BASE + "payment.html")).status(), 200);
 });
 
-test("payment.html：[data-pay-test] がある。リンクが空の今は、押すとモーダルが開き、ページは移動しない", async (t) => {
+test("payment.html：[data-pay-test] の href が testLink（Stripe のテスト用リンク）と一致する", async (t) => {
   const { page } = await open(t, "payment.html");
-  assert.ok((await page.locator("[data-pay-test]").count()) >= 1, "[data-pay-test]");
-  const before = page.url();
-  await page.locator("[data-pay-test]").first().click();
-  await page.locator(MODAL).first().waitFor({ state: "visible", timeout: 3000 });
-  assert.equal(page.url(), before, "URL が変わった");
+  const hrefs = await page.locator("[data-pay-test]").evaluateAll((els) => els.map((e) => e.getAttribute("href")));
+  assert.ok(hrefs.length >= 1, "[data-pay-test]");
+  for (const h of hrefs) assert.equal(h, PAY_URL);
 });
 
 test("payment.html?paid=1：[data-pay-done] が見え、URL からクエリが消える", async (t) => {

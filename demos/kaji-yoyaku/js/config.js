@@ -9,7 +9,7 @@ export const CONFIG = {
     staff: { s1: "", s2: "", s3: "" }, // 担当を指定した入口。空なら店全体へ
   },
   payment: {            // Stripe のテスト用 Payment Link（2時間 7,000円）。空なら「準備中」のモーダル
-    testLink: "",
+    testLink: "https://buy.stripe.com/test_9B67sK0u2cEA5HV3Yd2go00",
   },
   storagePrefix: "kajiDemo.",
 };

@@ -14,8 +14,8 @@
 ## 停止点（次にやること）
 1. 作り直し：済（ce7b71b、e2e 252件。審査 notes/review-site.md の指摘は直し済み）
 2. Square：予約サイト公開済み `https://book.squareup.com/appointments/yty8z30rub8b6y/location/L54G6PFCMRTWP`（config.js に反映済み）。テスト予約は利用者がスマホで1件済み、実名は出なかった（2026-10-23）。予約の確定には客の電話番号が必須（送る文面に書く）。スタッフ写真・ロゴは利用者が手で上げる
-3. Cloudflare Pages：利用者の `npx wrangler@3 login` 待ち → `sh scripts/build-dist.sh` → `npx wrangler@3 pages deploy dist --project-name kaji-yoyaku-demo`
-4. 送る文面 `notes/message-draft.md` に URL と費用の内訳を入れる
+3. 公開済み https://kaji-yoyaku-demo.pages.dev/ （再公開：`sh scripts/build-dist.sh && npx wrangler@3 pages deploy dist --project-name kaji-yoyaku-demo --branch main --commit-dirty=true`）。Stripe テストリンク設定済み（アカウント名「高尾の家事手伝い みどり（デモ）」、戻り先 /payment?paid=1）、カード払いの通しを確認済み
+4. 送る文面 `notes/message-draft.md`：URL・試し方は入れた。費用の内訳 {{COST_BREAKDOWN_NOTE}} は利用者の判断待ち。送信は利用者
 - 試作3案 `proposals/a〜c`（不採用、参考）。手元のサーバー：127.0.0.1:8765（dist）、:8766（作業場所）、0.0.0.0:8770（スマホ確認用 scratchpad/preview）
 - 利用者の Windows はアニメーション効果がオフ（遷移は動画で見せる：tests/record-transitions.mjs）
 - 戻し方：作業前 `366199c`、試作 `d981eaf`
